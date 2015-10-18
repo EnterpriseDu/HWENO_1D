@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
   printf("*********************************************************\n");
 
   int stat_mkdir = 0, len;
-  char add_mkdir[100] = "./data/\0";
+  char add_mkdir[100] = "../SOLUTION/\0";
   DIR * dir_test = NULL;
   strcat(add_mkdir, argv[2]);
   strcat(add_mkdir, "\0");
