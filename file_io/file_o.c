@@ -34,7 +34,7 @@ void file_write_data
 
 //===================Write solution File=========================
 
-  strcat(add_data, "./data/");
+  strcat(add_data, "../SOLUTION/");
   strcat(add_data, label);
   strcat(add_data, "/");
   strcat(add_data, source);
@@ -108,7 +108,7 @@ void file_write_log
 
   
 
-  strcat(add_log, "./data/");
+  strcat(add_log, "../SOLUTION/");
   strcat(add_log, name);
   strcat(add_log, "/log.txt");
 
@@ -241,7 +241,7 @@ void file_write_trouble(int m, int K, runList * runhist, char * label)
 
 //===================Write solution File=========================
 
-  strcat(add_data, "./data/");
+  strcat(add_data, "../SOLUTION/");
   strcat(add_data, label);
   strcat(add_data, "/trouble0");
   strcat(add_data, ".txt");
@@ -316,7 +316,7 @@ void write_column(int m, double data[], char * source, char * label)
 
 //===================Write solution File=========================
 
-  strcat(add_data, "./data/");
+  strcat(add_data, "../SOLUTION/");
   strcat(add_data, label);
   strcat(add_data, "/");
   strcat(add_data, source);
