@@ -78,7 +78,7 @@ int vec_read(char * add, int COLUMN, int err_code)
     fclose(fp_data);
     return column;}
   if((column != COLUMN) && (err_code != 10)){
-    printf("[%c] UNEQUAL! column_u=%d\tcolumn_rho=%d\n", column, COLUMN);
+    printf("[%c] UNEQUAL! column_u=%d\tcolumn_rho=%d\n", source, column, COLUMN);
     fclose(fp_data);
     return(err_code + 3);}
   fseek(fp_data, 0L, SEEK_SET);
