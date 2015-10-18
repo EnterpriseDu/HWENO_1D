@@ -1,0 +1,16 @@
+#! /bin/bash
+
+gcc -c ./MainEngine.c -g
+gcc -o MainEngine ./MainEngine.o\
+ ./GRP_fix/GRP_fix.a\
+ ./GRP_HWENO_fix/GRP_HWENO_fix.a\
+ ./FD_WENO/FD_WENO.a\
+ ./reconstruction/reconstruction.a\
+ ./Riemann_solver/Riemann_solver.a\
+ ./file_io/file_io.a -lm
+
+gcc -c ./driverList.c -g
+gcc -o driverList ./driverList.o ./file_io/file_io.a -lm
+
+
+exit 0

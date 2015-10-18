@@ -1,0 +1,48 @@
+#! /bin/bash
+
+
+cd ./reconstruction/
+gcc -c ./GRP_minmod.c -I ../ -g
+gcc -c ./local_WENO_5_inter.c -I ../ -g
+gcc -c ./local_HWENO_5_inter.c -I ../ -g
+gcc -c ./WENO_5.c -I ../ -g
+gcc -c ./HWENO_5.c -I ../ -g
+
+ar crv reconstruction.a GRP_minmod.o \
+                        local_WENO_5_inter.o \
+                        local_HWENO_5_inter.o \
+                        WENO_5.o \
+                        HWENO_5.o
+ranlib reconstruction.a
+echo "-----------------"
+
+
+
+cd ../GRP_fix/
+gcc -c ./GRP_fix.c -I ../ -g
+
+ar crv GRP_fix.a GRP_fix.o
+ranlib GRP_fix.a
+echo "-----------------"
+
+
+cd ../GRP_HWENO_fix/
+gcc -c ./GRP_HWENO_fix.c -I ../ -g
+gcc -c ./GRP_42_fix.c -I ../ -g
+
+ar crv GRP_HWENO_fix.a GRP_HWENO_fix.o GRP_42_fix.o
+ranlib GRP_HWENO_fix.a
+echo "-----------------"
+
+
+cd ../FD_WENO/
+gcc -c ./FV_WENO_fix.c -I ../ -g
+gcc -c ./FD_WENO_fix.c -I ../ -g
+gcc -c ./flux_RF.c -I ../ -g
+
+ar crv FD_WENO.a FV_WENO_fix.o FD_WENO_fix.o flux_RF.o
+ranlib FD_WENO.a
+echo "-----------------"
+
+
+exit 0
