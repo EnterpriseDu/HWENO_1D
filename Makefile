@@ -7,7 +7,7 @@ Riemann_solver/Riemann_solver.a: Riemann_solver/Riemann_solver_exact.c \
                                  Riemann_solver/linear_GRP_solver_Li.c \
                                  Riemann_solver/GRPSUB.c
 	@cd ./Riemann_solver/; \
-         gcc -c ./Riemann_solver_exact.c g; \
+         gcc -c ./Riemann_solver_exact.c -g; \
          gcc -c ./Riemann_solver_Toro.c -I ../ -g; \
          gcc -c ./linear_GRP_solver.c -I ../ -g; \
          gcc -c ./linear_GRP_solver_Li.c -I ../ -g; \
