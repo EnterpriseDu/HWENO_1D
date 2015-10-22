@@ -1,8 +1,6 @@
 #.RECIPEPREFIX = >
 .ONESHELL:
 
-
-.ONESHELL:
 Riemann_solver/Riemann_solver.a: Riemann_solver/Riemann_solver_exact.c \
                                  Riemann_solver/Riemann_solver_Toro.c \
                                  Riemann_solver/linear_GRP_solver.c \
