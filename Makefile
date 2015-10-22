@@ -50,7 +50,7 @@ clean:
          cd ./GRP_fix/; \
          rm *.[oa] 2>../null; \
          cd ..; \
-         cd ./GRP_HWENO/; \
+         cd ./GRP_HWENO_fix/; \
          rm *.[oa] 2>../null; \
          cd ..; \
          rm *.[oa] 2>./null; \
