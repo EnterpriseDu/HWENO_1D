@@ -6,7 +6,7 @@ Riemann_solver/Riemann_solver.a: Riemann_solver/Riemann_solver_exact.c \
                                  Riemann_solver/linear_GRP_solver.c \
                                  Riemann_solver/linear_GRP_solver_Li.c \
                                  Riemann_solver/GRPSUB.c
-	@cd ./Riemann_solver/; \
+	cd ./Riemann_solver/; \
          gcc -c ./Riemann_solver_exact.c -g; \
          gcc -c ./Riemann_solver_Toro.c -I ../ -g; \
          gcc -c ./linear_GRP_solver.c -I ../ -g; \
@@ -20,7 +20,7 @@ file_io/file_io.a: file_io/runhist.c \
                    file_io/str_opt.c \
                    file_io/file_i.c \
                    file_io/file_o.c
-	@cd ./file_io/; \
+	cd ./file_io/; \
          gcc -c ./runhist.c -I ../ -g; \
          gcc -c ./str_opt.c        -g; \
          gcc -c ./file_i.c -I ../  -g; \
@@ -30,36 +30,15 @@ file_io/file_io.a: file_io/runhist.c \
          cd ..
 
 
-
 .PHONY: clean
 
 clean:
-	@cd ./file_io/; \
-         rm *.[oa] 2>../null; \
-         cd ..; \
-         cd ./Riemann_solver/; \
-         rm *.[oa] 2>../null; \
-         cd ..; \
-         cd ./reconstruction/; \
-         rm *.[oa] 2>../null; \
-         cd ..; \
-         cd ./FD_WENO/; \
-         rm *.[oa] 2>../null; \
-         cd ..; \
-         cd ./GRP_fix/; \
-         rm *.[oa] 2>../null; \
-         cd ..; \
-         cd ./GRP_HWENO_fix/; \
-         rm *.[oa] 2>../null; \
-         cd ..; \
-         rm *.[oa] 2>./null; \
-         rm MainEngine 2>./null; \
-#
-#         if [ $(num) != 0 ]; \
-#         then \
-#           rm *.[oa]; \
-#         fi; \
+	rm -f ./file_io/*.[oa]; \
+        rm -f ./Riemann_solver/*.[oa]; \
+        rm -f ./reconstruction/*.[oa]; \
+        rm -f ./FD_WENO/*.[oa]; \
+        rm -f ./GRP_fix/*.[oa]; \
+        rm -f ./GRP_HWENO_fix/*.[oa]; \
+        rm -f *.[oa]; \
+        rm -f MainEngine;
 
-
-#         num=$(ls *.[oa] >./null | wc -l); \
-#         echo ${num}; \
