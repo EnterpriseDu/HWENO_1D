@@ -1,5 +1,7 @@
 *.[oa]
 *~
+null
+
 compile/*.[oa]
 file_io/*.[oa]
 GRP_fix/*.[oa]
