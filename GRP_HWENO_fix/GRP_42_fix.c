@@ -161,7 +161,12 @@ int GRP_42_fix
 
     for(j = 0; j < m+1; ++j)
     {
-      linear_GRP_solver(wave_speed, D, U, 0.0, rho_L[j], rho_R[j], D_rho_L[j], D_rho_R[j], u_L[j], u_R[j], D_u_L[j], D_u_R[j], 0.0, 0.0, 0.0, 0.0, p_L[j], p_R[j], D_p_L[j], D_p_R[j], gamma, eps);
+      linear_GRP_solver(wave_speed, D, U, 0.0, gamma, eps,
+			rho_L[j], u_L[j], 0.0, p_L[j],
+			rho_R[j], u_R[j], 0.0, p_R[j],
+			D_rho_L[j], D_u_L[j], 0.0, D_p_R[j],
+			D_rho_R[j], D_u_R[j], 0.0, D_p_L[j],
+			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
       f01[j] = U[0]*U[1];
       f02[j] = f01[j]*U[1] + U[3];
@@ -202,7 +207,12 @@ int GRP_42_fix
 
     for(j = 0; j < m+1; ++j)
     {
-      linear_GRP_solver(wave_speed, D, U, 0.0, rho_L[j], rho_R[j], D_rho_L[j], D_rho_R[j], u_L[j], u_R[j], D_u_L[j], D_u_R[j], 0.0, 0.0, 0.0, 0.0, p_L[j], p_R[j], D_p_L[j], D_p_R[j], gamma, eps);
+      linear_GRP_solver(wave_speed, D, U, 0.0, gamma, eps,
+			rho_L[j], u_L[j], 0.0, p_L[j],
+			rho_R[j], u_R[j], 0.0, p_R[j],
+			D_rho_L[j], D_u_L[j], 0.0, D_p_R[j],
+			D_rho_R[j], D_u_R[j], 0.0, D_p_L[j],
+			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
       g11[j] = U[0]*D[1] + U[1]*D[0];
       g12[j] = D[0]*U[1]*U[1] + 2.0*U[0]*U[1]*D[1] + D[3];
