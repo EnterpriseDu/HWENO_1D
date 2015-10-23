@@ -24,13 +24,6 @@
 
 
 
-#ifndef N_CONF
-#define N_CONF 9
-#endif /* N_CONF */
-#ifndef N_OPT
-#define N_OPT 8
-#endif /* N_OPT */
-
 double * RHO0 = NULL;
 double * U0 = NULL;
 double * V0 = NULL;
