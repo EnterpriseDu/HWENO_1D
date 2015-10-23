@@ -122,7 +122,7 @@ int vec_read(char * add, int COLUMN, int err_code)
  * double. The value of first of these variables is m.
  * The following m variables are the initial value.
  */
-int initialize(char * scheme, char * label, char * addrho, char * addu, char * addp, char * addx, int adp)
+int initialize(char * engine, char * prob, char * addrho, char * addu, char * addp, char * addx, int adp)
 {
   int read_state;
   int COLUMN;
@@ -154,7 +154,7 @@ int initialize(char * scheme, char * label, char * addrho, char * addu, char * a
     if(read_state){
       return read_state;}
   }
-  printf("[%s | %s] initialized, column=%d.\n\n\n", scheme+2, label, COLUMN);
+  printf("[%s | %s] initialized, column=%d.\n\n\n", engine+2, prob, COLUMN);
 
   return 0;
 }
@@ -173,7 +173,7 @@ int initialize(char * scheme, char * label, char * addrho, char * addu, char * a
  * CONFIG[7] is the modifier of the mesh redistribution
  * CONFIG[8] is the tolerance of the mesh redistribution
  */
-int configurate(double * CONFIG, char * scheme, char * label, char * add)
+int configurate(double * CONFIG, char * engine, char * prob, char * add)
 {
   FILE * fp_data;
   int n_conf, state, k, j, compare[N_CONF], sgn = 1;
@@ -268,7 +268,7 @@ int configurate(double * CONFIG, char * scheme, char * label, char * add)
     free(str_conf[k]);
 
 
-  printf("[%s | %s] configurated:\n", scheme+2, label);
+  printf("[%s | %s] configurated:\n", engine+2, prob);
   printf("  gamma  = %g\n", CONFIG[0]);
   printf("  CFL    = %g\n", CONFIG[1]);
   printf("  eps    = %g\n", CONFIG[2]);
@@ -293,7 +293,7 @@ int configurate(double * CONFIG, char * scheme, char * label, char * add)
  *        or the WENO-type ones in the reconstruction
  * OPT[7] is the switch of whether use the limiter in the reconstruction
  */
-int optionize(double * OPT, char * scheme, char * label, char * add)
+int optionize(double * OPT, char * engine, char * prob, char * add)
 {
   FILE * fp_data;
   int n_opt, state, k, j, compare[N_OPT], sgn = 1;
