@@ -1,3 +1,13 @@
+#ifndef N_CONF
+#define N_CONF 9
+#endif /* N_CONF */
+#ifndef N_OPT
+#define N_OPT 8
+#endif /* N_OPT */
+
+
+
+
 typedef struct runNode{
   int *trouble0, *trouble1;
   char RcstrState[6];
@@ -19,6 +29,11 @@ void insert_runList(runList * runhist);
 void locate_runList(int p, runList * runhist);
 
 void delete_runList(runList * runhist);
+
+
+
+
+void mem_release();
 
 
 
@@ -85,8 +100,6 @@ int string_read(FILE * fp, char * str_conf[], int const n_conf, int const L);
 
 
 
-void mem_release();
-
 int vec_read(char * add, int COLUMN, int err_code);
 
 
@@ -96,7 +109,7 @@ int vec_read(char * add, int COLUMN, int err_code);
  * double. The value of first of these variables is m.
  * The following m variables are the initial value.
  */
-int initialize(char * scheme, char * label, char * addrho, char * addu, char * addp, char * addx, int adp);
+int initialize(char * engine, char * prob, char * addrho, char * addu, char * addp, char * addx, int adp);
 
 
 /* This function read the configuration data file,
@@ -112,7 +125,7 @@ int initialize(char * scheme, char * label, char * addrho, char * addu, char * a
  * CONFIG[7] is the modifier of the mesh redistribution
  * CONFIG[8] is the tolerance of the mesh redistribution
  */
-int configurate(double * CONFIG, char * scheme, char * label, char * add);
+int configurate(double * CONFIG, char * engine, char * prob, char * add);
 
 
 /* OPT[0] is the maximal step to compute.
@@ -120,7 +133,7 @@ int configurate(double * CONFIG, char * scheme, char * label, char * add);
  * OPT[2] is the switch of whether keep the inter-data during the computation
  * OPT[3] is the switch of wether use an adaptive mesh
  */
-int optionize(double * OPT, char * scheme, char * label, char * add);
+int optionize(double * OPT, char * engine, char * prob, char * add);
 
 
 
@@ -134,7 +147,7 @@ int optionize(double * OPT, char * scheme, char * label, char * add);
  *
  */
 void file_write_data
-(int m, int start, int N, double * data[], char * source, char * label);
+(int m, int start, int N, double * data[], char * source, char * sol_name);
 
 
 /*
@@ -144,8 +157,8 @@ void file_write_data
  *
  */
 void file_write_log
-(int m, int n, int N, double scaling, double * CONFIG, double * OPT, runList * runhist, char * scheme, char * prob, char * name);
+(int m, int n, int N, double scaling, double * CONFIG, double * OPT, runList * runhist, char * scheme, char * prob, char * sol_name);
 
-void file_write_trouble(int m, int K, runList * runhist, char * label);
+void file_write_trouble(int m, int K, runList * runhist, char * sol_name);
 
-void write_column(int m, double data[], char * source, char * label);
+void write_column(int m, double data[], char * source, char * sol_name);

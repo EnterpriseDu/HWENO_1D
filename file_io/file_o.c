@@ -81,7 +81,7 @@ void file_write_data
  *
  */
 void file_write_log
-(int m, int n, int K, double scaling, double * CONFIG, double * OPT, runList * runhist, char * scheme, char * prob, char * name)
+(int m, int n, int K, double scaling, double * CONFIG, double * OPT, runList * runhist, char * scheme, char * prob, char * sol_name)
 {
   FILE * fp_write;
   char add_log[100] = "";
@@ -109,7 +109,7 @@ void file_write_log
   
 
   strcat(add_log, "../SOLUTION/");
-  strcat(add_log, name);
+  strcat(add_log, sol_name);
   strcat(add_log, "/log.txt");
 
   if((fp_write = fopen(add_log, "w")) == 0)

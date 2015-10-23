@@ -9,15 +9,6 @@
 #include "file_io.h"
 
 
-
-#ifndef N_CONF
-#define N_CONF 9
-#endif /* N_CONF */
-#ifndef N_OPT
-#define N_OPT 8
-#endif /* N_OPT */
-
-
 extern double * RHO0;
 extern double * U0;
 extern double * V0;
