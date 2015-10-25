@@ -8,12 +8,13 @@ void PREFUN(double *F, double *FD, double GAMMA, double P, double DK, double PK,
 
 
 void linear_GRP_solver
-(double *wave_speed, double *direvative, double *source, double lambda,
- double rho_L, double rho_R, double s_rho_L, double s_rho_R,
- double   u_L, double   u_R, double   s_u_L, double   s_u_R,
- double   v_L, double   v_R, double   s_v_L, double   s_v_R,
- double   p_L, double   p_R, double   s_p_L, double   s_p_R,
- double gamma, double eps);
+(double wave_speed[2], double D[4], double U[4], double lambda, double gamma, double eps,
+ double rho_L, double u_L, double v_L, double p_L,
+ double rho_R, double u_R, double v_R, double p_R,
+ double d_rho_L, double d_u_L, double d_v_L, double d_p_L,
+ double d_rho_R, double d_u_R, double d_v_R, double d_p_R,
+ double t_rho_L, double t_u_L, double t_v_L, double t_p_L,
+ double t_rho_R, double t_u_R, double t_v_R, double t_p_R);
 void vacuum
 (double *wave_speed, double *direvative, double *source, double lambda,
  double rho_L, double rho_R, double d_rho_L, double d_rho_R,

@@ -24,13 +24,6 @@
 
 
 
-#ifndef N_CONF
-#define N_CONF 9
-#endif /* N_CONF */
-#ifndef N_OPT
-#define N_OPT 8
-#endif /* N_OPT */
-
 double * RHO0 = NULL;
 double * U0 = NULL;
 double * V0 = NULL;
@@ -392,10 +385,13 @@ int main(int argc, char *argv[])
 
   int K = 0;
   char scheme[100];
+  char version[100] = "dev : beta version";
+  printf("The present version is [%s]", version);
   //*
   K = GRP_HWENO_fix(CONFIG, OPT, m, h, rho, u, p, &runhist, scheme);
   file_write_trouble(m, K, &runhist, argv[2]);/*/
   K = GRP_fix(CONFIG, OPT, m, h, rho, u, p, &runhist, scheme);//*/
+  printf("The present version is [%s]", version);
 
 
   int vvM = vM;
@@ -419,7 +415,7 @@ int main(int argc, char *argv[])
    * data[0 -- vvM]
    */
 
-  file_write_log(m, 1, K, scaling, CONFIG, OPT, &runhist, scheme, argv[1], argv[2]);
+  file_write_log(m, 1, K, scaling, CONFIG, OPT, &runhist, scheme, argv[1], argv[2], version);
   file_write_data(m, start, vvM, rho, "rho", argv[2]);
   file_write_data(m, start, vvM,   u, "u__", argv[2]);
   file_write_data(m, start, vvM,   p, "p__", argv[2]);

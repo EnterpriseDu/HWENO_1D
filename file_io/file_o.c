@@ -27,7 +27,7 @@ extern double * Y0;
  *
  */
 void file_write_data
-(int m, int start, int vvM, double * data[], char * source, char * label)
+(int m, int start, int vvM, double * data[], char * source, char * sol_name)
 {
   FILE * fp_write;
   char add_data[100] = "";
@@ -35,7 +35,7 @@ void file_write_data
 //===================Write solution File=========================
 
   strcat(add_data, "../SOLUTION/");
-  strcat(add_data, label);
+  strcat(add_data, sol_name);
   strcat(add_data, "/");
   strcat(add_data, source);
   strcat(add_data, "_0000.txt");
@@ -81,7 +81,8 @@ void file_write_data
  *
  */
 void file_write_log
-(int m, int n, int K, double scaling, double * CONFIG, double * OPT, runList * runhist, char * scheme, char * prob, char * name)
+(int m, int n, int K, double scaling, double * CONFIG, double * OPT, runList * runhist,
+ char * scheme, char * prob, char * sol_name, char * version)
 {
   FILE * fp_write;
   char add_log[100] = "";
@@ -109,7 +110,7 @@ void file_write_log
   
 
   strcat(add_log, "../SOLUTION/");
-  strcat(add_log, name);
+  strcat(add_log, sol_name);
   strcat(add_log, "/log.txt");
 
   if((fp_write = fopen(add_log, "w")) == 0)
@@ -119,6 +120,7 @@ void file_write_log
   }
 
   fprintf(fp_write, "[%s | %s] initialized with %d x-grids, %d y-grids.\n", scheme, prob, m, n);
+  fprintf(fp_write, "The present version is [%s].\n", version);
 
   t=time(NULL);
   local_time=localtime(&t);
@@ -219,7 +221,7 @@ void file_write_log
 }
 
 
-void file_write_trouble(int m, int K, runList * runhist, char * label)
+void file_write_trouble(int m, int K, runList * runhist, char * sol_name)
 {
   FILE * fp_write;
   char add_data[100] = "";
@@ -242,7 +244,7 @@ void file_write_trouble(int m, int K, runList * runhist, char * label)
 //===================Write solution File=========================
 
   strcat(add_data, "../SOLUTION/");
-  strcat(add_data, label);
+  strcat(add_data, sol_name);
   strcat(add_data, "/trouble0");
   strcat(add_data, ".txt");
 
@@ -309,7 +311,7 @@ void file_write_trouble(int m, int K, runList * runhist, char * label)
 
 
 
-void write_column(int m, double data[], char * source, char * label)
+void write_column(int m, double data[], char * source, char * sol_name)
 {
   FILE * fp_write;
   char add_data[100] = "";
@@ -317,7 +319,7 @@ void write_column(int m, double data[], char * source, char * label)
 //===================Write solution File=========================
 
   strcat(add_data, "../SOLUTION/");
-  strcat(add_data, label);
+  strcat(add_data, sol_name);
   strcat(add_data, "/");
   strcat(add_data, source);
   strcat(add_data, ".txt");
