@@ -385,7 +385,7 @@ int main(int argc, char *argv[])
 
   int K = 0;
   char scheme[100];
-  char version[100] = "dev : minmod reconstruction modified";
+  char version[100] = "dev : beta version";
   printf("The present version is [%s]", version);
   //*
   K = GRP_HWENO_fix(CONFIG, OPT, m, h, rho, u, p, &runhist, scheme);
