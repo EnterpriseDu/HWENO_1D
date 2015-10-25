@@ -81,7 +81,8 @@ void file_write_data
  *
  */
 void file_write_log
-(int m, int n, int K, double scaling, double * CONFIG, double * OPT, runList * runhist, char * scheme, char * prob, char * sol_name)
+(int m, int n, int K, double scaling, double * CONFIG, double * OPT, runList * runhist,
+ char * scheme, char * prob, char * sol_name, char * version)
 {
   FILE * fp_write;
   char add_log[100] = "";
@@ -119,6 +120,7 @@ void file_write_log
   }
 
   fprintf(fp_write, "[%s | %s] initialized with %d x-grids, %d y-grids.\n", scheme, prob, m, n);
+  fprintf(fp_write, "The present version is [%s].\n", version);
 
   t=time(NULL);
   local_time=localtime(&t);

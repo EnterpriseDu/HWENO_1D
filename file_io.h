@@ -157,7 +157,8 @@ void file_write_data
  *
  */
 void file_write_log
-(int m, int n, int N, double scaling, double * CONFIG, double * OPT, runList * runhist, char * scheme, char * prob, char * sol_name);
+(int m, int n, int N, double scaling, double * CONFIG, double * OPT, runList * runhist,
+ char * scheme, char * prob, char * sol_name, char * version);
 
 void file_write_trouble(int m, int K, runList * runhist, char * sol_name);
 
