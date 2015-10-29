@@ -16,7 +16,7 @@
 #include <sys/stat.h>
 #include <dirent.h>
 
-#include "file_io_2D.h"
+#include "file_io.h"
 
 #include "file_io_local.h"
 #include "solver.h"

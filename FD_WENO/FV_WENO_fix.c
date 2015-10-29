@@ -4,9 +4,11 @@
 #include <time.h>
 
 
-#include "file_io_2D.h"
 
-#include "solver.h"
+#include "file_io.h"
+#include "Riemann_solver.h"
+
+#include "file_io_local.h"
 #include "reconstruction.h"
 
 
@@ -151,7 +153,11 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
     WENO_5_noD(running_info, m, h, eps, alp2, gamma, rho[vk0], mom, ene, rho_L, rho_R, u_L, u_R, p_L, p_R);
     for(j = 0; j < m+1; ++j)
     {
-      linear_GRP_solver(wave_speed, D, U, 0.0, rho_L[j], rho_R[j], 0.0, 0.0, u_L[j], u_R[j], 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, p_L[j], p_R[j], 0.0, 0.0, gamma, eps);
+      linear_GRP_solver(wave_speed, D, U, 0.0, gamma, eps,
+			rho_L[j], u_L[j], 0.0, p_L[j],
+			rho_R[j], u_R[j], 0.0, p_R[j],
+			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
       f01[j] = U[0]*U[1];
       f02[j] = f01[j]*U[1] + U[3];
@@ -171,7 +177,11 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
     WENO_5_noD(running_info, m, h, eps, alp2, gamma, rho_1, mom_1, ene_1, rho_L, rho_R, u_L, u_R, p_L, p_R);
     for(j = 0; j < m+1; ++j)
     {
-      linear_GRP_solver(wave_speed, D, U, 0.0, rho_L[j], rho_R[j], 0.0, 0.0, u_L[j], u_R[j], 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, p_L[j], p_R[j], 0.0, 0.0, gamma, eps);
+      linear_GRP_solver(wave_speed, D, U, 0.0, gamma, eps,
+			rho_L[j], u_L[j], 0.0, p_L[j],
+			rho_R[j], u_R[j], 0.0, p_R[j],
+			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
       f11[j] = U[0]*U[1];
       f12[j] = f11[j]*U[1] + U[3];
@@ -191,7 +201,11 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
     WENO_5_noD(running_info, m, h, eps, alp2, gamma, rho_2, mom_2, ene_2, rho_L, rho_R, u_L, u_R, p_L, p_R);
     for(j = 0; j < m+1; ++j)
     {
-      linear_GRP_solver(wave_speed, D, U, 0.0, rho_L[j], rho_R[j], 0.0, 0.0, u_L[j], u_R[j], 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, p_L[j], p_R[j], 0.0, 0.0, gamma, eps);
+      linear_GRP_solver(wave_speed, D, U, 0.0, gamma, eps,
+			rho_L[j], u_L[j], 0.0, p_L[j],
+			rho_R[j], u_R[j], 0.0, p_R[j],
+			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
       f21[j] = U[0]*U[1];
       f22[j] = f21[j]*U[1] + U[3];
@@ -211,7 +225,11 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
     WENO_5_noD(running_info, m, h, eps, alp2, gamma, rho_3, mom_3, ene_3, rho_L, rho_R, u_L, u_R, p_L, p_R);
     for(j = 0; j < m+1; ++j)
     {
-      linear_GRP_solver(wave_speed, D, U, 0.0, rho_L[j], rho_R[j], 0.0, 0.0, u_L[j], u_R[j], 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, p_L[j], p_R[j], 0.0, 0.0, gamma, eps);
+      linear_GRP_solver(wave_speed, D, U, 0.0, gamma, eps,
+			rho_L[j], u_L[j], 0.0, p_L[j],
+			rho_R[j], u_R[j], 0.0, p_R[j],
+			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
       f31[j] = U[0]*U[1];
       f32[j] = f31[j]*U[1] + U[3];

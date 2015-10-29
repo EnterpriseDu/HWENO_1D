@@ -1,6 +1,6 @@
 #! /bin/bash
 
-gcc -c ./MainEngine.c -I ../file_io_2D/inc/  -g
+gcc -c ./MainEngine.c -I ../file_io/inc/  -g
 gcc -o MainEngine\
        MainEngine.o\
        FD_WENO/FD_WENO.a\
@@ -8,7 +8,7 @@ gcc -o MainEngine\
        GRP_HWENO_fix/GRP_HWENO_fix.a\
        reconstruction/reconstruction.a\
        file_io_local/file_o_local.o\
-       ../file_io_2D/file_io_2D.a\
+       ../file_io/file_io.a\
        ../Riemann_solver/Riemann_solver.a\
        -lm
 
