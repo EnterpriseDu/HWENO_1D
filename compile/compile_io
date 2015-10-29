@@ -1,11 +1,7 @@
 #! /bin/bash
 
-cd ./file_io/
-gcc -c ./runhist.c -I ../ -g
-gcc -c ./str_opt.c        -g
-gcc -c ./file_i.c -I ../  -g
-gcc -c ./file_o.c -I ../  -g
+cd ./file_io_local/
+gcc -c ./file_o_local.c   -I ../../file_io_2D/inc/   -g
 
-ar crv file_io.a str_opt.o file_i.o file_o.o runhist.o
 
 exit 0

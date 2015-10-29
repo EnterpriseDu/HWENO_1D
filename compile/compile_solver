@@ -18,8 +18,12 @@ echo "-----------------"
 
 
 
+
 cd ../GRP_fix/
-gcc -c ./GRP_fix.c -I ../ -g
+gcc -c ./GRP_fix.c    -I ../\
+                      -I ../../file_io_2D/inc/\
+                      -I ../../Riemann_solver/inc/\
+                      -g
 
 ar crv GRP_fix.a GRP_fix.o
 ranlib GRP_fix.a
@@ -27,8 +31,14 @@ echo "-----------------"
 
 
 cd ../GRP_HWENO_fix/
-gcc -c ./GRP_HWENO_fix.c -I ../ -g
-gcc -c ./GRP_42_fix.c -I ../ -g
+gcc -c ./GRP_HWENO_fix.c    -I ../\
+                            -I ../../file_io_2D/inc/\
+                            -I ../../Riemann_solver/inc/\
+                            -g
+gcc -c ./GRP_42_fix.c     -I ../\
+                          -I ../../file_io_2D/inc/\
+                          -I ../../Riemann_solver/inc/\
+                          -g
 
 ar crv GRP_HWENO_fix.a GRP_HWENO_fix.o GRP_42_fix.o
 ranlib GRP_HWENO_fix.a
@@ -36,9 +46,18 @@ echo "-----------------"
 
 
 cd ../FD_WENO/
-gcc -c ./FV_WENO_fix.c -I ../ -g
-gcc -c ./FD_WENO_fix.c -I ../ -g
-gcc -c ./flux_RF.c -I ../ -g
+gcc -c ./FV_WENO_fix.c    -I ../\
+                          -I ../../file_io_2D/inc/\
+                          -I ../../Riemann_solver/inc/\
+                          -g
+gcc -c ./FD_WENO_fix.c    -I ../\
+                          -I ../../file_io_2D/inc/\
+                          -I ../../Riemann_solver/inc/\
+                          -g
+gcc -c ./flux_RF.c    -I ../\
+                      -I ../../file_io_2D/inc/\
+                      -I ../../Riemann_solver/inc/\
+                      -g
 
 ar crv FD_WENO.a FV_WENO_fix.o FD_WENO_fix.o flux_RF.o
 ranlib FD_WENO.a
