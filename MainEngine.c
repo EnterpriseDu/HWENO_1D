@@ -16,10 +16,11 @@
 #include <sys/stat.h>
 #include <dirent.h>
 
-#include "file_io.h"
+#include "file_io_2D.h"
+
+#include "file_io_local.h"
 #include "solver.h"
 #include "reconstruction.h"
-#include "Riemann_solver.h"
 
 
 
@@ -170,23 +171,23 @@ int main(int argc, char *argv[])
   int vM = inter_data * MaxStp;  // vM == MaxStp or vN = 0
   double scaling = 1.0;
 
-  state = initialize(argv[0], argv[1], addRHO, addU, addP, addX, adp);  /* Firstly we read the initial
-									 * data file. The function 
-									 * initialize return a point
-									 * pointing to the position
-									 * of a block of memory
-									 * consisting (m+1) variables
-									 * of type double.
-									 * The value of first of these
-									 * variables is m. The
-									 * following m variables
-									 * are the initial value.
-									 */
+  state = initialize(argv[0], argv[1], addRHO, addU, NULL, addP, addX, NULL, adp);  /* Firstly we read the initial
+										     * data file. The function 
+										     * initialize return a point
+										     * pointing to the position
+										     * of a block of memory
+										     * consisting (m+1) variables
+										     * of type double.
+										     * The value of first of these
+										     * variables is m. The
+										     * following m variables
+										     * are the initial value.
+										     */
   if(state){
     mem_release();
     exit(state);}
 	
-  int m = (int)RHO0[0];  /* m is the number of initial value
+  int m = (int)RHO0[1];  /* m is the number of initial value
 			  * as well as the number of grids.
 			  * As m is frequently use to
 			  * represent the number of grids,
@@ -283,9 +284,9 @@ int main(int argc, char *argv[])
 
   for(j = 0; j < m; ++j)
   {
-    rho[0][j] = RHO0[j+1];
-    u[0][j] =   U0[j+1];
-    p[0][j] =   P0[j+1];
+    rho[0][j] = RHO0[j+2];
+    u[0][j] =   U0[j+2];
+    p[0][j] =   P0[j+2];
   }
 
 
@@ -362,36 +363,29 @@ int main(int argc, char *argv[])
 
   if(adp)
     for(j = 0; j < vm; ++j)
-      x[0][j] = X0[j+1]*scaling;
+      x[0][j] = X0[j+2]*scaling;
   else
     for(k = 0; k <= vM; ++k)
     {
       free(xc[k]);
       xc[k] = NULL;
     }
-  h = X0[1]*scaling;
+  h = X0[2]*scaling;
   OPT[1] = OPT[1]*scaling;
 
 
-  free(RHO0);
-  free(U0);
-  free(P0);
-  free(X0);
-  RHO0 = NULL;
-  U0 = NULL;
-  P0 = NULL;
-  X0 = NULL;
+  mem_release();
 
 
   int K = 0;
   char scheme[100];
-  char version[100] = "dev : beta version";
-  printf("The present version is [%s]", version);
+  char version[100] = "LibSepatating";
+  printf("The present version is [%s].\n", version);
   //*
   K = GRP_HWENO_fix(CONFIG, OPT, m, h, rho, u, p, &runhist, scheme);
   file_write_trouble(m, K, &runhist, argv[2]);/*/
   K = GRP_fix(CONFIG, OPT, m, h, rho, u, p, &runhist, scheme);//*/
-  printf("The present version is [%s]", version);
+  printf("The present version is [%s].\n", version);
 
 
   int vvM = vM;
@@ -416,13 +410,13 @@ int main(int argc, char *argv[])
    */
 
   file_write_log(m, 1, K, scaling, CONFIG, OPT, &runhist, scheme, argv[1], argv[2], version);
-  file_write_data(m, start, vvM, rho, "rho", argv[2]);
-  file_write_data(m, start, vvM,   u, "u__", argv[2]);
-  file_write_data(m, start, vvM,   p, "p__", argv[2]);
+  file_write_vec(m, start, vvM, rho, "rho", argv[2]);
+  file_write_vec(m, start, vvM,   u, "u__", argv[2]);
+  file_write_vec(m, start, vvM,   p, "p__", argv[2]);
   if(adp)
   {
-    file_write_data(m, start, vvM,  xc, "xc_", argv[2]);
-    file_write_data(m+1, start, vvM, x, "x__", argv[2]);
+    file_write_vec(m, start, vvM,  xc, "xc_", argv[2]);
+    file_write_vec(m+1, start, vvM, x, "x__", argv[2]);
   }
 
 

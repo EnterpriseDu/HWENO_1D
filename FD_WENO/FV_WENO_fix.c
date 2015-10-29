@@ -4,7 +4,8 @@
 #include <time.h>
 
 
-#include "file_io.h"
+#include "file_io_2D.h"
+
 #include "solver.h"
 #include "reconstruction.h"
 
