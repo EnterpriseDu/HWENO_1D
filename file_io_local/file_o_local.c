@@ -3,7 +3,7 @@
 #include <string.h>
 #include <time.h>
 
-#include "file_io_2D.h"
+#include "file_io.h"
 
 
 void file_write_trouble(int m, int K, runList * runhist, char * sol_name)
