@@ -379,7 +379,7 @@ int main(int argc, char *argv[])
 
   int K = 0;
   char scheme[100];
-  char version[100] = "LibSepatating";
+  char version[100] = "dev : a stable version";
   printf("The present version is [%s].\n", version);
   //*
   K = GRP_HWENO_fix(CONFIG, OPT, m, h, rho, u, p, &runhist, scheme);
