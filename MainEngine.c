@@ -372,7 +372,7 @@ int main(int argc, char *argv[])
 
   int stat_mkdir = 0;
   char add_mkdir[200] = "../SOLUTION/\0";
-  stat_mkdir = make_directory(add_mkdir, argv[2], scheme, version, m, 1);
+  stat_mkdir = make_directory(add_mkdir, argv[2], scheme, version, m, 1, OPT);
 
   file_write_trouble(m, K, &runhist, add_mkdir);
   file_write_log(m, 1, K, scaling, CONFIG, OPT, &runhist, scheme, version, argv[1], add_mkdir);
