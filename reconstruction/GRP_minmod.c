@@ -3,12 +3,17 @@
 
 
 void GRP_minmod
-(int const running_info[], int const m, double const h, double const alp2,
+(double const running_info[], int const m, double const h, double const alp2,
  double const rho[], double const u[], double const p[], double const rhoI[], double const uI[], double const pI[],
  double rho_L[], double rho_R[], double u_L[], double u_R[], double p_L[], double p_R[],
  double D_rho_L[], double D_rho_R[], double D_u_L[], double D_u_R[], double D_p_L[], double D_p_R[])
 {
-  int i, j, bod = running_info[2];
+  int i, j;
+  int const bod = (int)running_info[3];
+  int const WENOD = (int)running_info[4];
+  int const limiter = (int)running_info[5];
+  double const threshold = running_info[6];
+
   double SL, SR, Stmp;
   double Drho[m], Du[m], Dp[m];
   double P1[m+2], P2[m+2], P3[m+2];
@@ -161,12 +166,17 @@ void GRP_minmod
 }
 
 void GRP_minmod0
-(int const running_info[], int const m, double const h, double const alp2,
+(double const running_info[], int const m, double const h, double const alp2,
  double const rho[], double const u[], double const p[],
  double rho_L[], double rho_R[], double u_L[], double u_R[], double p_L[], double p_R[],
  double D_rho_L[], double D_rho_R[], double D_u_L[], double D_u_R[], double D_p_L[], double D_p_R[])
 {
-  int i, j, bod = running_info[2];
+  int i, j;
+  int const bod = (int)running_info[3];
+  int const WENOD = (int)running_info[4];
+  int const limiter = (int)running_info[5];
+  double const threshold = running_info[6];
+
   double SL, SR, Stmp;
   double Drho[m], Du[m], Dp[m];
   double P1[m+2], P2[m+2], P3[m+2];

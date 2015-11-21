@@ -6,7 +6,7 @@
 #include "file_io.h"
 
 
-void file_write_trouble(int m, int K, runList * runhist, char * sol_name)
+void file_write_trouble(int m, int K, runList * runhist, char * directory)
 {
   FILE * fp_write;
   char add_data[100] = "";
@@ -28,8 +28,7 @@ void file_write_trouble(int m, int K, runList * runhist, char * sol_name)
 
 //===================Write solution File=========================
 
-  strcat(add_data, "../SOLUTION/");
-  strcat(add_data, sol_name);
+  strcat(add_data, directory);
   strcat(add_data, "/trouble0");
   strcat(add_data, ".txt");
 

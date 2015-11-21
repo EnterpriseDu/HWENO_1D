@@ -12,10 +12,6 @@
 #include <math.h>
 #include <string.h>
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <dirent.h>
-
 #include "file_io.h"
 
 #include "file_io_local.h"
@@ -34,39 +30,6 @@ double * Y0 = NULL;
 
 int main(int argc, char *argv[])
 {
-  printf("*********************************************************\n");
-
-  int stat_mkdir = 0, len;
-  char add_mkdir[100] = "../SOLUTION/\0";
-  DIR * dir_test = NULL;
-  strcat(add_mkdir, argv[2]);
-  strcat(add_mkdir, "\0");
-  dir_test = opendir(add_mkdir);
-  if(dir_test != NULL)
-    printf("\nOutput directory \"%s\"\n already exists.\n\n", add_mkdir);
-  else
-  {
-    stat_mkdir = mkdir(add_mkdir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-    if(stat_mkdir)
-    {
-      printf("\nOutput directory \"%s\"\n construction failed.\n\n", add_mkdir);
-      exit(9);
-    }
-    else
-      printf("\nOutput directory \"%s\"\n constructed.\n\n", add_mkdir);
-  }
-  closedir(dir_test);
-  strcat(add_mkdir, "/rho\0");
-  mkdir(add_mkdir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-  len = strlen(add_mkdir);
-  add_mkdir[len-3] = 'm';
-  add_mkdir[len-2] = 'e';
-  add_mkdir[len-1] = 's';
-  add_mkdir[len]   = 'h';
-  add_mkdir[len+1] = '\0';
-  mkdir(add_mkdir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-
-
   int len_prob = 0, i = 0, l = 0, j = 0, k = 0;
   // len_prob is the number of characters in argv[1] EXCLUDING '\0'
   while(argv[1][len_prob] != '\0')
@@ -143,6 +106,7 @@ int main(int argc, char *argv[])
 			   * config[6] is the second parameter of the monitor function
 			   * config[7] is the modifier of the mesh redistribution
 			   * config[8] is the tolerance of the mesh redistribution
+			   * config[9] is the parameter of identifying the discontinuities
 			   */
   double OPT[N_OPT];  /* OPT[0] is the maximal step to compute.
 		       * OPT[1] is the time to stop the computation
@@ -164,7 +128,6 @@ int main(int argc, char *argv[])
   if(state){
     mem_release();
     exit(state);}
-  double gamma = CONFIG[0];
   int adp        = (int)OPT[3];
   int inter_data = (int)OPT[2];
   int MaxStp     = (int)OPT[0];
@@ -379,13 +342,10 @@ int main(int argc, char *argv[])
 
   int K = 0;
   char scheme[100];
-  char version[100] = "released v-1.0";
-  printf("The present version is [%s]", version);
-  //*
+  char version[100] = "V-1.1";
+  printf("The present version is [%s]\n", version);
   K = GRP_HWENO_fix(CONFIG, OPT, m, h, rho, u, p, &runhist, scheme);
-  file_write_trouble(m, K, &runhist, argv[2]);/*/
-  K = GRP_fix(CONFIG, OPT, m, h, rho, u, p, &runhist, scheme);//*/
-  printf("The present version is [%s].\n", version);
+  //K = GRP_fix(CONFIG, OPT, m, h, rho, u, p, &runhist, scheme);
 
 
   int vvM = vM;
@@ -409,14 +369,20 @@ int main(int argc, char *argv[])
    * data[0 -- vvM]
    */
 
-  file_write_log(m, 1, K, scaling, CONFIG, OPT, &runhist, scheme, argv[1], argv[2], version);
-  file_write_vec(m, start, vvM, rho, "rho", argv[2]);
-  file_write_vec(m, start, vvM,   u, "u__", argv[2]);
-  file_write_vec(m, start, vvM,   p, "p__", argv[2]);
+
+  int stat_mkdir = 0;
+  char add_mkdir[200] = "../SOLUTION/\0";
+  stat_mkdir = make_directory(add_mkdir, argv[2], scheme, version, m, 1);
+
+  file_write_trouble(m, K, &runhist, add_mkdir);
+  file_write_log(m, 1, K, scaling, CONFIG, OPT, &runhist, scheme, version, argv[1], add_mkdir);
+  file_write_vec(m, start, vvM, rho, "rho", add_mkdir);
+  file_write_vec(m, start, vvM,   u, "u__", add_mkdir);
+  file_write_vec(m, start, vvM,   p, "p__", add_mkdir);
   if(adp)
   {
-    file_write_vec(m, start, vvM,  xc, "xc_", argv[2]);
-    file_write_vec(m+1, start, vvM, x, "x__", argv[2]);
+    file_write_vec(m, start, vvM,  xc, "xc_", add_mkdir);
+    file_write_vec(m+1, start, vvM, x, "x__", add_mkdir);
   }
 
 

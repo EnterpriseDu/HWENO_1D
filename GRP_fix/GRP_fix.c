@@ -1,17 +1,3 @@
-#include <stdio.h>
-#include <math.h>
-#include <stdlib.h>
-#include <time.h>
-
-
-#include "file_io.h"
-#include "Riemann_solver.h"
-
-#include "file_io_local.h"
-#include "reconstruction.h"
-
-
-
 /**************************************************************************
  * This function use the GRP scheme to solve 1-D Euler eqautions:
  *                    w_t + f(w)_x = 0
@@ -45,6 +31,23 @@
  * runhist_n[]
  * runhist_c
  **************************************************************************/
+
+
+#include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
+#include <time.h>
+
+
+#include "file_io.h"
+#include "Riemann_solver.h"
+
+#include "file_io_local.h"
+#include "reconstruction.h"
+
+#define N_RUNNING 7
+
+
 int GRP_fix
 (double const CONFIG[], double const OPT[], int const m, double const h,
  double *rho[], double *u[], double *p[], runList *runhist, char *scheme)
@@ -67,6 +70,19 @@ int GRP_fix
 
   clock_t tic, toc;
   double sum = 0.0, T = 0.0;
+  int vk0, vk1;
+  
+  double const gamma     = CONFIG[0];  // the constant of the perfect gas
+  double const CFL       = CONFIG[1];  // CFL number
+  double const eps       = CONFIG[2];  // the largest value could be treat as zero
+  double const alp1      = CONFIG[3];
+  double const alp2      = CONFIG[4];
+  double const bet1      = CONFIG[5];
+  double const bet2      = CONFIG[6];
+  double const modifier  = CONFIG[7];
+  double const tol       = CONFIG[8];
+  double const threshold = CONFIG[9];
+
   int const    MaxStp     = (int)(OPT[0]);  // the number of time steps
   double const TIME       = OPT[1];
   int const    inter_data = (int)OPT[2];
@@ -74,22 +90,13 @@ int GRP_fix
   int const    Riemann    = (int)OPT[5];
   int const    WENOD      = (int)OPT[6];
   int const    limiter    = (int)OPT[7];
-  int vk0, vk1;
 
-  int running_info[5];
-  running_info[2] = bod;
-  running_info[3] = WENOD;
-  running_info[4] = limiter;
+  double running_info[N_RUNNING];
+  running_info[3] = OPT[4];  // the boundary condition
+  running_info[4] = OPT[6];  // the choice of the direvative reconstruction
+  running_info[5] = OPT[7];  // use the limiter or not
+  running_info[6] = CONFIG[9];
 
-  double const gamma = CONFIG[0];  // the constant of the perfect gas
-  double const CFL = CONFIG[1];    // CFL number
-  double const eps = CONFIG[2];    // the largest value could be treat as zero
-  double const alp1 = CONFIG[3];
-  double const alp2 = CONFIG[4];
-  double const bet1 = CONFIG[5];
-  double const bet2 = CONFIG[6];
-  double const modifier = CONFIG[7];
-  double const tol = CONFIG[8];
 
   double c, stmp, D[4], U[4], wave_speed[2];
 
@@ -111,8 +118,10 @@ int GRP_fix
     mom[j] = rho[0][j]*u[0][j];
     ene[j] = p[0][j]/(gamma-1.0)+0.5*mom[j]*u[0][j];
   }
-  running_info[1] = 0;
 
+  running_info[0] = 0.0;
+  running_info[1] = 0.0;
+  running_info[1] = 0.0;
   GRP_minmod0(running_info, m, h, alp2, rho[0], mom, ene, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
 
 //------------THE MAIN LOOP-------------
@@ -133,7 +142,7 @@ int GRP_fix
     
     vk0 = (k-1)*inter_data;  // vk0==0 or vk0==k-1
     vk1 =     k*inter_data;  // vk1==0 or vk1==k
-    running_info[0] = k;
+    running_info[0] = (double)k;
     //printf("-----------------%d-----------------", k);
     speed_max = 0.0;
     for(j = 0; j < m; ++j)
@@ -182,7 +191,9 @@ int GRP_fix
 	u[vk1][j] = mom[j] / rho[vk1][j];
 	p[vk1][j] = (ene[j] - 0.5*mom[j]*u[vk1][j])*(gamma-1.0);
     }
-    running_info[1] = 0;
+
+    running_info[1] = T;
+    running_info[2] = 0.0;
     GRP_minmod(running_info, m, h, alp2, rho[vk1], u[vk1], p[vk1], rhoI, uI, pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
 
 

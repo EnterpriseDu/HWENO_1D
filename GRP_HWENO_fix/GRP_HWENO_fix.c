@@ -1,18 +1,3 @@
-#include <stdio.h>
-#include <math.h>
-#include <stdlib.h>
-#include <time.h>
-
-
-
-#include "file_io.h"
-#include "Riemann_solver.h"
-
-#include "file_io_local.h"
-#include "reconstruction.h"
-
-
-
 /**************************************************************************
  * This function use the fourth-order GRP scheme combined with the
  * fifth-order HWENO reconstructions to solve 1-D Euler eqautions:
@@ -46,6 +31,22 @@
  * p    is the pressure
  * runhist
  **************************************************************************/
+
+#include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
+#include <time.h>
+
+
+
+#include "file_io.h"
+#include "Riemann_solver.h"
+
+#include "file_io_local.h"
+#include "reconstruction.h"
+
+#define N_RUNNING 7
+
 int GRP_HWENO_fix
 (double const CONFIG[], double const OPT[], int const m, double const h,
  double *rho[], double *u[], double *p[], runList *runhist, char *scheme)
@@ -65,6 +66,19 @@ int GRP_HWENO_fix
 
   clock_t tic, toc;
   double sum = 0.0, T = 0.0;
+  int vk0, vk1;
+  
+  double const gamma     = CONFIG[0];  // the constant of the perfect gas
+  double const CFL       = CONFIG[1];  // CFL number
+  double const eps       = CONFIG[2];  // the largest value could be treat as zero
+  double const alp1      = CONFIG[3];
+  double const alp2      = CONFIG[4];
+  double const bet1      = CONFIG[5];
+  double const bet2      = CONFIG[6];
+  double const modifier  = CONFIG[7];
+  double const tol       = CONFIG[8];
+  double const threshold = CONFIG[9];
+
   int const    MaxStp     = (int)(OPT[0]);  // the number of time steps
   double const TIME       = OPT[1];
   int const    inter_data = (int)OPT[2];
@@ -72,22 +86,13 @@ int GRP_HWENO_fix
   int const    Riemann    = (int)OPT[5];
   int const    WENOD      = (int)OPT[6];
   int const    limiter    = (int)OPT[7];
-  int vk0, vk1;
 
-  int running_info[5];
-  running_info[2] = bod;
-  running_info[3] = WENOD;
-  running_info[4] = limiter;
+  double running_info[N_RUNNING];
+  running_info[3] = OPT[4];  // the boundary condition
+  running_info[4] = OPT[6];  // the choice of the direvative reconstruction
+  running_info[5] = OPT[7];  // use the limiter or not
+  running_info[6] = CONFIG[9];
 
-  double const gamma = CONFIG[0];  // the constant of the perfect gas
-  double const CFL = CONFIG[1];    // CFL number
-  double const eps = CONFIG[2];    // the largest value could be treat as zero
-  double const alp1 = CONFIG[3];
-  double const alp2 = CONFIG[4];
-  double const bet1 = CONFIG[5];
-  double const bet2 = CONFIG[6];
-  double const modifier = CONFIG[7];
-  double const tol = CONFIG[8];
 
   double c, stmp, D[4], U[4], wave_speed[2];
 
@@ -121,7 +126,9 @@ int GRP_HWENO_fix
     ene[j] = p[0][j]/(gamma-1.0)+0.5*mom[j]*u[0][j];
   }
 
-  running_info[1] = 0;
+  running_info[0] = 0.0;
+  running_info[1] = 0.0;
+  running_info[2] = 0.0;
   WENO_5(running_info, m, h, eps, alp2, gamma, rho[0], mom, ene, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
   /*
   write_column(m, rho[0], "rho", "running");
@@ -164,7 +171,7 @@ int GRP_HWENO_fix
 
     vk0 = (k-1)*inter_data;  // vk0==0 or vk0==k-1
     vk1 =     k*inter_data;  // vk1==0 or vk1==k
-    running_info[0] = k;
+    running_info[0] = (double)k;
     //printf("-----------------%d-----------------", k);
     speed_max = 0.0;
     for(j = 0; j < m; ++j)
@@ -227,7 +234,8 @@ int GRP_HWENO_fix
         printf("half(%d,%d), %g\n", k, j, half_p[j]);
     }
 
-    running_info[1] = 1;
+    running_info[1] = T - half_tau;  // time
+    running_info[2] = 1.0;           // half
     HWENO_5_limited(running_info, m, h, eps, alp2, gamma, half_rho, half_mom, half_ene, half_rhoI, half_momI, half_eneI, half_uI, half_pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, runhist->current->trouble1);
     /*
   write_column(m, half_rho, "rho", "running");
@@ -290,7 +298,8 @@ int GRP_HWENO_fix
         printf("    (%d,%d), %g\n", k, j, p[vk1][j]);
     }
 
-    running_info[1] = 0;
+    running_info[1] = T;
+    running_info[2] = 0.0;  // not half
     HWENO_5_limited(running_info, m, h, eps, alp2, gamma, rho[vk1], mom, ene, rhoI, momI, eneI, uI, pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, runhist->current->trouble0);
     /*
   write_column(m, rho[vk1], "rho", "running");
@@ -314,7 +323,7 @@ int GRP_HWENO_fix
   write_column(m+1, D_p_R, "DpR", "running");//*/
 
     toc = clock();
-    runhist->current->time[1] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;;
+    runhist->current->time[1] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;
     sum += runhist->current->time[1];
   }
   k = k-1;

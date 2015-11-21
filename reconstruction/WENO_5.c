@@ -7,15 +7,16 @@
 
 
 void WENO_5_limited
-(int const running_info[], int const m, double const h, double const eps, double const alp2, double const gamma,
+(double const running_info[], int const m, double const h, double const eps, double const alp2, double const gamma,
  double const rho[], double const mom[], double const ene[], double const rhoI[], double const uI[], double const pI[],
  double rho_L[], double rho_R[], double u_L[], double u_R[], double p_L[], double p_R[],
  double D_rho_L[], double D_rho_R[], double D_u_L[], double D_u_R[], double D_p_L[], double D_p_R[], int trouble[])
 {
   int j, k;
-  int const bod = running_info[2];
-  int const WENOD = running_info[3];
-  int const limiter = running_info[4];
+  int const bod = (int)running_info[3];
+  int const WENOD = (int)running_info[4];
+  int const limiter = (int)running_info[5];
+  double const threshold = running_info[6];
 
 
   double W1[m+6], W2[m+6], W3[m+6]; //W1=rho, W2=mom, W3=ene
@@ -23,8 +24,8 @@ void WENO_5_limited
   double Q1[8], Q2[8], Q3[8], DQQ[3][2];
   double u[m+6], p[m+6], H[m+6], Entp[m+6];
   double EntpL, EntpR;
-  double deltaP, DP, theta = 25.0;
   double Qn1, Q0, Qp1, SL, SR, S0;
+  double deltaP, DP;
   int flag;
 
   double H_star, u_star, c_star;
@@ -149,17 +150,16 @@ void WENO_5_limited
     D_p_R[j-3] = (D_p_R[j-3] - 0.5*D_rho_R[j-3]*u_R[j-3]*u_R[j-3] - rho_R[j-3]*u_R[j-3]*D_u_R[j-3])*(gamma-1.0);
 
 
-    theta = 15.0;
     flag = 0;
 
-    deltaP = 15*fabs(rho_L[j-3] - rho_R[j-3]);
+    deltaP = threshold*fabs(rho_L[j-3] - rho_R[j-3]);
     DP = 1e-5+fabs(10*(W1[j]-W1[j-1]) + 5*(W1[j-2]-W1[j+1]) + (W1[j+2]-W1[j-3]));
     if(deltaP > DP) flag = 4*limiter;
 
     for(k = 0; k < 6; ++k)
       Q1[k] = Entp[j-3+k];
     local_WENO_5_inter(h, Q3);
-    deltaP = theta*fabs(Q1[6] - Q1[7]);
+    deltaP = threshold*fabs(Q1[6] - Q1[7]);
     DP = 1e-5+fabs(10*(Q1[3]-Q1[2]) + 5*(Q1[1]-Q1[4]) + (Q1[5]-Q1[0]));
     if(deltaP > DP) flag = 5*limiter;
 
@@ -275,15 +275,16 @@ void WENO_5_limited
 
 
 void WENO_5
-(int const running_info[], int const m, double const h, double const eps, double const alp2, double const gamma,
+(double const running_info[], int const m, double const h, double const eps, double const alp2, double const gamma,
  double const rho[], double const mom[], double const ene[],
  double rho_L[], double rho_R[], double u_L[], double u_R[], double p_L[], double p_R[],
  double D_rho_L[], double D_rho_R[], double D_u_L[], double D_u_R[], double D_p_L[], double D_p_R[])
 {
   int j, k;
-  int const bod = running_info[2];
-  int const WENOD = running_info[3];
-  int const limiter = running_info[4];
+  int const bod = (int)running_info[3];
+  int const WENOD = (int)running_info[4];
+  int const limiter = (int)running_info[5];
+  double const threshold = running_info[6];
 
   double W1[m+6], W2[m+6], W3[m+6]; //W1=rho, W2=mom, W3=ene
   double Q1[8], Q2[8], Q3[8];
@@ -424,14 +425,15 @@ void WENO_5
 
 
 void WENO_5_noD
-(int const running_info[], int const m, double const h, double const eps, double const alp2, double const gamma,
+(double const running_info[], int const m, double const h, double const eps, double const alp2, double const gamma,
  double const rho[], double const mom[], double const ene[],
  double rho_L[], double rho_R[], double u_L[], double u_R[], double p_L[], double p_R[])
 {
   int j, k;
-  int const bod = running_info[2];
-  int const WENOD = running_info[3];
-  int const limiter = running_info[4];
+  int const bod = (int)running_info[3];
+  int const WENOD = (int)running_info[4];
+  int const limiter = (int)running_info[5];
+  double const threshold = running_info[6];
 
 
   double W1[m+6], W2[m+6], W3[m+6]; //W1=rho, W2=mom, W3=ene
@@ -439,8 +441,8 @@ void WENO_5_noD
   double Q1[8], Q2[8], Q3[8];
   double u[m+6], p[m+6], H[m+6], Entp[m+6];
   double EntpL, EntpR;
-  double deltaP, DP, theta = 25.0;
   double Qn1, Q0, Qp1, SL, SR, S0;
+  double deltaP, DP;
   int flag, trouble[m];
 
   double H_star, u_star, c_star;
@@ -528,17 +530,16 @@ void WENO_5_noD
     p_R[j-3] = (p_R[j-3] - 0.5*u_R[j-3]*u_R[j-3]*rho_R[j-3])*(gamma-1.0);
 
 
-    theta = 15.0;
     flag = 0;
 
-    deltaP = 15*fabs(rho_L[j-3] - rho_R[j-3]);
+    deltaP = threshold*fabs(rho_L[j-3] - rho_R[j-3]);
     DP = 1e-5+fabs(10*(W1[j]-W1[j-1]) + 5*(W1[j-2]-W1[j+1]) + (W1[j+2]-W1[j-3]));
     if(deltaP > DP) flag = 4*limiter;
 
     for(k = 0; k < 6; ++k)
       Q1[k] = Entp[j-3+k];
     local_WENO_5_inter(h, Q3);
-    deltaP = theta*fabs(Q1[6] - Q1[7]);
+    deltaP = threshold*fabs(Q1[6] - Q1[7]);
     DP = 1e-5+fabs(10*(Q1[3]-Q1[2]) + 5*(Q1[1]-Q1[4]) + (Q1[5]-Q1[0]));
     if(deltaP > DP) flag = 5*limiter;
 

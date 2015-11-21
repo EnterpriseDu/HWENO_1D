@@ -1,21 +1,3 @@
-#include <stdio.h>
-#include <math.h>
-#include <stdlib.h>
-#include <time.h>
-
-
-
-
-#include "file_io.h"
-#include "Riemann_solver.h"
-
-#include "file_io_local.h"
-#include "reconstruction.h"
-
-
-
-
-
 /* This function use Godunov scheme to solve 1-D
  * scalar conservation law:
  *                    u_t + f(u)_x = 0.
@@ -26,6 +8,21 @@
  *         could be seen in the comments of the main function.
  *m      is the number of the grids.
  */
+
+#include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
+#include <time.h>
+
+#include "file_io.h"
+#include "Riemann_solver.h"
+
+#include "file_io_local.h"
+#include "reconstruction.h"
+
+#define N_RUNNING 7
+
+
 int FD_WENO_fix
 (double const CONFIG[], double const OPT[], int const m, double const h,
  double *rho[], double *u[], double *p[],
@@ -49,6 +46,19 @@ int FD_WENO_fix
 
   clock_t tic, toc;
   double sum = 0.0, T = 0.0;
+  int vk0, vk1;
+  
+  double const gamma     = CONFIG[0];  // the constant of the perfect gas
+  double const CFL       = CONFIG[1];  // CFL number
+  double const eps       = CONFIG[2];  // the largest value could be treat as zero
+  double const alp1      = CONFIG[3];
+  double const alp2      = CONFIG[4];
+  double const bet1      = CONFIG[5];
+  double const bet2      = CONFIG[6];
+  double const modifier  = CONFIG[7];
+  double const tol       = CONFIG[8];
+  double const threshold = CONFIG[9];
+
   int const    MaxStp     = (int)(OPT[0]);  // the number of time steps
   double const TIME       = OPT[1];
   int const    inter_data = (int)OPT[2];
@@ -56,22 +66,12 @@ int FD_WENO_fix
   int const    Riemann    = (int)OPT[5];
   int const    WENOD      = (int)OPT[6];
   int const    limiter    = (int)OPT[7];
-  int vk0, vk1;
 
-  int running_info[5];
-  running_info[2] = bod;
-  running_info[3] = WENOD;
-  running_info[4] = limiter;
-
-  double const gamma = CONFIG[0];  // the constant of the perfect gas
-  double const CFL = CONFIG[1];    // CFL number
-  double const eps = CONFIG[2];    // the largest value could be treat as zero
-  double const alp1 = CONFIG[3];
-  double const alp2 = CONFIG[4];
-  double const bet1 = CONFIG[5];
-  double const bet2 = CONFIG[6];
-  double const modifier = CONFIG[7];
-  double const tol = CONFIG[8];
+  double running_info[N_RUNNING];
+  running_info[3] = OPT[4];  // the boundary condition
+  running_info[4] = OPT[6];  // the choice of the direvative reconstruction
+  running_info[5] = OPT[7];  // use the limiter or not
+  running_info[6] = CONFIG[9];
 
   double c, stmp, direvative[4], source[4], wave_speed[2];
 
@@ -128,7 +128,7 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
 
     vk0 = (k-1)*inter_data;  // vk0==0 or vk0==k-1
     vk1 =     k*inter_data;  // vk1==0 or vk1==k
-    running_info[0] = k;
+    running_info[0] = (double)k;
     //printf("-----------------%d-----------------", k);
     speed_max = 0.0;
     for(j = 0; j < m; ++j)
@@ -147,7 +147,8 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
 
 
     //======FIRST=====================
-    running_info[1] = 0;
+    running_info[1] = T - tau;
+    running_info[2] = 0.0;
     flux_RF(running_info, m, h, gamma, rho[vk0], mom, ene, f01, f02, f03);
     for(j = 0; j < m; ++j)
     {
@@ -157,7 +158,8 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
     }
 
     //======SECOND=====================
-    running_info[1] = 1;
+    running_info[1] = T - 0.75*tau;
+    running_info[2] = 1.0;
     flux_RF(running_info, m, h, gamma, rho_1, mom_1, ene_1, f11, f12, f13);
     for(j = 0; j < m; ++j)
     {
@@ -167,7 +169,8 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
     }
 
     //======THIRD=====================
-    running_info[1] = 2;
+    running_info[1] = T - 0.5*tau;
+    running_info[2] = 2.0;
     flux_RF(running_info, m, h, gamma, rho_2, mom_2, ene_2, f21, f22, f23);
     for(j = 0; j < m; ++j)
     {
@@ -177,7 +180,8 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
     }
 
     //======FORTH=====================
-    running_info[1] = 3;
+    running_info[1] = T - 0.25*tau;
+    running_info[2] = 3.0;
     flux_RF(running_info, m, h, gamma, rho_3, mom_3, ene_3, f31, f32, f33);
 
 
