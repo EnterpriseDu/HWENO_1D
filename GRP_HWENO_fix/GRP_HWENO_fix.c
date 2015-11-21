@@ -197,8 +197,8 @@ int GRP_HWENO_fix
       linear_GRP_solver(wave_speed, D, U, 0.0, gamma, eps,
 			rho_L[j], u_L[j], 0.0, p_L[j],
 			rho_R[j], u_R[j], 0.0, p_R[j],
-			D_rho_L[j], D_u_L[j], 0.0, D_p_R[j],
-			D_rho_R[j], D_u_R[j], 0.0, D_p_L[j],
+			D_rho_L[j], D_u_L[j], 0.0, D_p_L[j],
+			D_rho_R[j], D_u_R[j], 0.0, D_p_R[j],
 			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
       f01[j] = U[0]*U[1];
@@ -264,8 +264,8 @@ int GRP_HWENO_fix
       linear_GRP_solver(wave_speed, D, U, 0.0, gamma, eps,
 			rho_L[j], u_L[j], 0.0, p_L[j],
 			rho_R[j], u_R[j], 0.0, p_R[j],
-			D_rho_L[j], D_u_L[j], 0.0, D_p_R[j],
-			D_rho_R[j], D_u_R[j], 0.0, D_p_L[j],
+			D_rho_L[j], D_u_L[j], 0.0, D_p_L[j],
+			D_rho_R[j], D_u_R[j], 0.0, D_p_R[j],
 			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
       g11[j] = U[0]*D[1] + U[1]*D[0];
