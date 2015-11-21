@@ -122,11 +122,20 @@ int GRP_42_fix
   double D0 = 1.0/6.0, D1 = 0.5-D0;
 
 
-  for(j = 0; j < m; ++j)
-  {
-    mom[j] = rho[0][j]*u[0][j];
-    ene[j] = p[0][j]/(gamma-1.0)+0.5*mom[j]*u[0][j];
-  }
+  if(Riemann)
+    for(j = 0; j < m; ++j)
+    {
+      mom[j] = rho[0][j]*u[0][j];
+      ene[j] = p[0][j]/(gamma-1.0)+0.5*mom[j]*u[0][j];
+    }
+  else
+    for(j = 0; j < m; ++j)
+    {
+      mom[j] = u[0][j];
+      ene[j] = p[0][j];
+      u[0][j] = mom[j]/rho[0][j];
+      p[0][j] = (ene[j]-0.5*mom[j]*u[0][j])*(gamma-1.0);
+    }
 
   running_info[0] = 0.0;
   running_info[1] = 0.0;
