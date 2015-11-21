@@ -113,16 +113,26 @@ int GRP_fix
   double tau, half_tau, alp, bet, nu;
 
 
-  for(j = 0; j < m; ++j)
-  {
-    mom[j] = rho[0][j]*u[0][j];
-    ene[j] = p[0][j]/(gamma-1.0)+0.5*mom[j]*u[0][j];
-  }
+  if(Riemann)
+    for(j = 0; j < m; ++j)
+    {
+      mom[j] = rho[0][j]*u[0][j];
+      ene[j] = p[0][j]/(gamma-1.0)+0.5*mom[j]*u[0][j];
+    }
+  else
+    for(j = 0; j < m; ++j)
+    {
+      mom[j] = u[0][j];
+      ene[j] = p[0][j];
+      u[0][j] = mom[j]/rho[0][j];
+      p[0][j] = (ene[j]-0.5*mom[j]*u[0][j])*(gamma-1.0);
+    }
+
 
   running_info[0] = 0.0;
   running_info[1] = 0.0;
   running_info[1] = 0.0;
-  GRP_minmod0(running_info, m, h, alp2, rho[0], mom, ene, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
+  GRP_minmod0(running_info, m, h, alp2, rho[0], u[0], p[0], rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
 
 //------------THE MAIN LOOP-------------
   for(k = 1; k <= MaxStp; ++k)

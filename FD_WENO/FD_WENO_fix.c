@@ -104,12 +104,21 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
 
 
 
+  if(Riemann)
+    for(j = 0; j < m; ++j)
+    {
+      mom[j] = rho[0][j]*u[0][j];
+      ene[j] = p[0][j]/(gamma-1.0)+0.5*mom[j]*u[0][j];
+    }
+  else
+    for(j = 0; j < m; ++j)
+    {
+      mom[j] = u[0][j];
+      ene[j] = p[0][j];
+      u[0][j] = mom[j]/rho[0][j];
+      p[0][j] = (ene[j]-0.5*mom[j]*u[0][j])*(gamma-1.0);
+    }
 
-  for(j = 0; j < m; ++j)
-  {
-    mom[j] = rho[0][j]*u[0][j];
-    ene[j] = p[0][j]/(gamma-1.0)+0.5*mom[j]*u[0][j];
-  }
 
 //------------THE MAIN LOOP-------------
   for(k = 1; k <= MaxStp; ++k)
