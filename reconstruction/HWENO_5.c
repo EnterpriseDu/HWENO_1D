@@ -16,7 +16,8 @@ void HWENO_5
   int const bod = (int)running_info[3];
   int const WENOD = (int)running_info[4];
   int const limiter = (int)running_info[5];
-  double const threshold = running_info[6];
+  int const decmop = (int)running_info[6];
+  double const threshold = running_info[7];
 
   double Q1[6], Q2[6], Q3[6], QI1[5], QI2[5], QI3[5], DQ1[6], DQ2[6], DQ3[6];
   double SL, SR, S0, pn1, p0, pp1;

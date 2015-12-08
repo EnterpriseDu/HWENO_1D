@@ -16,7 +16,8 @@ void WENO_5_limited
   int const bod = (int)running_info[3];
   int const WENOD = (int)running_info[4];
   int const limiter = (int)running_info[5];
-  double const threshold = running_info[6];
+  int const decmop = (int)running_info[6];
+  double const threshold = running_info[7];
 
 
   double W1[m+6], W2[m+6], W3[m+6]; //W1=rho, W2=mom, W3=ene

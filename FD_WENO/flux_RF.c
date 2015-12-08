@@ -8,7 +8,8 @@ void flux_RF(int const running_info[], int const m, double const h, double const
   int const bod = (int)running_info[3];
   int const WENOD = (int)running_info[4];
   int const limiter = (int)running_info[5];
-  double const threshold = running_info[6];
+  int const decmop = (int)running_info[6];
+  double const threshold = running_info[7];
 
 
   double rho_L, rho_R, u_L, u_R, p_L, p_R, c_L, c_R;

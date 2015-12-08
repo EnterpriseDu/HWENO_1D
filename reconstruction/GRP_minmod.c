@@ -12,7 +12,8 @@ void GRP_minmod
   int const bod = (int)running_info[3];
   int const WENOD = (int)running_info[4];
   int const limiter = (int)running_info[5];
-  double const threshold = running_info[6];
+  int const decmop = (int)running_info[6];
+  double const threshold = running_info[7];
 
   double SL, SR, Stmp;
   double Drho[m], Du[m], Dp[m];
