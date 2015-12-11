@@ -30,10 +30,10 @@ int FD_1st_fix
 (double const CONFIG[], double const OPT[], int const m, double const h,
  double *rho[], double *u[], double *p[], runList * runhist, char *scheme);
 
-void flux_RF(int const running_info[], int const m, double const h, double const gamma,
+void flux_RF(double const running_info[], int const m, double const h, double const gamma,
 	     double const rho[], double const mom[], double const ene[], double F1[], double F2[], double F3[]);
 
-void flux_RF_1st(int const running_info[], int const m, double const h, double const gamma,
+void flux_RF_1st(double const running_info[], int const m, double const h, double const gamma,
 		 double const rho[], double const mom[], double const ene[], double F1[], double F2[], double F3[]);
 
 int FV_WENO_fix

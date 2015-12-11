@@ -1,14 +1,15 @@
 #include <math.h>
 
 
-void flux_RF(int const running_info[], int const m, double const h, double const gamma,
+void flux_RF(double const running_info[], int const m, double const h, double const gamma,
 	     double const rho[], double const mom[], double const ene[], double F1[], double F2[], double F3[])
 {
   int j, k, a;
   int const bod = (int)running_info[3];
   int const WENOD = (int)running_info[4];
   int const limiter = (int)running_info[5];
-  double const threshold = running_info[6];
+  int const decmop = (int)running_info[6];
+  double const threshold = running_info[7];
 
 
   double rho_L, rho_R, u_L, u_R, p_L, p_R, c_L, c_R;

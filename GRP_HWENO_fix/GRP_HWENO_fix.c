@@ -53,7 +53,7 @@ int GRP_HWENO_fix
 {
   int i = 0, j = 0, k = 1, it = 0;
 
-  char scheme_local[50] = "GRP-4-HWENO-fix\0";
+  char scheme_local[50] = "G4H5\0";
   printf("===========================\n");
   printf("The scheme [%s] started.\n", scheme_local);
   int len = 0;
@@ -85,13 +85,16 @@ int GRP_HWENO_fix
   int const    bod        = (int)OPT[4];
   int const    Riemann    = (int)OPT[5];
   int const    WENOD      = (int)OPT[6];
-  int const    limiter    = (int)OPT[7];
+  int const    decomp     = (int)OPT[7];
+  int const    limiter    = (int)OPT[8];
 
   double running_info[N_RUNNING];
   running_info[3] = OPT[4];  // the boundary condition
   running_info[4] = OPT[6];  // the choice of the direvative reconstruction
   running_info[5] = OPT[7];  // use the limiter or not
-  running_info[6] = CONFIG[9];
+  running_info[6] = OPT[8];    // use the limiter or not
+  running_info[7] = CONFIG[9];
+
 
 
   double c, stmp, D[4], U[4], wave_speed[2];
@@ -138,7 +141,7 @@ int GRP_HWENO_fix
   running_info[0] = 0.0;
   running_info[1] = 0.0;
   running_info[2] = 0.0;
-  WENO_5(running_info, m, h, eps, alp2, gamma, rho[0], mom, ene, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
+  WENO_50(running_info, m, h, eps, alp2, gamma, rho[0], mom, ene, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
   /*
   write_column(m, rho[0], "rho", "running");
   write_column(m, u[0], "u", "running");

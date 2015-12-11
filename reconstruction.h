@@ -37,6 +37,12 @@ void WENO_5_limited
  double rho_L[], double rho_R[], double u_L[], double u_R[], double p_L[], double p_R[],
  double D_rho_L[], double D_rho_R[], double D_u_L[], double D_u_R[], double D_p_L[], double D_p_R[], int trouble[]);
 
+void WENO_50
+(double const running_info[], int const m, double const h, double const eps, double const alp2, double const gamma,
+ double const rho[], double const mom[], double const ene[],
+ double rho_L[], double rho_R[], double u_L[], double u_R[], double p_L[], double p_R[],
+ double D_rho_L[], double D_rho_R[], double D_u_L[], double D_u_R[], double D_p_L[], double D_p_R[]);
+
 void local_WENO_5_inter_d(double h, double Q[8], double DQQ[2]);
 
 void local_WENO_5_interleft(double h, double Q[8]);

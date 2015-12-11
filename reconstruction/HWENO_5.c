@@ -16,7 +16,8 @@ void HWENO_5
   int const bod = (int)running_info[3];
   int const WENOD = (int)running_info[4];
   int const limiter = (int)running_info[5];
-  double const threshold = running_info[6];
+  int const decmop = (int)running_info[6];
+  double const threshold = running_info[7];
 
   double Q1[6], Q2[6], Q3[6], QI1[5], QI2[5], QI3[5], DQ1[6], DQ2[6], DQ3[6];
   double SL, SR, S0, pn1, p0, pp1;
@@ -168,12 +169,6 @@ void HWENO_5
     D_p_L[j-2] = (D_p_L[j-2] - 0.5*D_rho_L[j-2]*u_L[j-2]*u_L[j-2] - rho_L[j-2]*u_L[j-2]*D_u_L[j-2])*(gamma-1.0);
     D_p_R[j-2] = (D_p_R[j-2] - 0.5*D_rho_R[j-2]*u_R[j-2]*u_R[j-2] - rho_R[j-2]*u_R[j-2]*D_u_R[j-2])*(gamma-1.0);
   }
-
-  if(bod < 0)
-  {
-    u_L[0] = 0.0; u_R[0] = 0.0;
-    u_L[m] = 0.0; u_R[m] = 0.0;
-  }
 }
 
 
@@ -324,10 +319,6 @@ void HWENO_5_limited
       DQ2[k] = QI2[k+1] - QI2[k];
       DQ3[k] = QI3[k+1] - QI3[k];
     }
-    local_HWENO_5_inter_d(h, Q1, DQ1);
-    local_HWENO_5_inter_d(h, Q2, DQ2);
-    local_HWENO_5_inter_d(h, Q3, DQ3);
-    /*
     if(WENOD)
     {
       local_HWENO_5_inter_d(h, Q1, DQ1);
@@ -345,7 +336,7 @@ void HWENO_5_limited
       DQ1[5] = DQ1[4];
       DQ2[5] = DQ2[4];
       DQ3[5] = DQ3[4];
-      }//*/
+    }
 
   //=====Recomposition========
     rho_L[j-2] = Q1[4] + Q2[4] + Q3[4];
@@ -377,7 +368,7 @@ void HWENO_5_limited
 
 
     flag = 0;
-
+    /*
     deltaP = threshold*fabs(Q1[4] - Q1[5]);
     DP = 1e-5+fabs(30.0*(Q1[2]-Q1[1]) + (520.0/27.0)*(Q1[0]-Q1[3]) + (20.0/3.0)*(QI1[4]-QI1[3]+QI1[1]-QI1[0]));
     //if(deltaP > DP) flag = 1*limiter;
@@ -389,11 +380,11 @@ void HWENO_5_limited
     deltaP = threshold*fabs(Q3[4] - Q3[5]);
     DP = 1e-5+fabs(30.0*(Q3[2]-Q3[1]) + (520.0/27.0)*(Q3[0]-Q3[3]) + (20.0/3.0)*(QI3[4]-QI3[3]+QI3[1]-QI3[0]));
     //if(deltaP > DP) flag = 3*limiter;
-
+    //*/
     deltaP = threshold*fabs(rho_L[j-2] - rho_R[j-2]);
     DP = 1e-5+fabs(30.0*(W1[j]-W1[j-1]) + (520.0/27.0)*(W1[j-2]-W1[j+1]) + (20.0/3.0)*(WI1[j+2]-WI1[j+1]+WI1[j-1]-WI1[j-2]));
     if(deltaP > DP) flag = 4*limiter;
-
+    /*
     for(k = 0; k < 5; ++k)
       QI1[k] = EntpI[j-2+k];
     for(k = 0; k < 4; ++k)
@@ -405,12 +396,12 @@ void HWENO_5_limited
     deltaP = threshold*fabs(Q1[4] - Q1[5]);
     DP = 1e-5+fabs(30.0*(Q1[2]-Q1[1]) + (520.0/27.0)*(Q1[0]-Q1[3]) + (20.0/3.0)*(QI1[4]-QI1[3]+QI1[1]-QI1[0]));
     if(deltaP > DP) flag = 5*limiter;
-
     //EntpL = p_L[j-2] / pow(rho_L[j-2], gamma);
     //EntpR = p_R[j-2] / pow(rho_R[j-2], gamma);
     //deltaP = threshold*fabs(EntpL[j-2] - EntpR[j-2]);
     //DP = 1e-5+fabs(30.0*(Entp[j]-Entp[j-1]) + (130.0/9.0)*(Entp[j-2]-Entp[j+1]) + (20.0/3.0)*(EntpI[j+2]-EntpI[j+1]+EntpI[j-1]-EntpI[j-2]));
     //if(deltaP > DP) trouble[j-2] = 6*limiter;
+    //*/
 
     if(j-2)
       trouble[j-3] += flag;
@@ -510,12 +501,6 @@ void HWENO_5_limited
 	D_p_L[j+1] = D_p_R[j];
       }
     }
-  }
-
-  if(bod < 0)
-  {
-    u_L[0] = 0.0; u_R[0] = 0.0;
-    u_L[m] = 0.0; u_R[m] = 0.0;
   }
 }
 

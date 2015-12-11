@@ -33,7 +33,7 @@ int FD_WENO_fix
 				     * ently used index for the time
 				     * step.
 				     */
-  char scheme_local[50] = "WENO-5-RF-4\0";
+  char scheme_local[50] = "RF4W5\0";
   printf("===========================\n");
   printf("The scheme [%s] started.\n", scheme_local);
   int len = 0;
@@ -47,6 +47,7 @@ int FD_WENO_fix
   clock_t tic, toc;
   double sum = 0.0, T = 0.0;
   int vk0, vk1;
+  
   
   double const gamma     = CONFIG[0];  // the constant of the perfect gas
   double const CFL       = CONFIG[1];  // CFL number
@@ -65,13 +66,15 @@ int FD_WENO_fix
   int const    bod        = (int)OPT[4];
   int const    Riemann    = (int)OPT[5];
   int const    WENOD      = (int)OPT[6];
-  int const    limiter    = (int)OPT[7];
+  int const    decomp     = (int)OPT[7];
+  int const    limiter    = (int)OPT[8];
 
   double running_info[N_RUNNING];
   running_info[3] = OPT[4];  // the boundary condition
   running_info[4] = OPT[6];  // the choice of the direvative reconstruction
   running_info[5] = OPT[7];  // use the limiter or not
-  running_info[6] = CONFIG[9];
+  running_info[6] = OPT[8];    // use the limiter or not
+  running_info[7] = CONFIG[9];
 
   double c, stmp, direvative[4], source[4], wave_speed[2];
 
