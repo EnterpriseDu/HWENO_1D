@@ -57,7 +57,7 @@ int GRP_fix
 				     * ently used index for the time
 				     * step.
 				     */
-  char scheme_local[50] = "minmod-2-GRP-2\0";
+  char scheme_local[50] = "GRP\0";
   printf("===========================\n");
   printf("The scheme [%s] started.\n", scheme_local);
   int len = 0;

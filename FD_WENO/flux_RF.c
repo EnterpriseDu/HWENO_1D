@@ -1,7 +1,7 @@
 #include <math.h>
 
 
-void flux_RF(int const running_info[], int const m, double const h, double const gamma,
+void flux_RF(double const running_info[], int const m, double const h, double const gamma,
 	     double const rho[], double const mom[], double const ene[], double F1[], double F2[], double F3[])
 {
   int j, k, a;

@@ -33,7 +33,7 @@ int FD_WENO_fix
 				     * ently used index for the time
 				     * step.
 				     */
-  char scheme_local[50] = "WENO-5-RF-4\0";
+  char scheme_local[50] = "RF4W5\0";
   printf("===========================\n");
   printf("The scheme [%s] started.\n", scheme_local);
   int len = 0;
