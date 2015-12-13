@@ -89,11 +89,17 @@ int GRP_HWENO_fix
   int const    limiter    = (int)OPT[8];
 
   double running_info[N_RUNNING];
+  running_info[3] = OPT[4];    // the boundary condition
+  running_info[4] = OPT[6];    // the choice of the direvative reconstruction
+  running_info[5] = OPT[7];    // use the charactoristic decomposition or not
+  running_info[6] = OPT[8];    // use the limiter or not
+  running_info[7] = CONFIG[9]; // threshold
+  /*
   running_info[3] = OPT[4];  // the boundary condition
   running_info[4] = OPT[6];  // the choice of the direvative reconstruction
   running_info[5] = OPT[7];  // use the limiter or not
   running_info[6] = OPT[8];    // use the limiter or not
-  running_info[7] = CONFIG[9];
+  running_info[7] = CONFIG[9]; // the treshold*/
 
 
 
