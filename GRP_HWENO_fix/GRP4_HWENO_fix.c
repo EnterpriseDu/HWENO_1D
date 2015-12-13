@@ -47,7 +47,7 @@
 
 #define N_RUNNING 7
 
-int GRP_HWENO_fix
+int GRP4_HWENO_fix
 (double const CONFIG[], double const OPT[], int const m, double const h,
  double *rho[], double *u[], double *p[], runList *runhist, char *scheme)
 {

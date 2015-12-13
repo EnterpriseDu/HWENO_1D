@@ -29,7 +29,7 @@
  * rho  is the density
  * u    is the velocity
  * p    is the pressure
- * runhist_n
+ * runhist
  **************************************************************************/
 
 #include <stdio.h>
@@ -47,15 +47,13 @@
 
 #define N_RUNNING 7
 
-
-
-int GRP_42_fix
+int ADER4_HWENO_fix
 (double const CONFIG[], double const OPT[], int const m, double const h,
  double *rho[], double *u[], double *p[], runList *runhist, char *scheme)
 {
   int i = 0, j = 0, k = 1, it = 0;
 
-  char scheme_local[50] = "GRP-4-HWENO-fix\0";
+  char scheme_local[50] = "G4H5\0";
   printf("===========================\n");
   printf("The scheme [%s] started.\n", scheme_local);
   int len = 0;
@@ -87,13 +85,16 @@ int GRP_42_fix
   int const    bod        = (int)OPT[4];
   int const    Riemann    = (int)OPT[5];
   int const    WENOD      = (int)OPT[6];
-  int const    limiter    = (int)OPT[7];
+  int const    decomp     = (int)OPT[7];
+  int const    limiter    = (int)OPT[8];
 
   double running_info[N_RUNNING];
   running_info[3] = OPT[4];  // the boundary condition
   running_info[4] = OPT[6];  // the choice of the direvative reconstruction
   running_info[5] = OPT[7];  // use the limiter or not
-  running_info[6] = CONFIG[9];
+  running_info[6] = OPT[8];    // use the limiter or not
+  running_info[7] = CONFIG[9];
+
 
 
   double c, stmp, D[4], U[4], wave_speed[2];
@@ -140,10 +141,27 @@ int GRP_42_fix
   running_info[0] = 0.0;
   running_info[1] = 0.0;
   running_info[2] = 0.0;
-  WENO_5_charact(running_info, m, h, eps, alp2, gamma, rho[0], mom, ene, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
+  WENO_50(running_info, m, h, eps, alp2, gamma, rho[0], mom, ene, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
+  /*
+  write_column(m, rho[0], "rho", "running");
+  write_column(m, u[0], "u", "running");
+  write_column(m, p[0], "p", "running");
+
+  write_column(m+1, rho_L, "rhoL", "running");
+  write_column(m+1, u_L, "uL", "running");
+  write_column(m+1, p_L, "pL", "running");
+  write_column(m+1, rho_R, "rhoR", "running");
+  write_column(m+1, u_R, "uR", "running");
+  write_column(m+1, p_R, "pR", "running");
+  write_column(m+1, D_rho_L, "DrhoL", "running");
+  write_column(m+1, D_u_L, "DuL", "running");
+  write_column(m+1, D_p_L, "DpL", "running");
+  write_column(m+1, D_rho_R, "DrhoR", "running");
+  write_column(m+1, D_u_R, "DuR", "running");
+  write_column(m+1, D_p_R, "DpR", "running");//*/
 //------------THE MAIN LOOP-------------
   for(k = 1; k <= MaxStp; ++k)
-  {
+  {    
     if(T+eps > TIME)
       break;
 
@@ -155,11 +173,17 @@ int GRP_42_fix
       exit(100);
     }
     locate_runList(k, runhist);
-
+    runhist->current->trouble0 = (int *)malloc(sizeof(int) * m);
+    runhist->current->trouble1 = (int *)malloc(sizeof(int) * m);
+    if((!runhist->current->trouble0) || (!runhist->current->trouble1))
+    {
+      printf("Not enough memory for the runhist node!\n\n");
+      exit(100);
+    }
 
     vk0 = (k-1)*inter_data;  // vk0==0 or vk0==k-1
     vk1 =     k*inter_data;  // vk1==0 or vk1==k
-    running_info[0] = k;
+    running_info[0] = (double)k;
     //printf("-----------------%d-----------------", k);
     speed_max = 0.0;
     for(j = 0; j < m; ++j)
@@ -182,7 +206,7 @@ int GRP_42_fix
 
     for(j = 0; j < m+1; ++j)
     {
-      linear_GRP_solver(wave_speed, D, U, 0.0, gamma, eps,
+      ADER2_solver_P2P(wave_speed, D, U, 0.0, gamma, eps,
 			rho_L[j], u_L[j], 0.0, p_L[j],
 			rho_R[j], u_R[j], 0.0, p_R[j],
 			D_rho_L[j], D_u_L[j], 0.0, D_p_L[j],
@@ -224,12 +248,32 @@ int GRP_42_fix
 
     running_info[1] = T - half_tau;  // time
     running_info[2] = 1.0;           // half
-    GRP_minmod(running_info, m, h, alp2, half_rho, half_u, half_p, half_rhoI, half_uI, half_pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
+    HWENO_5_limited(running_info, m, h, eps, alp2, gamma, half_rho, half_mom, half_ene, half_rhoI, half_momI, half_eneI, half_uI, half_pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, runhist->current->trouble1);
+    /*
+  write_column(m, half_rho, "rho", "running");
+  write_column(m, half_u, "u", "running");
+  write_column(m, half_p, "p", "running");
+  write_column(m+1, half_rhoI, "rhoI", "running");
+  write_column(m+1, half_uI, "uI", "running");
+  write_column(m+1, half_pI, "pI", "running");
+
+  write_column(m+1, rho_L, "rhoL", "running");
+  write_column(m+1, u_L, "uL", "running");
+  write_column(m+1, p_L, "pL", "running");
+  write_column(m+1, rho_R, "rhoR", "running");
+  write_column(m+1, u_R, "uR", "running");
+  write_column(m+1, p_R, "pR", "running");
+  write_column(m+1, D_rho_L, "DrhoL", "running");
+  write_column(m+1, D_u_L, "DuL", "running");
+  write_column(m+1, D_p_L, "DpL", "running");
+  write_column(m+1, D_rho_R, "DrhoR", "running");
+  write_column(m+1, D_u_R, "DuR", "running");
+  write_column(m+1, D_p_R, "DpR", "running");//*/
 
 
     for(j = 0; j < m+1; ++j)
     {
-      linear_GRP_solver(wave_speed, D, U, 0.0, gamma, eps,
+      ADER2_solver_P2P(wave_speed, D, U, 0.0, gamma, eps,
 			rho_L[j], u_L[j], 0.0, p_L[j],
 			rho_R[j], u_R[j], 0.0, p_R[j],
 			D_rho_L[j], D_u_L[j], 0.0, D_p_L[j],
@@ -256,9 +300,9 @@ int GRP_42_fix
 //===============THE CORE ITERATION=================
     for(j = 0; j < m; ++j)
     {
-	rho[vk1][j] = rho[vk0][j] - nu*(F1[j+1]-F1[j]);
-	     mom[j] =      mom[j] - nu*(F2[j+1]-F2[j]);
-	     ene[j] =      ene[j] - nu*(F3[j+1]-F3[j]);
+      rho[vk1][j] = rho[vk0][j] - nu*(F1[j+1]-F1[j]);
+           mom[j] =      mom[j] - nu*(F2[j+1]-F2[j]);
+	   ene[j] =      ene[j] - nu*(F3[j+1]-F3[j]);
 	u[vk1][j] = mom[j] / rho[vk1][j];
 	p[vk1][j] = (ene[j] - 0.5*mom[j]*u[vk1][j])*(gamma-1.0);
 
@@ -267,11 +311,31 @@ int GRP_42_fix
     }
 
     running_info[1] = T;
-    running_info[2] = 0.0;
-    GRP_minmod(running_info, m, h, alp2, rho[vk1], u[vk1], p[vk1], rhoI, uI, pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
+    running_info[2] = 0.0;  // not half
+    HWENO_5_limited(running_info, m, h, eps, alp2, gamma, rho[vk1], mom, ene, rhoI, momI, eneI, uI, pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, runhist->current->trouble0);
+    /*
+  write_column(m, rho[vk1], "rho", "running");
+  write_column(m, u[vk1], "u", "running");
+  write_column(m, p[vk1], "p", "running");
+  write_column(m+1, rhoI, "rhoI", "running");
+  write_column(m+1, uI, "uI", "running");
+  write_column(m+1, pI, "pI", "running");
+
+  write_column(m+1, rho_L, "rhoL", "running");
+  write_column(m+1, u_L, "uL", "running");
+  write_column(m+1, p_L, "pL", "running");
+  write_column(m+1, rho_R, "rhoR", "running");
+  write_column(m+1, u_R, "uR", "running");
+  write_column(m+1, p_R, "pR", "running");
+  write_column(m+1, D_rho_L, "DrhoL", "running");
+  write_column(m+1, D_u_L, "DuL", "running");
+  write_column(m+1, D_p_L, "DpL", "running");
+  write_column(m+1, D_rho_R, "DrhoR", "running");
+  write_column(m+1, D_u_R, "DuR", "running");
+  write_column(m+1, D_p_R, "DpR", "running");//*/
 
     toc = clock();
-    runhist->current->time[1] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;;
+    runhist->current->time[1] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;
     sum += runhist->current->time[1];
   }
   k = k-1;
@@ -295,3 +359,85 @@ int GRP_42_fix
 
   return k;
 }
+
+
+
+
+/*
+mrl=0.0, mul=0.0, mpl=0.0, mrr=0.0, mur=0.0, mpr=0.0, mdrl=0.0, mdul=0.0, mdpl=0.0, mdrr=0.0, mdur=0.0, mdpr=0.0, mQ[6];
+for(j=0; j < m+1; ++j)
+{
+if(fabs(D_rho_L2[j]-D_rho_L[j]) > fabs(mdrl))
+{
+  mdrl = D_rho_L2[j]-D_rho_L[j];
+  JJ[0] = j;
+}
+if(fabs(D_u_L2[j]-D_u_L[j]) > fabs(mdul))
+{
+  mdul = D_u_L2[j]-D_u_L[j];
+  JJ[1] = j;
+}
+if(fabs(D_p_L2[j]-D_p_L[j]) > fabs(mdpl))
+{
+  mdpl = D_p_L2[j]-D_p_L[j];
+  JJ[2] = j;
+}
+if(fabs(rho_L2[j]-rho_L[j]) > fabs(mrl))
+{
+  mrl = rho_L2[j]-rho_L[j];
+  J[0] = j;
+}
+if(fabs(u_L2[j]-u_L[j]) > fabs(mul))
+{
+  mul = u_L2[j]-u_L[j];
+  J[1] = j;
+}
+if(fabs(p_L2[j]-p_L[j]) > fabs(mpl))
+{
+  mpl = p_L2[j]-p_L[j];
+  J[2] = j;
+}
+if(fabs(D_rho_R2[j]-D_rho_R[j]) > fabs(mdrr))
+{
+  mdrr = D_rho_R2[j]-D_rho_R[j];
+  JJ[3] = j;
+}
+if(fabs(D_u_R2[j]-  D_u_R[j]) > fabs(mdur))
+{
+  mdur = D_u_R2[j]-  D_u_R[j];
+  JJ[4] = j;
+}
+if(fabs(D_p_R2[j]-  D_p_R[j]) > fabs(mdpr))
+{
+  mdpr = D_p_R2[j]-  D_p_R[j];
+  JJ[5] = j;
+}
+if(fabs(rho_R2[j]-rho_R[j]) > fabs(mrr))
+{
+  mrr = rho_R2[j]-rho_R[j];
+  J[3] = j;
+}
+if(fabs(u_R2[j]-  u_R[j]) > fabs(mur))
+{
+  mur = u_R2[j]-  u_R[j];
+  J[4] = j;
+}
+if(fabs(p_R2[j]-  p_R[j]) > fabs(mpr))
+{
+  mpr = p_R2[j]-  p_R[j];
+  J[5] = j;
+}
+}
+mQ[0]=mrl;
+mQ[1]=mul;
+mQ[2]=mpl;
+mQ[3]=mrr;
+mQ[4]=mur;
+mQ[5]=mpr;
+mDQ[0]=mdrl;
+mDQ[1]=mdul;
+mDQ[2]=mdpl;
+mDQ[3]=mdrr;
+mDQ[4]=mdur;
+mDQ[5]=mdpr;
+*/
