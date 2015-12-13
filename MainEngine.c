@@ -344,7 +344,7 @@ int main(int argc, char *argv[])
   char scheme[100];
   char version[100] = "dev-1.1";
   printf("The present version is [%s]\n", version);
-  K = GRP_HWENO_fix(CONFIG, OPT, m, h, rho, u, p, &runhist, scheme);
+  K = ADER4_HWENO_fix(CONFIG, OPT, m, h, rho, u, p, &runhist, scheme);
   //K = GRP_fix(CONFIG, OPT, m, h, rho, u, p, &runhist, scheme);
 
 

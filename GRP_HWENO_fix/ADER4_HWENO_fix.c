@@ -47,7 +47,7 @@
 
 #define N_RUNNING 7
 
-int GRP_HWENO_fix
+int ADER4_HWENO_fix
 (double const CONFIG[], double const OPT[], int const m, double const h,
  double *rho[], double *u[], double *p[], runList *runhist, char *scheme)
 {
@@ -89,17 +89,11 @@ int GRP_HWENO_fix
   int const    limiter    = (int)OPT[8];
 
   double running_info[N_RUNNING];
-  running_info[3] = OPT[4];    // the boundary condition
-  running_info[4] = OPT[6];    // the choice of the direvative reconstruction
-  running_info[5] = OPT[7];    // use the charactoristic decomposition or not
-  running_info[6] = OPT[8];    // use the limiter or not
-  running_info[7] = CONFIG[9]; // threshold
-  /*
   running_info[3] = OPT[4];  // the boundary condition
   running_info[4] = OPT[6];  // the choice of the direvative reconstruction
   running_info[5] = OPT[7];  // use the limiter or not
   running_info[6] = OPT[8];    // use the limiter or not
-  running_info[7] = CONFIG[9]; // the treshold*/
+  running_info[7] = CONFIG[9];
 
 
 
@@ -212,7 +206,7 @@ int GRP_HWENO_fix
 
     for(j = 0; j < m+1; ++j)
     {
-      linear_GRP_solver(wave_speed, D, U, 0.0, gamma, eps,
+      ADER2_solver_P2P(wave_speed, D, U, 0.0, gamma, eps,
 			rho_L[j], u_L[j], 0.0, p_L[j],
 			rho_R[j], u_R[j], 0.0, p_R[j],
 			D_rho_L[j], D_u_L[j], 0.0, D_p_L[j],
@@ -279,7 +273,7 @@ int GRP_HWENO_fix
 
     for(j = 0; j < m+1; ++j)
     {
-      linear_GRP_solver(wave_speed, D, U, 0.0, gamma, eps,
+      ADER2_solver_P2P(wave_speed, D, U, 0.0, gamma, eps,
 			rho_L[j], u_L[j], 0.0, p_L[j],
 			rho_R[j], u_R[j], 0.0, p_R[j],
 			D_rho_L[j], D_u_L[j], 0.0, D_p_L[j],
