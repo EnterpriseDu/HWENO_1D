@@ -47,7 +47,7 @@
 
 
 
-int GRP_fix
+int ADER2_fix
 (double const CONFIG[], double const OPT[], int const m, double const h,
  double *rho[], double *u[], double *p[], runList *runhist, char *scheme)
 {
@@ -176,7 +176,7 @@ int GRP_fix
 
     for(j = 0; j < m+1; ++j)
     {
-      linear_GRP_solver(wave_speed, D, U, 0.0, gamma, eps,
+      ADER2_solver_P2P(wave_speed, D, U, 0.0, gamma, eps,
 			rho_L[j], u_L[j], 0.0, p_L[j],
 			rho_R[j], u_R[j], 0.0, p_R[j],
 			D_rho_L[j], D_u_L[j], 0.0, D_p_L[j],

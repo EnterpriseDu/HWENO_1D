@@ -20,17 +20,25 @@ echo "-----------------"
 
 
 cd ../GRP_fix/
-gcc -c ./GRP_fix.c    -I ../\
-                      -I ../../file_io/inc/\
-                      -I ../../Riemann_solver/inc/\
-                      -g
+gcc -c ./ADER2_fix.c    -I ../\
+                        -I ../../file_io/inc/\
+                        -I ../../Riemann_solver/inc/\
+                        -g
+gcc -c ./GRP2_fix.c    -I ../\
+                       -I ../../file_io/inc/\
+                       -I ../../Riemann_solver/inc/\
+                       -g
 
-ar crv GRP_fix.a GRP_fix.o
+ar crv GRP_fix.a GRP2_fix.o ADER2_fix.o
 ranlib GRP_fix.a
 echo "-----------------"
 
 
 cd ../GRP_HWENO_fix/
+gcc -c ./ADER4_HWENO_fix.c    -I ../\
+                              -I ../../file_io/inc/\
+                              -I ../../Riemann_solver/inc/\
+                              -g
 gcc -c ./GRP4_HWENO_fix.c    -I ../\
                              -I ../../file_io/inc/\
                              -I ../../Riemann_solver/inc/\
@@ -40,7 +48,7 @@ gcc -c ./GRP4_minmod_fix.c    -I ../\
                               -I ../../Riemann_solver/inc/\
                               -g
 
-ar crv GRP_HWENO_fix.a GRP4_HWENO_fix.o GRP4_minmod_fix.o
+ar crv GRP_HWENO_fix.a GRP4_HWENO_fix.o GRP4_minmod_fix.o ADER4_HWENO_fix.o
 ranlib GRP_HWENO_fix.a
 echo "-----------------"
 

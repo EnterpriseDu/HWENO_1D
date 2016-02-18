@@ -12,7 +12,6 @@ void HWENO_5
  double rho_L[], double rho_R[], double u_L[], double u_R[], double p_L[], double p_R[],
  double D_rho_L[], double D_rho_R[], double D_u_L[], double D_u_R[], double D_p_L[], double D_p_R[], int trouble[])
 {
-  int j, k;
   int const    K         = (int)running_info[0];
   double const time      =      running_info[1];
   int const    half      = (int)running_info[2];
@@ -21,6 +20,7 @@ void HWENO_5
   int const    decomp    = (int)running_info[5];
   int const    limiter   = (int)running_info[6];
   double const threshold =      running_info[7];
+  int j, k;
 
   double Q1[6], Q2[6], Q3[6], QI1[5], QI2[5], QI3[5], DQ1[6], DQ2[6], DQ3[6];
   double SL, SR, S0, pn1, p0, pp1;
@@ -292,7 +292,6 @@ void HWENO_5
  double rho_L[], double rho_R[], double u_L[], double u_R[], double p_L[], double p_R[],
  double D_rho_L[], double D_rho_R[], double D_u_L[], double D_u_R[], double D_p_L[], double D_p_R[], int trouble[])
 {
-  int j, k;
   int const    K         = (int)running_info[0];
   double const time      =      running_info[1];
   int const    half      = (int)running_info[2];
@@ -301,6 +300,7 @@ void HWENO_5
   int const    decomp    = (int)running_info[5];
   int const    limiter   = (int)running_info[6];
   double const threshold =      running_info[7];
+  int j, k;
 
   double Q1[6], Q2[6], Q3[6], QI1[5], QI2[5], QI3[5], DQ1[6], DQ2[6], DQ3[6];
   double u[m+4], p[m+4], H[m+4], Entp[m+4], EntpI[m+5];
@@ -491,15 +491,15 @@ void HWENO_5
     /*
     deltaP = threshold*fabs(Q1[4] - Q1[5]);
     DP = 1e-5+fabs(30.0*(Q1[2]-Q1[1]) + (520.0/27.0)*(Q1[0]-Q1[3]) + (20.0/3.0)*(QI1[4]-QI1[3]+QI1[1]-QI1[0]));
-    //if(deltaP > DP) flag = 1*limiter;
+    if(deltaP > DP) flag = 1*limiter;
 
     deltaP = threshold*fabs(Q2[4] - Q2[5]);
     DP = 1e-5+fabs(30.0*(Q2[2]-Q2[1]) + (520.0/27.0)*(Q2[0]-Q2[3]) + (20.0/3.0)*(QI2[4]-QI2[3]+QI2[1]-QI2[0]));
-    //if(deltaP > DP) flag = 2*limiter;
+    if(deltaP > DP) flag = 2*limiter;
 
     deltaP = threshold*fabs(Q3[4] - Q3[5]);
     DP = 1e-5+fabs(30.0*(Q3[2]-Q3[1]) + (520.0/27.0)*(Q3[0]-Q3[3]) + (20.0/3.0)*(QI3[4]-QI3[3]+QI3[1]-QI3[0]));
-    //if(deltaP > DP) flag = 3*limiter;
+    if(deltaP > DP) flag = 3*limiter;
     //*/
     deltaP = threshold*fabs(rho_L[j-2] - rho_R[j-2]);
     DP = 1e-5+fabs(30.0*(W1[j]-W1[j-1]) + (520.0/27.0)*(W1[j-2]-W1[j+1]) + (20.0/3.0)*(WI1[j+2]-WI1[j+1]+WI1[j-1]-WI1[j-2]));
@@ -516,17 +516,21 @@ void HWENO_5
     deltaP = threshold*fabs(Q1[4] - Q1[5]);
     DP = 1e-5+fabs(30.0*(Q1[2]-Q1[1]) + (520.0/27.0)*(Q1[0]-Q1[3]) + (20.0/3.0)*(QI1[4]-QI1[3]+QI1[1]-QI1[0]));
     if(deltaP > DP) flag = 5*limiter;
+    
     //EntpL = p_L[j-2] / pow(rho_L[j-2], gamma);
     //EntpR = p_R[j-2] / pow(rho_R[j-2], gamma);
-    //deltaP = threshold*fabs(EntpL[j-2] - EntpR[j-2]);
+    //deltaP = threshold*fabs(EntpL - EntpR);
     //DP = 1e-5+fabs(30.0*(Entp[j]-Entp[j-1]) + (130.0/9.0)*(Entp[j-2]-Entp[j+1]) + (20.0/3.0)*(EntpI[j+2]-EntpI[j+1]+EntpI[j-1]-EntpI[j-2]));
+    //if(deltaP > DP) flag = 5*limiter;
     //if(deltaP > DP) trouble[j-2] = 6*limiter;
     //*/
-
-    if(j-2)
-      trouble[j-3] += flag;
-    if(m+2-j)
-      trouble[j-2] += flag;
+    if(deltaP > DP)
+    {
+      if(j-2)
+	trouble[j-3] += flag;
+      if(m+2-j)
+        trouble[j-2] += flag;
+    }
   }
 
   for(j = 0; j < m; ++j)

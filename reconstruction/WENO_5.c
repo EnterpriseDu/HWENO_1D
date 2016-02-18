@@ -12,7 +12,6 @@ void WENO_5
  double rho_L[], double rho_R[], double u_L[], double u_R[], double p_L[], double p_R[],
  double D_rho_L[], double D_rho_R[], double D_u_L[], double D_u_R[], double D_p_L[], double D_p_R[], int trouble[])
 {
-  int j, k;
   int const    K         = (int)running_info[0];
   double const time      =      running_info[1];
   int const    half      = (int)running_info[2];
@@ -21,6 +20,7 @@ void WENO_5
   int const    decomp    = (int)running_info[5];
   int const    limiter   = (int)running_info[6];
   double const threshold =      running_info[7];
+  int j, k;
 
 
   double W1[m+6], W2[m+6], W3[m+6]; //W1=rho, W2=mom, W3=ene
@@ -285,7 +285,6 @@ void WENO_50
  double rho_L[], double rho_R[], double u_L[], double u_R[], double p_L[], double p_R[],
  double D_rho_L[], double D_rho_R[], double D_u_L[], double D_u_R[], double D_p_L[], double D_p_R[])
 {
-  int j, k;
   int const    K         = (int)running_info[0];
   double const time      =      running_info[1];
   int const    half      = (int)running_info[2];
@@ -294,6 +293,7 @@ void WENO_50
   int const    decomp    = (int)running_info[5];
   int const    limiter   = (int)running_info[6];
   double const threshold =      running_info[7];
+  int j, k;
 
   double W1[m+6], W2[m+6], W3[m+6]; //W1=rho, W2=mom, W3=ene
   double Q1[8], Q2[8], Q3[8];
@@ -421,7 +421,7 @@ void WENO_50
       flag += 1;
 
     deltaP = threshold*fabs(rho_L[j-3] - rho_R[j-3]);
-    DP = 1e-5+fabs(10*(W1[j]-W1[j-1]) + 5*(W1[j-2]-W1[j+1]) + (W1[j+2]-W1[j-3]));
+    DP = 1e-5+fabs(10.0*(W1[j]-W1[j-1]) + 5.0*(W1[j-2]-W1[j+1]) + (W1[j+2]-W1[j-3]));
     if(deltaP > DP) flag = 4*limiter;
 
     if(j-3)
@@ -498,7 +498,6 @@ void WENO_50
     }
   }
 }
-
 
 
 

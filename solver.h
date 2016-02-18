@@ -7,11 +7,19 @@
 
 
 //======================fixed GRP=================================
-int GRP_fix
+int GRP2_fix
+(double const CONFIG[], double const OPT[], int const m, double const h,
+ double *rho[], double *u[], double *p[], runList * runhist, char *scheme);
+
+int ADER2_fix
 (double const CONFIG[], double const OPT[], int const m, double const h,
  double *rho[], double *u[], double *p[], runList * runhist, char *scheme);
 
 //======================fixed GRPWENO=================================
+int ADER4_HWENO_fix
+(double const CONFIG[], double const OPT[], int const m, double const h,
+ double *rho[], double *u[], double *p[], runList * runhist, char *scheme);
+
 int GRP4_HWENO_fix
 (double const CONFIG[], double const OPT[], int const m, double const h,
  double *rho[], double *u[], double *p[], runList * runhist, char *scheme);

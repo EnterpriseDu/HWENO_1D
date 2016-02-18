@@ -4,7 +4,6 @@
 void flux_RF(double const running_info[], int const m, double const h, double const gamma,
 	     double const rho[], double const mom[], double const ene[], double F1[], double F2[], double F3[])
 {
-  int j, k, a;
   int const    K         = (int)running_info[0];
   double const time      =      running_info[1];
   int const    half      = (int)running_info[2];
@@ -13,7 +12,7 @@ void flux_RF(double const running_info[], int const m, double const h, double co
   int const    decomp    = (int)running_info[5];
   int const    limiter   = (int)running_info[6];
   double const threshold =      running_info[7];
-
+  int j, k, a;
 
   double rho_L, rho_R, u_L, u_R, p_L, p_R, c_L, c_R;
   double rho_star_L, rho_star_R, u_star_L, u_star_R, p_star_L, p_star_R, c_star_L, c_star_R;
