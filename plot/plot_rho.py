@@ -5,20 +5,19 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 
 
-cut = 0
-fname = '0000'
-label = 'test'
-add = './data/' + label
-#addx = add + '/xc__'
-#addy = add + '/yc__'
-addr = add + '/rho_'
-#addx = addx + fname
-#addy = addy + fname
-addr = addr + fname
-#addx = addx + '.txt'
-#addy = addy + '.txt'
-addr = addr + '.txt'
 
+fname = '0000'
+label = 'wood'
+scheme = 'G4H5'
+version = 'dev-1.1'
+m = '800'
+switches = 'FWDY'
+label = label + '_' + scheme + '_' + version + '_' + m + '_' + switches
+#label = 'DM_GRP-H-fixed_limiter-test_240x60_002010'
+add = '../SOLUTION/' + label
+addr = add + '/rho_'
+addr = addr + fname
+addr = addr + '.txt'
 
 
 
