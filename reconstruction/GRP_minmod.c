@@ -9,11 +9,14 @@ void GRP_minmod
  double D_rho_L[], double D_rho_R[], double D_u_L[], double D_u_R[], double D_p_L[], double D_p_R[])
 {
   int i, j;
-  int const bod = (int)running_info[3];
-  int const WENOD = (int)running_info[4];
-  int const limiter = (int)running_info[5];
-  int const decmop = (int)running_info[6];
-  double const threshold = running_info[7];
+  int const    K         = (int)running_info[0];
+  double const time      =      running_info[1];
+  int const    half      = (int)running_info[2];
+  int const    bod       = (int)running_info[3];
+  int const    WENOD     = (int)running_info[4];
+  int const    decomp    = (int)running_info[5];
+  int const    limiter   = (int)running_info[6];
+  double const threshold =      running_info[7];
 
   double SL, SR, Stmp;
   double Drho[m], Du[m], Dp[m];
@@ -173,10 +176,14 @@ void GRP_minmod0
  double D_rho_L[], double D_rho_R[], double D_u_L[], double D_u_R[], double D_p_L[], double D_p_R[])
 {
   int i, j;
-  int const bod = (int)running_info[3];
-  int const WENOD = (int)running_info[4];
-  int const limiter = (int)running_info[5];
-  double const threshold = running_info[6];
+  int const    K         = (int)running_info[0];
+  double const time      =      running_info[1];
+  int const    half      = (int)running_info[2];
+  int const    bod       = (int)running_info[3];
+  int const    WENOD     = (int)running_info[4];
+  int const    decomp    = (int)running_info[5];
+  int const    limiter   = (int)running_info[6];
+  double const threshold =      running_info[7];
 
   double SL, SR, Stmp;
   double Drho[m], Du[m], Dp[m];

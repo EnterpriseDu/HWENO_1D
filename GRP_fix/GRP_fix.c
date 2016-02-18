@@ -45,7 +45,6 @@
 #include "file_io_local.h"
 #include "reconstruction.h"
 
-#define N_RUNNING 7
 
 
 int GRP_fix
@@ -96,9 +95,9 @@ int GRP_fix
   double running_info[N_RUNNING];
   running_info[3] = OPT[4];  // the boundary condition
   running_info[4] = OPT[6];  // the choice of the direvative reconstruction
-  running_info[5] = OPT[7];  // use the limiter or not
+  running_info[5] = OPT[7];  // use the charactoristic decomposition or not
   running_info[6] = OPT[8];    // use the limiter or not
-  running_info[7] = CONFIG[9];
+  running_info[7] = CONFIG[9]; // threshold
 
 
   double c, stmp, D[4], U[4], wave_speed[2];

@@ -4,23 +4,27 @@
 
 
 
-
+/*
 void HWENO_5
 (double const running_info[], int const m, double const h, double const eps, double const alp2, double const gamma,
  double const rho[], double const mom[], double const ene[],
  double const rhoI[], double const momI[], double const eneI[], double const uI[], double const pI[],
  double rho_L[], double rho_R[], double u_L[], double u_R[], double p_L[], double p_R[],
- double D_rho_L[], double D_rho_R[], double D_u_L[], double D_u_R[], double D_p_L[], double D_p_R[])
+ double D_rho_L[], double D_rho_R[], double D_u_L[], double D_u_R[], double D_p_L[], double D_p_R[], int trouble[])
 {
   int j, k;
-  int const bod = (int)running_info[3];
-  int const WENOD = (int)running_info[4];
-  int const limiter = (int)running_info[5];
-  int const decmop = (int)running_info[6];
-  double const threshold = running_info[7];
+  int const    K         = (int)running_info[0];
+  double const time      =      running_info[1];
+  int const    half      = (int)running_info[2];
+  int const    bod       = (int)running_info[3];
+  int const    WENOD     = (int)running_info[4];
+  int const    decomp    = (int)running_info[5];
+  int const    limiter   = (int)running_info[6];
+  double const threshold =      running_info[7];
 
   double Q1[6], Q2[6], Q3[6], QI1[5], QI2[5], QI3[5], DQ1[6], DQ2[6], DQ3[6];
   double SL, SR, S0, pn1, p0, pp1;
+  int flag;
 
   double H_star, u_star, c_star, u, p, H[m+4];
 
@@ -168,13 +172,120 @@ void HWENO_5
     D_u_R[j-2] = (D_u_R[j-2] - u_R[j-2]*D_rho_R[j-2]) / rho_R[j-2];
     D_p_L[j-2] = (D_p_L[j-2] - 0.5*D_rho_L[j-2]*u_L[j-2]*u_L[j-2] - rho_L[j-2]*u_L[j-2]*D_u_L[j-2])*(gamma-1.0);
     D_p_R[j-2] = (D_p_R[j-2] - 0.5*D_rho_R[j-2]*u_R[j-2]*u_R[j-2] - rho_R[j-2]*u_R[j-2]*D_u_R[j-2])*(gamma-1.0);
+
+
+    flag = 0;
+    //physical check
+    if((rho_L[j-2] < 1e-9) || (p_L[j-2] < 1e-9) || isnan(rho_L[j-2]) || isnan(p_L[j-2]))
+      flag += 1;
+    if((rho_R[j-2] < 1e-9) || (p_R[j-2] < 1e-9) || isnan(rho_R[j-2]) || isnan(p_R[j-2]))
+      flag += 1;
+
+    if(j-2)
+      trouble[j-3] += flag;
+    if(m+2-j)
+      trouble[j-2] += flag;
+  }
+
+  for(j = 0; j < m; ++j)
+  {
+    if(trouble[j])
+    {
+      Qn1 = W1[j+1];
+      Q0  = W1[j+2];
+      Qp1 = W1[j+3];
+
+      SL = Q0 - Qn1; SR = Qp1 - Q0; S0 = rhoI[j+1] - rhoI[j];
+      if(SL*SR < 0.0)
+      {
+	D_rho_R[j] = 0.0;
+	rho_R[j] = Q0;
+	rho_L[j+1] = Q0;
+	D_rho_L[j+1] = D_rho_R[j];
+      }
+      else if(SL*S0 < 0.0)
+      {
+	D_rho_R[j] = 0.0;
+	rho_R[j] = Q0;
+	rho_L[j+1] = Q0;
+	D_rho_L[j+1] = D_rho_R[j];
+      }
+      else
+      {
+	SL = alp2*((fabs(SL) < fabs(SR))? SL : SR);
+	if(fabs(SL) < fabs(S0))
+	  S0 = SL;
+	rho_R[j] = Q0 - 0.5*S0;
+	D_rho_R[j] = S0 / h;
+	rho_L[j+1] = Q0 + 0.5*S0;
+	D_rho_L[j+1] = D_rho_R[j];
+      }
+
+      Qn1 = u[j+1];
+      Q0  = u[j+2];
+      Qp1 = u[j+3];
+      SL = Q0 - Qn1; SR = Qp1 - Q0; S0 = uI[j+1] - uI[j];
+      if(SL*SR < 0.0)
+      {
+	D_u_R[j] = 0.0;
+	u_R[j] = Q0;
+	u_L[j+1] = Q0;
+	D_u_L[j+1] = D_u_R[j];
+      }
+      else if(SL*S0 < 0.0)
+      {
+	D_u_R[j] = 0.0;
+	u_R[j] = Q0;
+	u_L[j+1] = Q0;
+	D_u_L[j+1] = D_u_R[j];
+      }
+      else
+      {
+	SL = alp2*((fabs(SL) < fabs(SR))? SL : SR);
+	if(fabs(SL) < fabs(S0))
+	  S0 = SL;
+	u_R[j] = Q0 - 0.5*S0;
+	D_u_R[j] = S0 / h;
+	u_L[j+1] = Q0 + 0.5*S0;
+	D_u_L[j+1] = D_u_R[j];
+      }
+
+      Qn1 = p[j+1];
+      Q0  = p[j+2];
+      Qp1 = p[j+3];
+      SL = Q0 - Qn1; SR = Qp1 - Q0; S0 = pI[j+1] - pI[j];
+      if(SL*SR < 0.0)
+      {
+	D_p_R[j] = 0.0;
+	p_R[j] = Q0;
+	p_L[j+1] = Q0;
+	D_p_L[j+1] = D_p_R[j];
+      }
+      else if(SL*S0 < 0.0)
+      {
+	D_p_R[j] = 0.0;
+	p_R[j] = Q0;
+	p_L[j+1] = Q0;
+	D_p_L[j+1] = D_p_R[j];
+      }
+      else
+      {
+	SL = alp2*((fabs(SL) < fabs(SR))? SL : SR);
+	if(fabs(SL) < fabs(S0))
+	  S0 = SL;
+	p_R[j] = Q0 - 0.5*S0;
+	D_p_R[j] = S0 / h;
+	p_L[j+1] = Q0 + 0.5*S0;
+	D_p_L[j+1] = D_p_R[j];
+      }
+    }
   }
 }
+*/
 
 
 
-
-void HWENO_5_limited
+void HWENO_5
 (double const running_info[], int const m, double const h, double const eps, double const alp2, double const gamma,
  double const rho[], double const mom[], double const ene[],
  double const rhoI[], double const momI[], double const eneI[], double const uI[], double const pI[],
@@ -182,10 +293,14 @@ void HWENO_5_limited
  double D_rho_L[], double D_rho_R[], double D_u_L[], double D_u_R[], double D_p_L[], double D_p_R[], int trouble[])
 {
   int j, k;
-  int const bod = (int)running_info[3];
-  int const WENOD = (int)running_info[4];
-  int const limiter = (int)running_info[5];
-  double const threshold = running_info[6];
+  int const    K         = (int)running_info[0];
+  double const time      =      running_info[1];
+  int const    half      = (int)running_info[2];
+  int const    bod       = (int)running_info[3];
+  int const    WENOD     = (int)running_info[4];
+  int const    decomp    = (int)running_info[5];
+  int const    limiter   = (int)running_info[6];
+  double const threshold =      running_info[7];
 
   double Q1[6], Q2[6], Q3[6], QI1[5], QI2[5], QI3[5], DQ1[6], DQ2[6], DQ3[6];
   double u[m+4], p[m+4], H[m+4], Entp[m+4], EntpI[m+5];
@@ -368,6 +483,11 @@ void HWENO_5_limited
 
 
     flag = 0;
+    //physical check
+    if((rho_L[j-2] < 1e-9) || (p_L[j-2] < 1e-9) || isnan(rho_L[j-2]) || isnan(p_L[j-2]))
+      flag += 1;
+    if((rho_R[j-2] < 1e-9) || (p_R[j-2] < 1e-9) || isnan(rho_R[j-2]) || isnan(p_R[j-2]))
+      flag += 1;
     /*
     deltaP = threshold*fabs(Q1[4] - Q1[5]);
     DP = 1e-5+fabs(30.0*(Q1[2]-Q1[1]) + (520.0/27.0)*(Q1[0]-Q1[3]) + (20.0/3.0)*(QI1[4]-QI1[3]+QI1[1]-QI1[0]));
