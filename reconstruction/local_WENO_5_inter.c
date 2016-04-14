@@ -209,7 +209,7 @@ void local_WENO_5_interright(double h, double Q[8])
 
 void local_WENO_5_inter(double h, double Q[8])
 {
-  double c[3][3], d[3][3], e[3][3], f[3][3], eps = 1e-6;
+  double c[3][3], d[3][3], e[3][3], f[3][3], eps = 1e-40;
   c[0][0] = 1.0/3.0;
   c[0][1] = 5.0/6.0;
   c[0][2] = -1.0/6.0;
