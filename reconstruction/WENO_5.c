@@ -2,6 +2,7 @@
 
 #include "reconstruction.h"
 
+#include "de_re_composition.h"
 
 
 
@@ -298,10 +299,11 @@ void WENO_50
   double W1[m+6], W2[m+6], W3[m+6]; //W1=rho, W2=mom, W3=ene
   double Q1[8], Q2[8], Q3[8];
   double SL, SR, S0, Qn2, Qn1, Q0, Qp1, Qp2, DQQ[3][2];
+  double QL[3], QR[3], PL[3], PR[3];
   double H[m+6], u[m+6], p[m+6];
   double deltaP, DP, flag, trouble[m];
 
-  double H_star, u_star, c_star;
+  double H_star, u_star, c_square, c_star, gamma1 = gamma-1.0;
   for(j = 0; j < m; ++j)
   {
     W1[j+3] = rho[j];
@@ -348,9 +350,12 @@ void WENO_50
   {
     u_star = (W2[j]/sqrt(W1[j]) + W2[j-1]/sqrt(W1[j-1]))/(sqrt(W1[j]) + sqrt(W1[j-1]));
     H_star = (sqrt(W1[j])* H[j] + sqrt(W1[j-1])* H[j-1])/(sqrt(W1[j]) + sqrt(W1[j-1]));
-    c_star = sqrt((gamma-1.0)*(H_star - 0.5*u_star*u_star));
+    c_square = gamma1*(H_star - 0.5*u_star*u_star);
+    c_star = sqrt(c_square);
 
   //=========Charactoristic Decomposition=========
+    decomposition(H_star, u_star, c_square, c_star, gamma1, m, j, 6, 3, decomp, W1, W2, W3, Q1, Q2, Q3);
+    /*
     for(k = 0; k < 6; ++k)
     {
       Q1[k] = W1[j-3+k] * 0.5*u_star* (0.5*(gamma-1.0)*u_star/c_star + 1.0);
@@ -362,7 +367,7 @@ void WENO_50
       Q3[k]+= W3[j-3+k] * 0.5 * (gamma-1.0) / c_star;
       Q3[k] = Q3[k] / c_star;
       Q2[k] = (gamma-1.0) * ((W2[j-3+k]-0.5*W1[j-3+k]*u_star)*u_star - W3[j-3+k]) / c_star/c_star + W1[j-3+k];
-    }
+      }*/
 
     if(WENOD)
     {
@@ -385,6 +390,21 @@ void WENO_50
 
 
   //=====Recomposition========
+    QL[0] = Q1[6]; QR[0] = Q1[7];
+    QL[1] = Q2[6]; QR[1] = Q2[7];
+    QL[2] = Q3[6]; QR[2] = Q3[7];
+    recomposition(H_star, u_star, c_star, decomp, QL, QR, PL, PR);
+    rho_L[j-3] = PL[0]; rho_R[j-3] = PR[0];
+    u_L[j-3] = PL[1];   u_R[j-3] = PR[1];
+    p_L[j-3] = PL[2];   p_R[j-3] = PR[2];
+    QL[0] = DQQ[0][0]; QR[0] = DQQ[0][1];
+    QL[1] = DQQ[1][0]; QR[1] = DQQ[1][1];
+    QL[2] = DQQ[2][0]; QR[2] = DQQ[2][1];
+    recomposition(H_star, u_star, c_star, decomp, QL, QR, PL, PR);
+    D_rho_L[j-3] = PL[0]; D_rho_R[j-3] = PR[0];
+    D_u_L[j-3] = PL[1];   D_u_R[j-3] = PR[1];
+    D_p_L[j-3] = PL[2];   D_p_R[j-3] = PR[2];
+    /*
     rho_L[j-3] = Q1[6] + Q2[6] + Q3[6];
     rho_R[j-3] = Q1[7] + Q2[7] + Q3[7];
     D_rho_L[j-3] = DQQ[0][0] + DQQ[1][0] + DQQ[2][0];
@@ -399,7 +419,7 @@ void WENO_50
     p_R[j-3] = H_star*(Q1[7]+Q3[7]) + u_star*c_star*(Q3[7]-Q1[7]) + 0.5*u_star*u_star*Q2[7];
     D_p_L[j-3] = H_star*(DQQ[0][0]+DQQ[2][0]) + u_star*c_star*(DQQ[2][0]-DQQ[0][0]) + 0.5*u_star*u_star*DQQ[1][0];
     D_p_R[j-3] = H_star*(DQQ[0][1]+DQQ[2][1]) + u_star*c_star*(DQQ[2][1]-DQQ[0][1]) + 0.5*u_star*u_star*DQQ[1][1];
-
+    */
 
     u_L[j-3] = u_L[j-3] / rho_L[j-3];
     u_R[j-3] = u_R[j-3] / rho_R[j-3];

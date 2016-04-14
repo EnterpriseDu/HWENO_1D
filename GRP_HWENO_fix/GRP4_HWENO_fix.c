@@ -192,7 +192,7 @@ int GRP4_HWENO_fix
       if(speed_max < sigma)
 	speed_max = sigma;
     }
-    tau = (CFL * h) / speed_max;
+    tau = (CFL * h);
     if(T+tau > TIME){tau = TIME-T; T = TIME;} else{T += tau;}
     half_tau = 0.5*tau;
     nu = tau/h;
@@ -247,6 +247,36 @@ int GRP4_HWENO_fix
 
     running_info[1] = T - half_tau;  // time
     running_info[2] = 1.0;           // half
+    for(i = 0; i < m+1; ++i)
+      printf("%.10lf  ", rho_L[i]);
+    printf("\n\n");
+    for(i = 0; i < m+1; ++i)
+      printf("%.10lf  ", rho_R[i]);
+    printf("\n\n");
+    for(i = 0; i < m+1; ++i)
+      printf("%.10lf  ", u_L[i]);
+    printf("\n\n");
+    for(i = 0; i < m+1; ++i)
+      printf("%.10lf  ", u_R[i]);
+    printf("\n\n");
+    for(i = 0; i < m+1; ++i)
+      printf("%.10lf  ", p_L[i]);
+    printf("\n\n");
+    for(i = 0; i < m+1; ++i)
+      printf("%.10lf  ", p_R[i]);
+    printf("\n\n");
+    for(i = 0; i < m+1; ++i)
+      printf("%.10lf  ", rhoI[i]);
+    printf("\n\n");
+    for(i = 0; i < m+1; ++i)
+      printf("%.10lf  ", half_rhoI[i]);
+    printf("\n\n");
+    for(i = 0; i < m+1; ++i)
+      printf("%.10lf  ", uI[i]);
+    printf("\n\n");
+    for(i = 0; i < m+1; ++i)
+      printf("%.10lf  ", pI[i]);
+    printf("\n\n");
     HWENO_5(running_info, m, h, eps, alp2, gamma, half_rho, half_mom, half_ene, half_rhoI, half_momI, half_eneI, half_uI, half_pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, runhist->current->trouble1);
     /*
   write_column(m, half_rho, "rho", "running");
@@ -311,6 +341,15 @@ int GRP4_HWENO_fix
 
     running_info[1] = T;
     running_info[2] = 0.0;  // not half
+    for(i = 0; i < m+1; ++i)
+      printf("%.10lf  ", rho_L[i]);
+    printf("\n");
+    for(i = 0; i < m+1; ++i)
+      printf("%.10lf  ", rho_R[i]);
+    printf("\n");
+    for(i = 0; i < m+1; ++i)
+      printf("%.10lf  ", rhoI[i]);
+    printf("\n\n");
     HWENO_5(running_info, m, h, eps, alp2, gamma, rho[vk1], mom, ene, rhoI, momI, eneI, uI, pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, runhist->current->trouble0);
     /*
   write_column(m, rho[vk1], "rho", "running");

@@ -342,8 +342,12 @@ int main(int argc, char *argv[])
 
   int K = 0;
   char scheme[100];
-  char version[100] = "dev-1.1";
+  char version[100] = "debug-acc";
   printf("The present version is [%s]\n", version);
+  CONFIG[1] = 0.2;
+  OPT[6] = 0.0;
+  OPT[7] = 0.0;
+  OPT[8] = 0.0;
   K = GRP4_HWENO_fix(CONFIG, OPT, m, h, rho, u, p, &runhist, scheme);
   //K = GRP_fix(CONFIG, OPT, m, h, rho, u, p, &runhist, scheme);
 
