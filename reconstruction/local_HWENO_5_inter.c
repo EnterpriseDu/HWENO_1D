@@ -100,7 +100,7 @@ void local_HWENO_5_inter_d(double h, double Q[6], double DQ[6])
 
 void local_HWENO_5_inter(double h, double Q[6], double DQ[4])
 {
-  double eps = 1e-6;
+  double eps = 1e-40;
   double Dneg[3] = {0.1125, 0.525, 0.3625};
   double Dpos[3] = {0.525, 0.1125, 0.3625};
 
