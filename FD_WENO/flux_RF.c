@@ -100,11 +100,27 @@ void flux_RF(double const running_info[], int const m, double const h, double co
     if(u_L-c_L < 0.0)//possible left transonic rarefaction
     {
       alp1 = (Q1[3]-Q1[2])/(u_star-c_star);
+      /*
+       *   Q1[3] - Q1[2] = beta^1_R - beta^1_L
+       * = dF.L1
+       * = (A dU).L1
+       * = dU^t A^t L1
+       * = dU^t [L1 L2 L3] Lambda R L1
+       * = [alp1 alp2 alp3] Lambda [1 0 0]^t
+       * = [lamb1*alp1 lamb2*alp2 lamb3*alp3] [1 0 0]^t
+       * = lamb1*alp1
+       * ==> alp1 = (Q1[3]-Q1[2])/lamb1
+       */
       rho_star_L = W1[j-1] + alp1;
-        u_star_L = (W2[j-1] + alp1*(u_star-c_star)) / rho_star_L;
-        p_star_L = W3[j-1] + alp1*(H_star-u_star*c_star);
-        p_star_L = (gamma-1.0)*(p_star_L - 0.5*rho_star_L*u_star_L*u_star_L);
-	c_star_L = sqrt(gamma*p_star_L/rho_star_L);
+      u_star_L = (W2[j-1] + alp1*(u_star-c_star));
+      u_star_L = u_star_L / rho_star_L;
+      p_star_L = W3[j-1] + alp1*(H_star-u_star*c_star);
+      p_star_L = (gamma-1.0)*(p_star_L - 0.5*rho_star_L*u_star_L*u_star_L);
+      c_star_L = sqrt(gamma*p_star_L/rho_star_L);
+      /*  ^    U*L = UL + alp1 * R1
+       *  |  compute u_star_L-c_star_L to decide whether there is a left
+       *     transonic rarefaction
+       */
       if(u_star_L-c_star_L > 0.0)//left transonic rarefaction
       {
 	local_WENO_5_interleft(h, Q1);
@@ -128,10 +144,15 @@ void flux_RF(double const running_info[], int const m, double const h, double co
     {
       alp3 = (Q3[3]-Q3[2])/(u_star+c_star);
       rho_star_R = W1[j] - alp3;
-        u_star_R = (W2[j] - alp3*(u_star+c_star)) / rho_star_R;
-        p_star_R = W3[j] - alp3*(H_star+u_star*c_star);
-        p_star_R = (gamma-1.0)*(p_star_R - 0.5*rho_star_R*u_star_R*u_star_R);
-	c_star_R = sqrt(gamma*p_star_R/rho_star_R);
+      u_star_R = (W2[j] - alp3*(u_star+c_star));
+      u_star_R = u_star_R / rho_star_R;
+      p_star_R = W3[j] - alp3*(H_star+u_star*c_star);
+      p_star_R = (gamma-1.0)*(p_star_R - 0.5*rho_star_R*u_star_R*u_star_R);
+      c_star_R = sqrt(gamma*p_star_R/rho_star_R);
+      /*  ^    U*R = UR - alp3 * R3
+       *  |  compute u_star_R+c_star_R to decide whether there is a right
+       *     transonic rarefaction
+       */
       if(u_star_R+c_star_R < 0.0)//right transonic rarefaction
       {
 	local_WENO_5_interright(h, Q1);
@@ -202,7 +223,18 @@ void flux_RF(double const running_info[], int const m, double const h, double co
 }
 
 
-
+/*
+ * We use this dual Roe solver to solve dual Riemann problem
+ *     u_t - f(u)_x = 0
+ * Its Roe linearization is
+ *     u_t - A u_x = 0
+ * The eigenvector of -A is the same as those of A. The eigenvalues
+ * of -A is the opposite signs, i.e. they are
+ *     [eta_1, eta_2, eta_3] = [-u+c, -u, -u-c]
+ * corresponding to the right eigenvectors
+ *                [R1, R2, R3].
+ *
+ */
 void flux_RF_dual(double const running_info[], int const m, double const h, double const gamma,
 		  double const rho[], double const mom[], double const ene[], double F1[], double F2[], double F3[])
 {
@@ -302,11 +334,27 @@ void flux_RF_dual(double const running_info[], int const m, double const h, doub
     if(u_L-c_L < 0.0)//possible left transonic rarefaction
     {
       alp1 = (Q1[3]-Q1[2])/(u_star-c_star);
+      /*
+       *   Q1[3] - Q1[2] = beta^1_R - beta^1_L
+       * = dF.L1
+       * = (A dU).L1
+       * = dU^t A^t L1
+       * = dU^t [L1 L2 L3] Lambda R L1
+       * = [alp1 alp2 alp3] Lambda [1 0 0]^t
+       * = [lamb1*alp1 lamb2*alp2 lamb3*alp3] [1 0 0]^t
+       * = lamb1*alp1
+       * ==> alp1 = (Q1[3]-Q1[2])/lamb1
+       */
       rho_star_L = W1[j-1] + alp1;
-        u_star_L = (W2[j-1] + alp1*(u_star-c_star)) / rho_star_L;
-        p_star_L = W3[j-1] + alp1*(H_star-u_star*c_star);
-        p_star_L = (gamma-1.0)*(p_star_L - 0.5*rho_star_L*u_star_L*u_star_L);
-	c_star_L = sqrt(gamma*p_star_L/rho_star_L);
+      u_star_L = (W2[j-1] + alp1*(u_star-c_star));
+      u_star_L = u_star_L / rho_star_L;
+      p_star_L = W3[j-1] + alp1*(H_star-u_star*c_star);
+      p_star_L = (gamma-1.0)*(p_star_L - 0.5*rho_star_L*u_star_L*u_star_L);
+      c_star_L = sqrt(gamma*p_star_L/rho_star_L);
+      /*  ^    U*L = UL + alp1 * R1
+       *  |  compute u_star_L-c_star_L to decide whether there is a left
+       *     transonic rarefaction
+       */
       if(u_star_L-c_star_L > 0.0)//left transonic rarefaction
       {
 	local_WENO_5_interleft(h, Q1);
@@ -330,10 +378,15 @@ void flux_RF_dual(double const running_info[], int const m, double const h, doub
     {
       alp3 = (Q3[3]-Q3[2])/(u_star+c_star);
       rho_star_R = W1[j] - alp3;
-        u_star_R = (W2[j] - alp3*(u_star+c_star)) / rho_star_R;
-        p_star_R = W3[j] - alp3*(H_star+u_star*c_star);
-        p_star_R = (gamma-1.0)*(p_star_R - 0.5*rho_star_R*u_star_R*u_star_R);
-	c_star_R = sqrt(gamma*p_star_R/rho_star_R);
+      u_star_R = (W2[j] - alp3*(u_star+c_star));
+      u_star_R = u_star_R / rho_star_R;
+      p_star_R = W3[j] - alp3*(H_star+u_star*c_star);
+      p_star_R = (gamma-1.0)*(p_star_R - 0.5*rho_star_R*u_star_R*u_star_R);
+      c_star_R = sqrt(gamma*p_star_R/rho_star_R);
+      /*  ^    U*R = UR - alp3 * R3
+       *  |  compute u_star_R+c_star_R to decide whether there is a right
+       *     transonic rarefaction
+       */
       if(u_star_R+c_star_R < 0.0)//right transonic rarefaction
       {
 	local_WENO_5_interright(h, Q1);
@@ -353,36 +406,36 @@ void flux_RF_dual(double const running_info[], int const m, double const h, doub
     //non transonic rarefaction
     if(u_star-c_star > 0.0)
     {
-      local_WENO_5_interleft(h, Q1);
-      local_WENO_5_interleft(h, Q2);
-      local_WENO_5_interleft(h, Q3);
+      local_WENO_5_interright(h, Q1);
+      local_WENO_5_interright(h, Q2);
+      local_WENO_5_interright(h, Q3);
       g1 = Q1[6];
       g2 = Q2[6];
       g3 = Q3[6];
     }
     else if(u_star > 0.0)
     {
-      local_WENO_5_interright(h, Q1);
-      local_WENO_5_interleft(h, Q2);
-      local_WENO_5_interleft(h, Q3);
+      local_WENO_5_interleft(h, Q1);
+      local_WENO_5_interright(h, Q2);
+      local_WENO_5_interright(h, Q3);
       g1 = Q1[7];
       g2 = Q2[6];
       g3 = Q3[6];
     }
     else if(u_star+c_star > 0.0)
     {
-      local_WENO_5_interright(h, Q1);
-      local_WENO_5_interright(h, Q2);
-      local_WENO_5_interleft(h, Q3);
+      local_WENO_5_interleft(h, Q1);
+      local_WENO_5_interleft(h, Q2);
+      local_WENO_5_interright(h, Q3);
       g1 = Q1[7];
       g2 = Q2[7];
       g3 = Q3[6];
     }
     else
     {
-      local_WENO_5_interright(h, Q1);
-      local_WENO_5_interright(h, Q2);
-      local_WENO_5_interright(h, Q3);
+      local_WENO_5_interleft(h, Q1);
+      local_WENO_5_interleft(h, Q2);
+      local_WENO_5_interleft(h, Q3);
       g1 = Q1[7];
       g2 = Q2[7];
       g3 = Q3[7];
