@@ -348,8 +348,9 @@ int main(int argc, char *argv[])
   OPT[6] = 0.0;
   OPT[7] = 0.0;
   OPT[8] = 0.0;
+  //OPT[1] = 0.8;
   K = GRP4_HWENO_fix(CONFIG, OPT, m, h, rho, u, p, &runhist, scheme);
-  //K = GRP_fix(CONFIG, OPT, m, h, rho, u, p, &runhist, scheme);
+  //K = GRP2_fix(CONFIG, OPT, m, h, rho, u, p, &runhist, scheme);
 
 
   int vvM = vM;
