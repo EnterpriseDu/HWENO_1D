@@ -141,7 +141,7 @@ int GRP4_HWENO_fix
   running_info[1] = 0.0;  // time
   running_info[2] = 0.0;  // not half
   WENO_50(running_info, m, h, eps, alp2, gamma, rho[0], mom, ene, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
-  //*
+  /*
   write_column(m, rho[0], "rho", "running");
   write_column(m, ene, "ene", "running");
   write_column(m, p[0], "p", "running");
@@ -192,7 +192,7 @@ int GRP4_HWENO_fix
       if(speed_max < sigma)
 	speed_max = sigma;
     }
-    tau = (CFL * h);
+    tau = (CFL * h) / speed_max;
     if(T+tau > TIME){tau = TIME-T; T = TIME;} else{T += tau;}
     half_tau = 0.5*tau;
     nu = tau/h;

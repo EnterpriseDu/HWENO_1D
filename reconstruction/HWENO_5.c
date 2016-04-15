@@ -410,6 +410,7 @@ void HWENO_5
     c_star = sqrt(c_square);
 
   //=========Charactoristic Decomposition=========
+    /*
     decomposition(H_star, u_star, c_square, c_star, gamma1, m, j, 4, 2, decomp, W1, W2, W3, Q1, Q2, Q3);
     decomposition(H_star, u_star, c_square, c_star, gamma1, m, j, 5, 2, decomp, WI1, WI2, WI3, QI1, QI2, QI3);
     for(k = 0; k < 4; ++k)
@@ -418,7 +419,7 @@ void HWENO_5
       DQ2[k] = QI2[k+1] - QI2[k];
       DQ3[k] = QI3[k+1] - QI3[k];
     }
-    /*
+    /*/
     for(k = 0; k < 5; ++k)
     {
       QI1[k] = WI1[j-2+k] * 0.5*u_star* (0.5*(gamma-1.0)*u_star/c_star + 1.0);
@@ -447,7 +448,7 @@ void HWENO_5
       DQ2[k] = QI2[k+1] - QI2[k];
       DQ3[k] = QI3[k+1] - QI3[k];
     }
-    */
+    //*/
     if(WENOD)
     {
       local_HWENO_5_inter_d(h, Q1, DQ1);
@@ -468,6 +469,7 @@ void HWENO_5
     }
 
   //=====Recomposition========
+    /*
     QL[0] = Q1[4]; QR[0] = Q1[5];
     QL[1] = Q2[4]; QR[1] = Q2[5];
     QL[2] = Q3[4]; QR[2] = Q3[5];
@@ -482,7 +484,7 @@ void HWENO_5
     D_rho_L[j-2] = PL[0]; D_rho_R[j-2] = PR[0];
     D_u_L[j-2] = PL[1];   D_u_R[j-2] = PR[1];
     D_p_L[j-2] = PL[2];   D_p_R[j-2] = PR[2];
-    /*
+    /*/
     rho_L[j-2] = Q1[4] + Q2[4] + Q3[4];
     rho_R[j-2] = Q1[5] + Q2[5] + Q3[5];
     D_rho_L[j-2] = DQ1[4] + DQ2[4] + DQ3[4];
@@ -497,7 +499,7 @@ void HWENO_5
     p_R[j-2] = H_star*(Q1[5]+Q3[5]) + u_star*c_star*(Q3[5]-Q1[5]) + 0.5*u_star*u_star*Q2[5];
     D_p_L[j-2] = H_star*(DQ1[4]+DQ3[4]) + u_star*c_star*(DQ3[4]-DQ1[4]) + 0.5*u_star*u_star*DQ2[4];
     D_p_R[j-2] = H_star*(DQ1[5]+DQ3[5]) + u_star*c_star*(DQ3[5]-DQ1[5]) + 0.5*u_star*u_star*DQ2[5];
-    */
+    //*/
 
     u_L[j-2] = u_L[j-2] / rho_L[j-2];
     u_R[j-2] = u_R[j-2] / rho_R[j-2];
