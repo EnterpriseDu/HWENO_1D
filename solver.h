@@ -41,6 +41,9 @@ int FD_1st_fix
 void flux_RF(double const running_info[], int const m, double const h, double const gamma,
 	     double const rho[], double const mom[], double const ene[], double F1[], double F2[], double F3[]);
 
+void flux_RF_dual(double const running_info[], int const m, double const h, double const gamma,
+		  double const rho[], double const mom[], double const ene[], double F1[], double F2[], double F3[]);
+
 void flux_RF_1st(double const running_info[], int const m, double const h, double const gamma,
 		 double const rho[], double const mom[], double const ene[], double F1[], double F2[], double F3[]);
 

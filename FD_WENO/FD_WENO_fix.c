@@ -88,6 +88,8 @@ int FD_WENO_fix
   double f11[m+1], f12[m+1], f13[m+1];
   double f21[m+1], f22[m+1], f23[m+1];
   double f31[m+1], f32[m+1], f33[m+1];
+  double df01[m+1], df02[m+1], df03[m+1]; // DUAL flux
+  double df11[m+1], df12[m+1], df13[m+1]; // DUAL flux
 
   double sigma, speed_max;  /* speed_max denote the largest character
 					 * speed at each time step
@@ -98,7 +100,7 @@ int FD_WENO_fix
 double a10 = 1.0;
 double a20 = 649.0/1600.0, a21 = 951.0/1600.0;
 double a30 = 53989.0/2500000.0, a31 = 4806213.0/20000000.0, a32 = 23619.0/32000.0;
-double a40 = 0.2, a41 = 6127.0/30000.0, a42 = 7873.0/30000.0, a43=1.0/3.0;
+double a40 = 0.2, a41 = 6127.0/30000.0, a42 = 7873.0/30000.0, a43 = 1.0/3.0;
 double b10 = 0.5;
 double b20 = -10890423.0/25193600.0, b21 = 5000.0/7873.0;
 double b30 = -102261.0/5000000.0, b31 = -5121.0/20000.0, b32 = 7873.0/10000.0;
@@ -161,6 +163,7 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
     running_info[1] = T - tau;
     running_info[2] = 0.0;
     flux_RF(running_info, m, h, gamma, rho[vk0], mom, ene, f01, f02, f03);
+    flux_RF_dual(running_info, m, h, gamma, rho[vk0], mom, ene, df01, df02, df03);
     for(j = 0; j < m; ++j)
     {
       rho_1[j] = rho[vk0][j] - half_tau*(f01[j+1]-f01[j])/h;
@@ -172,11 +175,13 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
     running_info[1] = T - 0.75*tau;
     running_info[2] = 1.0;
     flux_RF(running_info, m, h, gamma, rho_1, mom_1, ene_1, f11, f12, f13);
+    flux_RF_dual(running_info, m, h, gamma, rho_1, mom_1, ene_1, df11, df12, df13);
     for(j = 0; j < m; ++j)
     {
-      rho_2[j] = (a20*rho[vk0][j]+a21*rho_1[j]) - tau*(b20*(f01[j+1]-f01[j])+b21*(f11[j+1]-f11[j]))/h;
-      mom_2[j] = (a20*     mom[j]+a21*mom_1[j]) - tau*(b20*(f02[j+1]-f02[j])+b21*(f12[j+1]-f12[j]))/h;
-      ene_2[j] = (a20*     ene[j]+a21*ene_1[j]) - tau*(b20*(f03[j+1]-f03[j])+b21*(f13[j+1]-f13[j]))/h;
+      // b20 < 0
+      rho_2[j] = (a20*rho[vk0][j]+a21*rho_1[j]) - tau*(b20*(df01[j+1]-df01[j])+b21*(f11[j+1]-f11[j]))/h;
+      mom_2[j] = (a20*     mom[j]+a21*mom_1[j]) - tau*(b20*(df02[j+1]-df02[j])+b21*(f12[j+1]-f12[j]))/h;
+      ene_2[j] = (a20*     ene[j]+a21*ene_1[j]) - tau*(b20*(df03[j+1]-df03[j])+b21*(f13[j+1]-f13[j]))/h;
     }
 
     //======THIRD=====================
@@ -185,9 +190,10 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
     flux_RF(running_info, m, h, gamma, rho_2, mom_2, ene_2, f21, f22, f23);
     for(j = 0; j < m; ++j)
     {
-      rho_3[j] = (a30*rho[vk0][j]+a31*rho_1[j]+a32*rho_2[j]) - tau*(b30*(f01[j+1]-f01[j])+b31*(f11[j+1]-f11[j])+b32*(f21[j+1]-f21[j]))/h;
-      mom_3[j] = (a30*     mom[j]+a31*mom_1[j]+a32*mom_2[j]) - tau*(b30*(f02[j+1]-f02[j])+b31*(f12[j+1]-f12[j])+b32*(f22[j+1]-f22[j]))/h;
-      ene_3[j] = (a30*     ene[j]+a31*ene_1[j]+a32*ene_2[j]) - tau*(b30*(f03[j+1]-f03[j])+b31*(f13[j+1]-f13[j])+b32*(f23[j+1]-f23[j]))/h;
+      // b30 < 0, b31 < 0
+      rho_3[j] = (a30*rho[vk0][j]+a31*rho_1[j]+a32*rho_2[j]) - tau*(b30*(df01[j+1]-df01[j])+b31*(df11[j+1]-df11[j])+b32*(f21[j+1]-f21[j]))/h;
+      mom_3[j] = (a30*     mom[j]+a31*mom_1[j]+a32*mom_2[j]) - tau*(b30*(df02[j+1]-df02[j])+b31*(df12[j+1]-df12[j])+b32*(f22[j+1]-f22[j]))/h;
+      ene_3[j] = (a30*     ene[j]+a31*ene_1[j]+a32*ene_2[j]) - tau*(b30*(df03[j+1]-df03[j])+b31*(df13[j+1]-df13[j])+b32*(f23[j+1]-f23[j]))/h;
     }
 
     //======FORTH=====================
