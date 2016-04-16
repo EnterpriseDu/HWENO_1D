@@ -30,7 +30,7 @@ int GRP4_minmod_fix
 
 
 
-int FD_WENO_fix
+int RF4_WENO_fix
 (double const CONFIG[], double const OPT[], int const m, double const h,
  double *rho[], double *u[], double *p[], runList * runhist, char *scheme);
 
@@ -48,6 +48,10 @@ void flux_RF_1st(double const running_info[], int const m, double const h, doubl
 		 double const rho[], double const mom[], double const ene[], double F1[], double F2[], double F3[]);
 
 int FV_WENO_fix
+(double const CONFIG[], double const OPT[], int const m, double const h,
+ double *rho[], double *u[], double *p[], runList * runhist, char *scheme);
+
+int LF4_WENO_fix
 (double const CONFIG[], double const OPT[], int const m, double const h,
  double *rho[], double *u[], double *p[], runList * runhist, char *scheme);
 

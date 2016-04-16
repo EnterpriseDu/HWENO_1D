@@ -62,14 +62,13 @@ gcc -c ./LF4_WENO_fix.c    -I ../\
                            -I ../../file_io/inc/\
                            -I ../../Riemann_solver/inc/\
                            -g
-gcc -c ./flux_LF.c         -g
 gcc -c ./RF4_WENO_fix.c    -I ../\
                            -I ../../file_io/inc/\
                            -I ../../Riemann_solver/inc/\
                            -g
 gcc -c ./flux_RF.c         -g
 
-ar crv FD_WENO.a FV_WENO_fix.o RF4_WENO_fix.o flux_RF.o LF4_WENO_fix.o flux_LF.o
+ar crv FD_WENO.a FV_WENO_fix.o RF4_WENO_fix.o flux_RF.o LF4_WENO_fix.o
 ranlib FD_WENO.a
 echo "-----------------"
 

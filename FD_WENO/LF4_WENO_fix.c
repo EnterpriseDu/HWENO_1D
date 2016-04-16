@@ -22,7 +22,7 @@
 
 
 
-int FD_WENO_fix
+int LF4_WENO_fix
 (double const CONFIG[], double const OPT[], int const m, double const h,
  double *rho[], double *u[], double *p[],
  runList *runhist, char *scheme)
@@ -32,7 +32,7 @@ int FD_WENO_fix
 				     * ently used index for the time
 				     * step.
 				     */
-  char scheme_local[50] = "RF4W5\0";
+  char scheme_local[50] = "LF4W5\0";
   printf("===========================\n");
   printf("The scheme [%s] started.\n", scheme_local);
   int len = 0;
@@ -47,7 +47,7 @@ int FD_WENO_fix
   double sum = 0.0, T = 0.0;
   int vk0, vk1;
   
-  
+
   double const gamma     = CONFIG[0];  // the constant of the perfect gas
   double const CFL       = CONFIG[1];  // CFL number
   double const eps       = CONFIG[2];  // the largest value could be treat as zero
@@ -58,6 +58,7 @@ int FD_WENO_fix
   double const modifier  = CONFIG[7];
   double const tol       = CONFIG[8];
   double const threshold = CONFIG[9];
+  double const gamma1    = gamma-1.0;
 
   int const    MaxStp     = (int)(OPT[0]);  // the number of time steps
   double const TIME       = OPT[1];
@@ -75,14 +76,15 @@ int FD_WENO_fix
   running_info[6] = OPT[8];    // use the limiter or not
   running_info[7] = CONFIG[9]; // threshold
 
-  double c, stmp, direvative[4], source[4], wave_speed[2];
-
 
   double mom[m], ene[m];
 
   double rho_1[m], mom_1[m], ene_1[m];
   double rho_2[m], mom_2[m], ene_2[m];
   double rho_3[m], mom_3[m], ene_3[m];
+  double rho_L[m+1], mom_L[m+1], ene_L[m+1], u_L, p_L, c_L;
+  double rho_R[m+1], mom_R[m+1], ene_R[m+1], u_R, p_R, c_R;
+  double VISC, visc;
 
   double f01[m+1], f02[m+1], f03[m+1];
   double f11[m+1], f12[m+1], f13[m+1];
@@ -90,8 +92,10 @@ int FD_WENO_fix
   double f31[m+1], f32[m+1], f33[m+1];
   double df01[m+1], df02[m+1], df03[m+1]; // DUAL flux
   double df11[m+1], df12[m+1], df13[m+1]; // DUAL flux
+  double fnv1, fnv2, fnv3, v1, v2, v3;
+  // flux without viscosity, and viscosity
 
-  double sigma, speed_max;  /* speed_max denote the largest character
+  double c, sigma, speed_max;  /* speed_max denote the largest character
 					 * speed at each time step
 					 */
   double tau, half_tau, alp, bet;
@@ -162,8 +166,39 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
     //======FIRST=====================
     running_info[1] = T - tau;
     running_info[2] = 0.0;
-    flux_RF(running_info, m, h, gamma, rho[vk0], mom, ene, f01, f02, f03);
-    flux_RF_dual(running_info, m, h, gamma, rho[vk0], mom, ene, df01, df02, df03);
+    WENO_5_LF(running_info, m, h, eps, alp2, gamma, rho[vk0], mom, ene, rho_L, rho_R, mom_L, mom_R, ene_L, ene_R);
+    for(j = 0; j < m+1; ++j)
+    {
+      u_L = mom_L[j] / rho_L[j];
+      p_L = (ene_L[j] - 0.5*mom_L[j]*u_L)*(gamma1);
+      c_L = sqrt(gamma*p_L/rho_L[j]);
+      u_R = mom_R[j] / rho_R[j];
+      p_R = (ene_R[j] - 0.5*mom_R[j]*u_R)*(gamma1);
+      c_R = sqrt(gamma*p_R/rho_R[j]);
+
+      VISC = fabs(u_L + c_L);
+      visc = fabs(u_L - c_L);
+      if(visc > VISC)
+	VISC = visc;
+      visc = fabs(u_R - c_R);
+      if(visc > VISC)
+	VISC = visc;
+      visc = fabs(u_R + c_R);
+      if(visc > VISC)
+	VISC = visc;
+
+      fnv1 = mom_R[j]           + mom_L[j];
+      fnv2 = mom_R[j]*u_R+p_R   + mom_L[j]*u_L+p_L;
+      fnv3 = (ene_R[j]+p_R)*u_R + (ene_L[j]+p_L)*u_L;
+      v1 = VISC*(rho_R[j]-rho_L[j]);
+      v2 = VISC*(mom_R[j]-mom_L[j]);
+      v3 = VISC*(ene_R[j]-ene_L[j]);
+
+      f01[j] = 0.5*(fnv1 - v1); df01[j] = 0.5*(fnv1 + v1);
+      f02[j] = 0.5*(fnv2 - v2); df02[j] = 0.5*(fnv2 + v2);
+      f03[j] = 0.5*(fnv3 - v3); df03[j] = 0.5*(fnv3 + v3);
+    }
+
     for(j = 0; j < m; ++j)
     {
       rho_1[j] = rho[vk0][j] - half_tau*(f01[j+1]-f01[j])/h;
@@ -174,8 +209,38 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
     //======SECOND=====================
     running_info[1] = T - 0.75*tau;
     running_info[2] = 1.0;
-    flux_RF(running_info, m, h, gamma, rho_1, mom_1, ene_1, f11, f12, f13);
-    flux_RF_dual(running_info, m, h, gamma, rho_1, mom_1, ene_1, df11, df12, df13);
+    WENO_5_LF(running_info, m, h, eps, alp2, gamma, rho_1, mom_1, ene_1, rho_L, rho_R, mom_L, mom_R, ene_L, ene_R);
+    for(j = 0; j < m+1; ++j)
+    {
+      u_L = mom_L[j] / rho_L[j];
+      p_L = (ene_L[j] - 0.5*mom_L[j]*u_L)*(gamma1);
+      c_L = sqrt(gamma*p_L/rho_L[j]);
+      u_R = mom_R[j] / rho_R[j];
+      p_R = (ene_R[j] - 0.5*mom_R[j]*u_R)*(gamma1);
+      c_R = sqrt(gamma*p_R/rho_R[j]);
+
+      VISC = fabs(u_L + c_L);
+      visc = fabs(u_L - c_L);
+      if(visc > VISC)
+	VISC = visc;
+      visc = fabs(u_R - c_R);
+      if(visc > VISC)
+	VISC = visc;
+      visc = fabs(u_R + c_R);
+      if(visc > VISC)
+	VISC = visc;
+
+      fnv1 = mom_R[j]           + mom_L[j];
+      fnv2 = mom_R[j]*u_R+p_R   + mom_L[j]*u_L+p_L;
+      fnv3 = (ene_R[j]+p_R)*u_R + (ene_L[j]+p_L)*u_L;
+      v1 = VISC*(rho_R[j]-rho_L[j]);
+      v2 = VISC*(mom_R[j]-mom_L[j]);
+      v3 = VISC*(ene_R[j]-ene_L[j]);
+
+      f11[j] = 0.5*(fnv1 - v1); df11[j] = 0.5*(fnv1 + v1);
+      f12[j] = 0.5*(fnv2 - v2); df12[j] = 0.5*(fnv2 + v2);
+      f13[j] = 0.5*(fnv3 - v3); df13[j] = 0.5*(fnv3 + v3);
+    }
     for(j = 0; j < m; ++j)
     {
       // b20 < 0
@@ -187,7 +252,31 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
     //======THIRD=====================
     running_info[1] = T - 0.5*tau;
     running_info[2] = 2.0;
-    flux_RF(running_info, m, h, gamma, rho_2, mom_2, ene_2, f21, f22, f23);
+    WENO_5_LF(running_info, m, h, eps, alp2, gamma, rho_2, mom_2, ene_2, rho_L, rho_R, mom_L, mom_R, ene_L, ene_R);
+    for(j = 0; j < m+1; ++j)
+    {
+      u_L = mom_L[j] / rho_L[j];
+      p_L = (ene_L[j] - 0.5*mom_L[j]*u_L)*(gamma1);
+      c_L = sqrt(gamma*p_L/rho_L[j]);
+      u_R = mom_R[j] / rho_R[j];
+      p_R = (ene_R[j] - 0.5*mom_R[j]*u_R)*(gamma1);
+      c_R = sqrt(gamma*p_R/rho_R[j]);
+
+      VISC = fabs(u_L + c_L);
+      visc = fabs(u_L - c_L);
+      if(visc > VISC)
+	VISC = visc;
+      visc = fabs(u_R - c_R);
+      if(visc > VISC)
+	VISC = visc;
+      visc = fabs(u_R + c_R);
+      if(visc > VISC)
+	VISC = visc;
+
+      f21[j] = 0.5*(mom_R[j]           + mom_L[j]           - VISC*(rho_R[j]-rho_L[j]));
+      f22[j] = 0.5*(mom_R[j]*u_R+p_R   + mom_L[j]*u_L+p_L   - VISC*(mom_R[j]-mom_L[j]));
+      f23[j] = 0.5*((ene_R[j]+p_R)*u_R + (ene_L[j]+p_L)*u_L - VISC*(ene_R[j]-ene_L[j]));
+    }
     for(j = 0; j < m; ++j)
     {
       // b30 < 0, b31 < 0
@@ -199,8 +288,31 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
     //======FORTH=====================
     running_info[1] = T - 0.25*tau;
     running_info[2] = 3.0;
-    flux_RF(running_info, m, h, gamma, rho_3, mom_3, ene_3, f31, f32, f33);
+    WENO_5_LF(running_info, m, h, eps, alp2, gamma, rho_3, mom_3, ene_3, rho_L, rho_R, mom_L, mom_R, ene_L, ene_R);
+    for(j = 0; j < m+1; ++j)
+    {
+      u_L = mom_L[j] / rho_L[j];
+      p_L = (ene_L[j] - 0.5*mom_L[j]*u_L)*(gamma1);
+      c_L = sqrt(gamma*p_L/rho_L[j]);
+      u_R = mom_R[j] / rho_R[j];
+      p_R = (ene_R[j] - 0.5*mom_R[j]*u_R)*(gamma1);
+      c_R = sqrt(gamma*p_R/rho_R[j]);
 
+      VISC = fabs(u_L + c_L);
+      visc = fabs(u_L - c_L);
+      if(visc > VISC)
+	VISC = visc;
+      visc = fabs(u_R - c_R);
+      if(visc > VISC)
+	VISC = visc;
+      visc = fabs(u_R + c_R);
+      if(visc > VISC)
+	VISC = visc;
+
+      f31[j] = 0.5*(mom_R[j]           + mom_L[j]           - VISC*(rho_R[j]-rho_L[j]));
+      f32[j] = 0.5*(mom_R[j]*u_R+p_R   + mom_L[j]*u_L+p_L   - VISC*(mom_R[j]-mom_L[j]));
+      f33[j] = 0.5*((ene_R[j]+p_R)*u_R + (ene_L[j]+p_L)*u_L - VISC*(ene_R[j]-ene_L[j]));
+    }
 
 
 //===============THE CORE ITERATION=================
