@@ -132,7 +132,7 @@ void local_HWENO_5_inter_Z(double h, double Q[6], double DQ[4])
   double Dneg[3] = {0.1125, 0.525, 0.3625};
   double Dpos[3] = {0.525, 0.1125, 0.3625};
 
-  double alp[3], omg[3], beta[3], sum;
+  double alp[3], omg[3], beta[3], tau, sum;
   double Qneg[3], Qpos[3];
 
   /*
