@@ -75,3 +75,7 @@ void HWENO_5_limited
 void local_HWENO_5_inter_d(double h, double Q[6], double DQ[6]);
 
 void local_HWENO_5_inter(double h, double Q[6], double DQ[4]);
+
+void local_HWENO_5_inter_d_Z(double h, double Q[6], double DQ[6]);
+
+void local_HWENO_5_inter_Z(double h, double Q[6], double DQ[4]);

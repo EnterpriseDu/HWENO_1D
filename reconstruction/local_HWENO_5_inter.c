@@ -15,6 +15,14 @@ void local_HWENO_5_inter_d(double h, double Q[6], double DQ[6])
   double Qneg[3], Qpos[3], dQneg[3], dQpos[3];
 
 
+  /*
+   * Stencil
+   *   #=====#=====#=====#
+   *   |----[0]----|
+   *         |----[1]----|
+   *   |-------[2]-------|
+   */
+
   //=====Reconstruction for The Negative Limit======
   Qneg[0] = (-7.0*Q[0] + 13.0*Q[1] - 4.0*DQ[0]) / 6.0;
   Qneg[1] = (Q[1] + 5.0*Q[2] - 2.0*DQ[2]) / 6.0;
@@ -107,6 +115,14 @@ void local_HWENO_5_inter(double h, double Q[6], double DQ[4])
   double alp[3], omg[3], beta[3], sum;
   double Qneg[3], Qpos[3];
 
+
+  /*
+   * Stencil
+   *   #=====#=====#=====#
+   *   |----[0]----|
+   *         |----[1]----|
+   *   |-------[2]-------|
+   */
 
   //=====Reconstruction for The Negative Limit======
   Qneg[0] = (-7.0*Q[0] + 13.0*Q[1] - 4.0*DQ[0]) / 6.0;

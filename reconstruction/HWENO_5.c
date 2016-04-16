@@ -420,15 +420,15 @@ void HWENO_5
     }
     if(WENOD)
     {
-      local_HWENO_5_inter_d(h, Q1, DQ1);
-      local_HWENO_5_inter_d(h, Q2, DQ2);
-      local_HWENO_5_inter_d(h, Q3, DQ3);
+      local_HWENO_5_inter_d_Z(h, Q1, DQ1);
+      local_HWENO_5_inter_d_Z(h, Q2, DQ2);
+      local_HWENO_5_inter_d_Z(h, Q3, DQ3);
     }
     else
     {
-      local_HWENO_5_inter(h, Q1, DQ1);
-      local_HWENO_5_inter(h, Q2, DQ2);
-      local_HWENO_5_inter(h, Q3, DQ3);
+      local_HWENO_5_inter_Z(h, Q1, DQ1);
+      local_HWENO_5_inter_Z(h, Q2, DQ2);
+      local_HWENO_5_inter_Z(h, Q3, DQ3);
       DQ1[4] = (15*(Q1[2] - Q1[1]) + Q1[0] - Q1[3]) / (12*h);
       DQ2[4] = (15*(Q2[2] - Q2[1]) + Q2[0] - Q2[3]) / (12*h);
       DQ3[4] = (15*(Q3[2] - Q3[1]) + Q3[0] - Q3[3]) / (12*h);
