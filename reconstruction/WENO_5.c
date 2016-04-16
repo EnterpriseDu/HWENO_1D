@@ -155,14 +155,14 @@ void WENO_5
 
     deltaP = threshold*fabs(rho_L[j-3] - rho_R[j-3]);
     DP = 1e-5+fabs(10*(W1[j]-W1[j-1]) + 5*(W1[j-2]-W1[j+1]) + (W1[j+2]-W1[j-3]));
-    if(deltaP > DP) flag = 4*limiter;
+    if(deltaP > DP) flag += 4*limiter;
 
     for(k = 0; k < 6; ++k)
       Q1[k] = Entp[j-3+k];
     local_WENO_5_inter(h, Q3);
     deltaP = threshold*fabs(Q1[6] - Q1[7]);
     DP = 1e-5+fabs(10*(Q1[3]-Q1[2]) + 5*(Q1[1]-Q1[4]) + (Q1[5]-Q1[0]));
-    if(deltaP > DP) flag = 5*limiter;
+    if(deltaP > DP) flag += 5*limiter;
 
     if(j-3)
       trouble[j-4] += flag;

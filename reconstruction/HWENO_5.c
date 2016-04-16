@@ -485,7 +485,7 @@ void HWENO_5
     //*/
     deltaP = threshold*fabs(rho_L[j-2] - rho_R[j-2]);
     DP = 1e-5+fabs(30.0*(W1[j]-W1[j-1]) + (520.0/27.0)*(W1[j-2]-W1[j+1]) + (20.0/3.0)*(WI1[j+2]-WI1[j+1]+WI1[j-1]-WI1[j-2]));
-    if(deltaP > DP) flag = 4*limiter;
+    if(deltaP > DP) flag += 4*limiter;
     /*
     for(k = 0; k < 5; ++k)
       QI1[k] = EntpI[j-2+k];
@@ -506,13 +506,11 @@ void HWENO_5
     //if(deltaP > DP) flag = 5*limiter;
     //if(deltaP > DP) trouble[j-2] = 6*limiter;
     //*/
-    if(deltaP > DP)
-    {
-      if(j-2)
-	trouble[j-3] += flag;
-      if(m+2-j)
-        trouble[j-2] += flag;
-    }
+
+    if(j-2)
+      trouble[j-3] += flag;
+    if(m+2-j)
+      trouble[j-2] += flag;
   }
 
   for(j = 0; j < m; ++j)
