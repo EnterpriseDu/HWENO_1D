@@ -37,11 +37,11 @@ inline static void recomposition(double H, double u, double c, int flag,
   {
     PL[0] = QL[0] + QL[1] + QL[2];
     PL[1] = u*PL[0] + c*(QL[2] - QL[0]);
-    PL[3] = H*(QL[0]+QL[2]) + u*c*(QL[2]-QL[0]) + 0.5*u_square*QL[1];
+    PL[2] = H*(QL[0]+QL[2]) + u*c*(QL[2]-QL[0]) + 0.5*u_square*QL[1];
 
     PR[0] = QR[0] + QR[1] + QR[2];
     PR[1] = u*PR[0] + c*(QR[2] - QR[0]);
-    PR[3] = H*(QR[0]+QR[2]) + u*c*(QR[2]-QR[0]) + 0.5*u_square*QR[1];
+    PR[2] = H*(QR[0]+QR[2]) + u*c*(QR[2]-QR[0]) + 0.5*u_square*QR[1];
   }
   else
   {
