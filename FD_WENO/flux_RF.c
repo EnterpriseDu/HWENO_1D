@@ -230,10 +230,10 @@ void flux_RF(double const running_info[], int const m, double const h, double co
  *     u_t - A u_x = 0
  * The eigenvector of -A is the same as those of A. The eigenvalues
  * of -A is the opposite signs, i.e. they are
- *     [eta_1, eta_2, eta_3] = [-u+c, -u, -u-c]
+ *     [eta_3, eta_2, eta_1] = [-u-c, -u, -u+c]
  * corresponding to the right eigenvectors
- *                [R1, R2, R3].
- *
+ *                [R3, R2, R1].
+ * More details can be seen in our document.
  */
 void flux_RF_dual(double const running_info[], int const m, double const h, double const gamma,
 		  double const rho[], double const mom[], double const ene[], double F1[], double F2[], double F3[])
