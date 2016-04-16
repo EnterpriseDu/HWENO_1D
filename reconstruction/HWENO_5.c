@@ -305,7 +305,6 @@ void HWENO_5
   int j, k;
 
   double Q1[6], Q2[6], Q3[6], QI1[5], QI2[5], QI3[5], DQ1[6], DQ2[6], DQ3[6];
-  double R1[6], R2[6], R3[6], RI1[5], RI2[5], RI3[5];
   double QL[3], QR[3], PL[3], PR[3];
   double u[m+4], p[m+4], H[m+4], Entp[m+4], EntpI[m+5];
   double EntpL, EntpR;
@@ -411,7 +410,6 @@ void HWENO_5
     c_star = sqrt(c_square);
 
   //=========Charactoristic Decomposition=========
-    //*
     decomposition(H_star, u_star, c_square, c_star, gamma1, m, j, 4, 2, decomp, W1, W2, W3, Q1, Q2, Q3);
     decomposition(H_star, u_star, c_square, c_star, gamma1, m, j, 5, 2, decomp, WI1, WI2, WI3, QI1, QI2, QI3);
     for(k = 0; k < 4; ++k)
@@ -420,39 +418,6 @@ void HWENO_5
       DQ2[k] = QI2[k+1] - QI2[k];
       DQ3[k] = QI3[k+1] - QI3[k];
     }
-    /*/
-    for(k = 0; k < 5; ++k)
-    {
-      QI1[k] = WI1[j-2+k] * 0.5*u_star* (0.5*(gamma-1.0)*u_star/c_star + 1.0);
-      QI1[k]+= WI2[j-2+k] * 0.5 * ((1.0-gamma)*u_star/c_star - 1.0);
-      QI1[k]+= WI3[j-2+k] * 0.5 * (gamma-1.0) / c_star;
-      QI1[k] = QI1[k] / c_star;
-      QI3[k] = WI1[j-2+k] * 0.5*u_star* (0.5*(gamma-1.0)*u_star/c_star - 1.0);
-      QI3[k]+= WI2[j-2+k] * 0.5 * ((1.0-gamma)*u_star/c_star + 1.0);
-      QI3[k]+= WI3[j-2+k] * 0.5 * (gamma-1.0) / c_star;
-      QI3[k] = QI3[k] / c_star;
-      QI2[k] = (gamma-1.0) * ((WI2[j-2+k]-0.5*WI1[j-2+k]*u_star)*u_star - WI3[j-2+k]) / c_star/c_star + WI1[j-2+k];
-    }
-    for(k = 0; k < 4; ++k)
-    {
-      Q1[k] = W1[j-2+k] * 0.5*u_star* (0.5*(gamma-1.0)*u_star/c_star + 1.0);
-      Q1[k]+= W2[j-2+k] * 0.5 * ((1.0-gamma)*u_star/c_star - 1.0);
-      Q1[k]+= W3[j-2+k] * 0.5 * (gamma-1.0) / c_star;
-      Q1[k] = Q1[k] / c_star;
-      Q3[k] = W1[j-2+k] * 0.5*u_star* (0.5*(gamma-1.0)*u_star/c_star - 1.0);
-      Q3[k]+= W2[j-2+k] * 0.5 * ((1.0-gamma)*u_star/c_star + 1.0);
-      Q3[k]+= W3[j-2+k] * 0.5 * (gamma-1.0) / c_star;
-      Q3[k] = Q3[k] / c_star;
-      Q2[k] = (gamma-1.0) * ((W2[j-2+k]-0.5*W1[j-2+k]*u_star)*u_star - W3[j-2+k]) / c_star/c_star + W1[j-2+k];
-
-      DQ1[k] = QI1[k+1] - QI1[k];
-      DQ2[k] = QI2[k+1] - QI2[k];
-      DQ3[k] = QI3[k+1] - QI3[k];
-    }
-    printf("%.8lf, %.8lf, %.8lf, %.8lf\n\n", Q1[0]-R1[0], Q1[1]-R1[1], Q1[2]-R1[2], Q1[3]-R1[3]);
-    printf("%.8lf, %.8lf, %.8lf, %.8lf\n\n", Q2[0]-R2[0], Q2[1]-R2[1], Q2[2]-R2[2], Q2[3]-R2[3]);
-    printf("%.8lf, %.8lf, %.8lf, %.8lf\n\n", Q3[0]-R3[0], Q3[1]-R3[1], Q3[2]-R3[2], Q3[3]-R3[3]);
-    //*/
     if(WENOD)
     {
       local_HWENO_5_inter_d(h, Q1, DQ1);
@@ -473,7 +438,6 @@ void HWENO_5
     }
 
   //=====Recomposition========
-    //*
     QL[0] = Q1[4]; QR[0] = Q1[5];
     QL[1] = Q2[4]; QR[1] = Q2[5];
     QL[2] = Q3[4]; QR[2] = Q3[5];
@@ -488,24 +452,6 @@ void HWENO_5
     D_rho_L[j-2] = PL[0]; D_rho_R[j-2] = PR[0];
     D_u_L[j-2] = PL[1];   D_u_R[j-2] = PR[1];
     D_p_L[j-2] = PL[2];   D_p_R[j-2] = PR[2];
-    /*/
-    rho_L[j-2] = Q1[4] + Q2[4] + Q3[4];
-    rho_R[j-2] = Q1[5] + Q2[5] + Q3[5];
-    D_rho_L[j-2] = DQ1[4] + DQ2[4] + DQ3[4];
-    D_rho_R[j-2] = DQ1[5] + DQ2[5] + DQ3[5];
-
-    u_L[j-2] = u_star*rho_L[j-2] + c_star*(Q3[4] - Q1[4]);
-    u_R[j-2] = u_star*rho_R[j-2] + c_star*(Q3[5] - Q1[5]);
-    D_u_L[j-2] = u_star*D_rho_L[j-2] + c_star*(DQ3[4] - DQ1[4]);
-    D_u_R[j-2] = u_star*D_rho_R[j-2] + c_star*(DQ3[5] - DQ1[5]);
-
-    p_L[j-2] = H_star*(Q1[4]+Q3[4]) + u_star*c_star*(Q3[4]-Q1[4]) + 0.5*u_star*u_star*Q2[4];
-    p_R[j-2] = H_star*(Q1[5]+Q3[5]) + u_star*c_star*(Q3[5]-Q1[5]) + 0.5*u_star*u_star*Q2[5];
-    D_p_L[j-2] = H_star*(DQ1[4]+DQ3[4]) + u_star*c_star*(DQ3[4]-DQ1[4]) + 0.5*u_star*u_star*DQ2[4];
-    D_p_R[j-2] = H_star*(DQ1[5]+DQ3[5]) + u_star*c_star*(DQ3[5]-DQ1[5]) + 0.5*u_star*u_star*DQ2[5];
-    printf("%.8lf, %.8lf, %.8lf\n\n", rho_L[j-2]-PL[0], u_L[j-2]-PL[1], p_L[j-2]-PL[2]);
-    printf("%.8lf, %.8lf, %.8lf\n\n", rho_R[j-2]-PR[0], u_R[j-2]-PR[1], p_R[j-2]-PR[2]);
-    //*/
 
     u_L[j-2] = u_L[j-2] / rho_L[j-2];
     u_R[j-2] = u_R[j-2] / rho_R[j-2];
