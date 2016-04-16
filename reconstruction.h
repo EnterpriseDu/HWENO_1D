@@ -54,6 +54,15 @@ void local_WENO_5_interright(double h, double Q[8]);
 void local_WENO_5_inter(double h, double Q[8]);
 
 
+void local_WENO_5_inter_d_Z(double h, double Q[8], double DQQ[2]);
+
+void local_WENO_5_interleft_Z(double h, double Q[8]);
+
+void local_WENO_5_interright_Z(double h, double Q[8]);
+
+void local_WENO_5_inter_Z(double h, double Q[8]);
+
+
 
 
 

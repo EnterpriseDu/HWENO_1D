@@ -123,9 +123,9 @@ void flux_RF(double const running_info[], int const m, double const h, double co
        */
       if(u_star_L-c_star_L > 0.0)//left transonic rarefaction
       {
-	local_WENO_5_interleft(h, Q1);
-	local_WENO_5_interleft(h, Q2);
-	local_WENO_5_interleft(h, Q3);
+	local_WENO_5_interleft_Z(h, Q1);
+	local_WENO_5_interleft_Z(h, Q2);
+	local_WENO_5_interleft_Z(h, Q3);
 	g1 = Q1[6];
 	g2 = Q2[6];
 	g3 = Q3[6];
@@ -155,9 +155,9 @@ void flux_RF(double const running_info[], int const m, double const h, double co
        */
       if(u_star_R+c_star_R < 0.0)//right transonic rarefaction
       {
-	local_WENO_5_interright(h, Q1);
-	local_WENO_5_interright(h, Q2);
-	local_WENO_5_interright(h, Q3);
+	local_WENO_5_interright_Z(h, Q1);
+	local_WENO_5_interright_Z(h, Q2);
+	local_WENO_5_interright_Z(h, Q3);
 	g1 = Q1[7];
 	g2 = Q2[7];
 	g3 = Q3[7];
@@ -172,36 +172,36 @@ void flux_RF(double const running_info[], int const m, double const h, double co
     //non transonic rarefaction
     if(u_star-c_star > 0.0)
     {
-      local_WENO_5_interleft(h, Q1);
-      local_WENO_5_interleft(h, Q2);
-      local_WENO_5_interleft(h, Q3);
+      local_WENO_5_interleft_Z(h, Q1);
+      local_WENO_5_interleft_Z(h, Q2);
+      local_WENO_5_interleft_Z(h, Q3);
       g1 = Q1[6];
       g2 = Q2[6];
       g3 = Q3[6];
     }
     else if(u_star > 0.0)
     {
-      local_WENO_5_interright(h, Q1);
-      local_WENO_5_interleft(h, Q2);
-      local_WENO_5_interleft(h, Q3);
+      local_WENO_5_interright_Z(h, Q1);
+      local_WENO_5_interleft_Z(h, Q2);
+      local_WENO_5_interleft_Z(h, Q3);
       g1 = Q1[7];
       g2 = Q2[6];
       g3 = Q3[6];
     }
     else if(u_star+c_star > 0.0)
     {
-      local_WENO_5_interright(h, Q1);
-      local_WENO_5_interright(h, Q2);
-      local_WENO_5_interleft(h, Q3);
+      local_WENO_5_interright_Z(h, Q1);
+      local_WENO_5_interright_Z(h, Q2);
+      local_WENO_5_interleft_Z(h, Q3);
       g1 = Q1[7];
       g2 = Q2[7];
       g3 = Q3[6];
     }
     else
     {
-      local_WENO_5_interright(h, Q1);
-      local_WENO_5_interright(h, Q2);
-      local_WENO_5_interright(h, Q3);
+      local_WENO_5_interright_Z(h, Q1);
+      local_WENO_5_interright_Z(h, Q2);
+      local_WENO_5_interright_Z(h, Q3);
       g1 = Q1[7];
       g2 = Q2[7];
       g3 = Q3[7];
@@ -346,9 +346,9 @@ void flux_RF_dual(double const running_info[], int const m, double const h, doub
        */
       if(-u_star_L-c_star_L > 0.0)//left transonic rarefaction
       {
-	local_WENO_5_interleft(h, Q1);
-	local_WENO_5_interleft(h, Q2);
-	local_WENO_5_interleft(h, Q3);
+	local_WENO_5_interleft_Z(h, Q1);
+	local_WENO_5_interleft_Z(h, Q2);
+	local_WENO_5_interleft_Z(h, Q3);
 	g1 = Q1[6];
 	g2 = Q2[6];
 	g3 = Q3[6];
@@ -389,9 +389,9 @@ void flux_RF_dual(double const running_info[], int const m, double const h, doub
        */
       if(-u_star_R+c_star_R < 0.0)//right transonic rarefaction
       {
-	local_WENO_5_interright(h, Q1);
-	local_WENO_5_interright(h, Q2);
-	local_WENO_5_interright(h, Q3);
+	local_WENO_5_interright_Z(h, Q1);
+	local_WENO_5_interright_Z(h, Q2);
+	local_WENO_5_interright_Z(h, Q3);
 	g1 = Q1[7];
 	g2 = Q2[7];
 	g3 = Q3[7];
@@ -406,36 +406,36 @@ void flux_RF_dual(double const running_info[], int const m, double const h, doub
     //non transonic rarefaction
     if(u_star-c_star > 0.0)
     {
-      local_WENO_5_interright(h, Q1);
-      local_WENO_5_interright(h, Q2);
-      local_WENO_5_interright(h, Q3);
+      local_WENO_5_interright_Z(h, Q1);
+      local_WENO_5_interright_Z(h, Q2);
+      local_WENO_5_interright_Z(h, Q3);
       g1 = Q1[7];
       g2 = Q2[7];
       g3 = Q3[7];
     }
     else if(u_star > 0.0)
     {
-      local_WENO_5_interleft(h, Q1);
-      local_WENO_5_interright(h, Q2);
-      local_WENO_5_interright(h, Q3);
+      local_WENO_5_interleft_Z(h, Q1);
+      local_WENO_5_interright_Z(h, Q2);
+      local_WENO_5_interright_Z(h, Q3);
       g1 = Q1[6];
       g2 = Q2[7];
       g3 = Q3[7];
     }
     else if(u_star+c_star > 0.0)
     {
-      local_WENO_5_interleft(h, Q1);
-      local_WENO_5_interleft(h, Q2);
-      local_WENO_5_interright(h, Q3);
+      local_WENO_5_interleft_Z(h, Q1);
+      local_WENO_5_interleft_Z(h, Q2);
+      local_WENO_5_interright_Z(h, Q3);
       g1 = Q1[6];
       g2 = Q2[6];
       g3 = Q3[7];
     }
     else
     {
-      local_WENO_5_interleft(h, Q1);
-      local_WENO_5_interleft(h, Q2);
-      local_WENO_5_interleft(h, Q3);
+      local_WENO_5_interleft_Z(h, Q1);
+      local_WENO_5_interleft_Z(h, Q2);
+      local_WENO_5_interleft_Z(h, Q3);
       g1 = Q1[6];
       g2 = Q2[6];
       g3 = Q3[6];
