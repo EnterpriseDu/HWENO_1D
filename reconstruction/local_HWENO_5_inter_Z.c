@@ -38,7 +38,7 @@ void local_HWENO_5_inter_d_Z(double h, double Q[6], double DQ[6])
   beta[1] += 9.75*(-2.0*(Q[2] - Q[1]) + DQ[2] + DQ[1])*(-2.0*(Q[2] - Q[1]) + DQ[2] + DQ[1]);
   beta[2]  = (Q[0] - 2.0*Q[1] + Q[2])*(Q[0] - 2.0*Q[1] + Q[2]);
   beta[2] += 2.4375*(Q[2] - Q[0] - 2.0*DQ[1])*(Q[2] - Q[0] - 2.0*DQ[1]);
-  tau = beta[1] - beta[0];
+  tau = fabs(beta[1] - beta[0]);
   beta[0] = tau / (beta[0] + eps);
   beta[1] = tau / (beta[1] + eps);
   beta[2] = tau / (beta[2] + eps);
@@ -58,7 +58,7 @@ void local_HWENO_5_inter_d_Z(double h, double Q[6], double DQ[6])
   beta[1]+= (13.0/3.0)*( Q[2] -     Q[1] - DQ[2])*(     Q[2] -     Q[1] - DQ[2]);
   beta[2] = (13.0/12.0)*(Q[0] - 2.0*Q[1] + Q[2])*(Q[0] - 2.0*Q[1] + Q[2]);
   beta[2]+= 0.25*(Q[0] - Q[2])*(Q[0] - Q[2]);
-  tau = beta[1] - beta[0];
+  tau = fabs(beta[1] - beta[0]);
   beta[0] = tau / (beta[0] + eps);
   beta[1] = tau / (beta[1] + eps);
   beta[2] = tau / (beta[2] + eps);
@@ -89,7 +89,7 @@ void local_HWENO_5_inter_d_Z(double h, double Q[6], double DQ[6])
   beta[1] += 9.75*(-2.0*(Q[3] - Q[2]) + DQ[3] + DQ[2])*(-2.0*(Q[3] - Q[2]) + DQ[3] + DQ[2]);
   beta[2]  = (Q[1] - 2.0*Q[2] + Q[3])*(Q[1] - 2.0*Q[2] + Q[3]);
   beta[2] += 2.4375*(Q[3] - Q[1] - 2.0*DQ[2])*(Q[3] - Q[1] - 2.0*DQ[2]);
-  tau = beta[1] - beta[0];
+  tau = fabs(beta[1] - beta[0]);
   beta[0] = tau / (beta[0] + eps);
   beta[1] = tau / (beta[1] + eps);
   beta[2] = tau / (beta[2] + eps);
@@ -109,7 +109,7 @@ void local_HWENO_5_inter_d_Z(double h, double Q[6], double DQ[6])
   beta[1]+= (13.0/3.0)*( Q[3] -     Q[2] - DQ[3])*(     Q[3] -     Q[2] - DQ[3]);
   beta[2] = (13.0/12.0)*(Q[1] - 2.0*Q[2] + Q[3])*(Q[1] - 2.0*Q[2] + Q[3]);
   beta[2]+= 0.25*(Q[1] - Q[3])*(Q[1] - Q[3]);
-  tau = beta[1] - beta[0];
+  tau = fabs(beta[1] - beta[0]);
   beta[0] = tau / (beta[0] + eps);
   beta[1] = tau / (beta[1] + eps);
   beta[2] = tau / (beta[2] + eps);
@@ -154,7 +154,7 @@ void local_HWENO_5_inter_Z(double h, double Q[6], double DQ[4])
   beta[1]+= (13.0/3.0)*( Q[2] -     Q[1] - DQ[2])*(     Q[2] -     Q[1] - DQ[2]);
   beta[2] = (13.0/12.0)*(Q[0] - 2.0*Q[1] + Q[2])*(Q[0] - 2.0*Q[1] + Q[2]);
   beta[2]+= 0.25*(Q[0] - Q[2])*(Q[0] - Q[2]);
-  tau = beta[1] - beta[0];
+  tau = fabs(beta[1] - beta[0]);
   beta[0] = tau / (beta[0] + eps);
   beta[1] = tau / (beta[1] + eps);
   beta[2] = tau / (beta[2] + eps);
@@ -181,7 +181,7 @@ void local_HWENO_5_inter_Z(double h, double Q[6], double DQ[4])
   beta[1]+= (13.0/3.0)*( Q[3] -     Q[2] - DQ[3])*(     Q[3] -     Q[2] - DQ[3]);
   beta[2] = (13.0/12.0)*(Q[1] - 2.0*Q[2] + Q[3])*(Q[1] - 2.0*Q[2] + Q[3]);
   beta[2]+= 0.25*(Q[1] - Q[3])*(Q[1] - Q[3]);
-  tau = beta[1] - beta[0];
+  tau = fabs(beta[1] - beta[0]);
   beta[0] = tau / (beta[0] + eps);
   beta[1] = tau / (beta[1] + eps);
   beta[2] = tau / (beta[2] + eps);
