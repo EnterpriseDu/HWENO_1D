@@ -9,6 +9,7 @@ gcc -c ./local_HWENO_5_inter.c -I ../ -g
 gcc -c ./local_HWENO_5_inter_Z.c -I ../ -g
 gcc -c ./WENO_5.c -I ../ -g
 gcc -c ./HWENO_5.c -I ../ -g
+gcc -c ./THINC.c -I ../ -g
 
 ar crv reconstruction.a GRP_minmod.o \
                         local_WENO_5_inter.o \
@@ -16,7 +17,8 @@ ar crv reconstruction.a GRP_minmod.o \
                         local_HWENO_5_inter.o \
                         local_HWENO_5_inter_Z.o \
                         WENO_5.o \
-                        HWENO_5.o
+                        HWENO_5.o \
+                        THINC.o
 ranlib reconstruction.a
 echo "-----------------"
 
