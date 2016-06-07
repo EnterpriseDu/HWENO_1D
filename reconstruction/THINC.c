@@ -1,4 +1,6 @@
 #include <math.h>
+#include <stdio.h>
+
 
 #include "reconstruction.h"
 
@@ -149,6 +151,17 @@ void THINC0
       D_p_R[j-1] = -result[3];
       D_p_L[j] = -result[2];
     }
+
+    printf("Density:\n");
+    printf("%g\t%g\t%g\t%g\t%g\n", P1[j-1], rho_R[j-1], P1[j], rho_L[j], P1[j+1]);
+    printf("\t\t%g\t\t%g\n", D_rho_R[j-1], D_rho_L[j]);
+    printf("Velocity:\n");
+    printf("%g\t%g\t%g\t%g\t%g\n", P2[j-1], u_R[j-1], P2[j], u_L[j], P2[j+1]);
+    printf("\t\t%g\t\t%g\n", D_u_R[j-1], D_u_L[j]);
+    printf("Pressure:\n");
+    printf("%g\t%g\t%g\t%g\t%g\n", P3[j-1], p_R[j-1], P3[j], p_L[j], P3[j+1]);
+    printf("\t\t%g\t\t%g\n", D_p_R[j-1], D_p_L[j]);
+    printf("\n");
   }
 
 

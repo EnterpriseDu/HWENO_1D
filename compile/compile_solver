@@ -34,8 +34,12 @@ gcc -c ./GRP2_fix.c    -I ../\
                        -I ../../file_io/inc/\
                        -I ../../Riemann_solver/inc/\
                        -g
+gcc -c ./THINC_fix.c    -I ../\
+                        -I ../../file_io/inc/\
+                        -I ../../Riemann_solver/inc/\
+                        -g
 
-ar crv GRP_fix.a GRP2_fix.o ADER2_fix.o
+ar crv GRP_fix.a GRP2_fix.o ADER2_fix.o THINC_fix.o
 ranlib GRP_fix.a
 echo "-----------------"
 
