@@ -244,6 +244,7 @@ void THINC_local(double result[], double const u_min, double const u_max, double
   double B, A;
   double idx, exp_idx_0, exp_idx_1, tanh_beta, sinh_beta;
 
+  u_max = u_max-u_min;
   tanh_beta = tanh(thickness);
   sinh_beta = sinh(thickness);
   idx = (u_bar-u_min+eps)/(u_max+eps);
