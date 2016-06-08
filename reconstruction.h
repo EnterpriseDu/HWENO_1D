@@ -98,4 +98,4 @@ void THINC0
  double rho_L[], double rho_R[], double u_L[], double u_R[], double p_L[], double p_R[],
  double D_rho_L[], double D_rho_R[], double D_u_L[], double D_u_R[], double D_p_L[], double D_p_R[], int trouble[]);
 
-void THINC_local(double result[], double const u_min, double const u_max, double const u_bar, double const thickness, double const h);
+void THINC_local(double result[], double const u_min, double const u_jump, double const u_bar, double const thickness, double const h);

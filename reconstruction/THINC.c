@@ -70,7 +70,7 @@ void THINC0
       u_min = P1[j-1];
       u_bar = P1[j];
       u_max = P1[j+1];
-      THINC_local(result, u_min, u_max, u_bar, thickness, h);
+      THINC_local(result, u_min, u_max-u_min, u_bar, thickness, h);
       rho_R[j-1] = result[0];
       rho_L[j] = result[1];
       D_rho_R[j-1] = result[2];
@@ -81,7 +81,7 @@ void THINC0
       u_min = P1[j+1];
       u_bar = P1[j];
       u_max = P1[j-1];
-      THINC_local(result, u_min, u_max, u_bar, thickness, h);
+      THINC_local(result, u_min, u_max-u_min, u_bar, thickness, h);
       rho_R[j-1] = result[1];
       rho_L[j] = result[0];
       D_rho_R[j-1] = -result[3];
@@ -102,7 +102,7 @@ void THINC0
       u_min = P2[j-1];
       u_bar = P2[j];
       u_max = P2[j+1];
-      THINC_local(result, u_min, u_max, u_bar, thickness, h);
+      THINC_local(result, u_min, u_max-u_min, u_bar, thickness, h);
       u_R[j-1] = result[0];
       u_L[j] = result[1];
       D_u_R[j-1] = result[2];
@@ -113,7 +113,7 @@ void THINC0
       u_min = P2[j+1];
       u_bar = P2[j];
       u_max = P2[j-1];
-      THINC_local(result, u_min, u_max, u_bar, thickness, h);
+      THINC_local(result, u_min, u_max-u_min, u_bar, thickness, h);
       u_R[j-1] = result[1];
       u_L[j] = result[0];
       D_u_R[j-1] = -result[3];
@@ -134,7 +134,7 @@ void THINC0
       u_min = P3[j-1];
       u_bar = P3[j];
       u_max = P3[j+1];
-      THINC_local(result, u_min, u_max, u_bar, thickness, h);
+      THINC_local(result, u_min, u_max-u_min, u_bar, thickness, h);
       p_R[j-1] = result[0];
       p_L[j] = result[1];
       D_p_R[j-1] = result[2];
@@ -145,13 +145,13 @@ void THINC0
       u_min = P3[j+1];
       u_bar = P3[j];
       u_max = P3[j-1];
-      THINC_local(result, u_min, u_max, u_bar, thickness, h);
+      THINC_local(result, u_min, u_max-u_min, u_bar, thickness, h);
       p_R[j-1] = result[1];
       p_L[j] = result[0];
       D_p_R[j-1] = -result[3];
       D_p_L[j] = -result[2];
     }
-
+    /*
     printf("Density:\n");
     printf("%g\t%g\t%g\t%g\t%g\n", P1[j-1], rho_R[j-1], P1[j], rho_L[j], P1[j+1]);
     printf("\t\t%g\t\t%g\n", D_rho_R[j-1], D_rho_L[j]);
@@ -161,7 +161,7 @@ void THINC0
     printf("Pressure:\n");
     printf("%g\t%g\t%g\t%g\t%g\n", P3[j-1], p_R[j-1], P3[j], p_L[j], P3[j+1]);
     printf("\t\t%g\t\t%g\n", D_p_R[j-1], D_p_L[j]);
-    printf("\n");
+    printf("\n");//*/
   }
 
 
@@ -238,26 +238,26 @@ void THINC0
 
 
 
-void THINC_local(double result[], double const u_min, double const u_max, double const u_bar, double const thickness, double const h)
+void THINC_local(double result[], double const u_min, double const u_jump, double const u_bar, double const thickness, double const h)
 {
   double eps = 1e-20;
   double B, A;
   double idx, exp_idx_0, exp_idx_1, tanh_beta, sinh_beta;
 
-  u_max = u_max-u_min;
+
   tanh_beta = tanh(thickness);
   sinh_beta = sinh(thickness);
-  idx = (u_bar-u_min+eps)/(u_max+eps);
-  //idx = thickness*(2.0*(u_bar-u_min+eps)/(u_max+eps)-1);
+  idx = (u_bar-u_min+eps)/(u_jump+eps);
+  //idx = thickness*(2.0*(u_bar-u_min+eps)/(u_jump+eps)-1);
   B = exp(thickness*(2.0*idx - 1.0));
   A = (B/cosh(thickness)-1.0) / tanh_beta;
 
-  result[0] = u_min + 0.5*u_max*(1.0+A);
-  result[1] = u_min + 0.5*u_max*(1.0+((tanh_beta+A)/(1.0+A*tanh_beta)));
+  result[0] = u_min + 0.5*u_jump*(1.0+A);
+  result[1] = u_min + 0.5*u_jump*(1.0+((tanh_beta+A)/(1.0+A*tanh_beta)));
 
   exp_idx_0 = exp(2.0*thickness*idx);
   exp_idx_1 = exp(2.0*thickness*(idx-1.0));
-  result[2] = -0.5*u_max*thickness/h/(sinh_beta*sinh_beta);
+  result[2] = -0.5*u_jump*thickness/h/(sinh_beta*sinh_beta);
   result[3] = result[2]*(1.0/exp_idx_0 - 1.0)*(1.0/exp_idx_1 - 1.0);
   result[2] = result[2]*(exp_idx_0 - 1.0)*(exp_idx_1 - 1.0);
 }
