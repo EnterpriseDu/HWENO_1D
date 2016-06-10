@@ -57,7 +57,7 @@ int THINC_fix
 				     * ently used index for the time
 				     * step.
 				     */
-  char scheme_local[50] = "G2m2\0";
+  char scheme_local[50] = "THINCm2\0";
   printf("===========================\n");
   printf("The scheme [%s] started.\n", scheme_local);
   int len = 0;
@@ -101,7 +101,7 @@ int THINC_fix
   running_info[7] = CONFIG[9]; // threshold
   int trouble[m];
   for(j = 0; j < m; ++j)
-    trouble[j] = 0;
+    trouble[j] = 1;
 
 
   double c, stmp, D[4], U[4], wave_speed[2];
