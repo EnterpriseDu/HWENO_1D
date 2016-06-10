@@ -34,7 +34,7 @@ void THINC0
     P3[j+1] =   p[j];
   }
 
-  printf("####%d####\n", K);
+  printf("####%d####\n", K+(1-half));
 
   if(bod < 0)
   {

@@ -212,7 +212,13 @@ int THINC_fix
 
 	u[vk1][j] = mom[j] / rho[vk1][j];
 	p[vk1][j] = (ene[j] - 0.5*mom[j]*u[vk1][j])*(gamma-1.0);
-    }
+    } 
+//==================================================
+    write_column(m, rho[vk1], "rho_sheer", "running");
+    write_column(m, u[vk1], "u_sheer", "running");
+    write_column(m, p[vk1], "p_sheer", "running");
+    write_column(m, mom, "momx_sheer", "running");
+    write_column(m, ene, "ene_sheer", "running");
 
     running_info[1] = T;
     running_info[2] = 0.0;

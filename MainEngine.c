@@ -345,8 +345,8 @@ int main(int argc, char *argv[])
   char version[100] = "thinc";
   printf("The present version is [%s]\n", version);
   //K = LF4_WENO_fix(CONFIG, OPT, m, h, rho, u, p, &runhist, scheme);
-  K = GRP4_HWENO_fix(CONFIG, OPT, m, h, rho, u, p, &runhist, scheme);
-  //K = GRP2_fix(CONFIG, OPT, m, h, rho, u, p, &runhist, scheme);
+  //K = GRP4_HWENO_fix(CONFIG, OPT, m, h, rho, u, p, &runhist, scheme);
+  K = THINC_fix(CONFIG, OPT, m, h, rho, u, p, &runhist, scheme);
 
 
   int vvM = vM;
