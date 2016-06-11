@@ -308,7 +308,7 @@ void HWENO_5
   double QL[3], QR[3], PL[3], PR[3];
   double u[m+4], p[m+4], H[m+4], Entp[m+4], EntpI[m+5];
   double EntpL, EntpR;
-  double deltaP, DP, theta = 25.0;
+  double deltaP, DP, theta = 25.0, thickness = 1.6;
   double Qn1, Q0, Qp1, SL, SR, S0;
   int flag;
 
@@ -514,7 +514,7 @@ void HWENO_5
   }
 
 
-  THINC0(running_info, m, h, alp2, rho+2, u+2, p+2, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, trouble);
+  THINC0(running_info, m, h, thickness, rho+2, u+2, p+2, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, trouble);
   /*
   for(j = 0; j < m; ++j)
   {

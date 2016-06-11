@@ -346,7 +346,7 @@ int main(int argc, char *argv[])
   printf("The present version is [%s]\n", version);
   //K = LF4_WENO_fix(CONFIG, OPT, m, h, rho, u, p, &runhist, scheme);
   //K = GRP4_HWENO_fix(CONFIG, OPT, m, h, rho, u, p, &runhist, scheme);
-  K = THINC_fix(CONFIG, OPT, m, h, rho, u, p, &runhist, scheme);
+  K = THINC_primitive_fix(CONFIG, OPT, m, h, rho, u, p, &runhist, scheme);
 
 
   int vvM = vM;

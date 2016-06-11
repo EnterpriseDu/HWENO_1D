@@ -15,6 +15,13 @@ int ADER2_fix
 (double const CONFIG[], double const OPT[], int const m, double const h,
  double *rho[], double *u[], double *p[], runList * runhist, char *scheme);
 
+int THINC_primitive_fix
+(double const CONFIG[], double const OPT[], int const m, double const h,
+ double *rho[], double *u[], double *p[], runList * runhist, char *scheme);
+
+int THINC_conservative_fix
+(double const CONFIG[], double const OPT[], int const m, double const h,
+ double *rho[], double *u[], double *p[], runList * runhist, char *scheme);
 //======================fixed GRPWENO=================================
 int ADER4_HWENO_fix
 (double const CONFIG[], double const OPT[], int const m, double const h,
