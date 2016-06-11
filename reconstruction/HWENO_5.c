@@ -302,13 +302,14 @@ void HWENO_5
   int const    decomp    = (int)running_info[5];
   int const    limiter   = (int)running_info[6];
   double const threshold =      running_info[7];
+  double const thickness =      running_info[8];
   int j, k;
 
   double Q1[6], Q2[6], Q3[6], QI1[5], QI2[5], QI3[5], DQ1[6], DQ2[6], DQ3[6];
   double QL[3], QR[3], PL[3], PR[3];
   double u[m+4], p[m+4], H[m+4], Entp[m+4], EntpI[m+5];
   double EntpL, EntpR;
-  double deltaP, DP, theta = 25.0, thickness = 1.6;
+  double deltaP, DP;
   double Qn1, Q0, Qp1, SL, SR, S0;
   int flag;
 

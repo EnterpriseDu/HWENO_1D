@@ -77,6 +77,7 @@ int GRP4_HWENO_fix
   double const modifier  = CONFIG[7];
   double const tol       = CONFIG[8];
   double const threshold = CONFIG[9];
+  double const thickness = CONFIG[10];
 
   int const    MaxStp     = (int)(OPT[0]);  // the number of time steps
   double const TIME       = OPT[1];
@@ -93,6 +94,7 @@ int GRP4_HWENO_fix
   running_info[5] = OPT[7];  // use the charactoristic decomposition or not
   running_info[6] = OPT[8];    // use the limiter or not
   running_info[7] = CONFIG[9]; // threshold
+  running_info[8] = CONFIG[10]; //thickness
 
 
 
