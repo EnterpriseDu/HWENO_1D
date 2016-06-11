@@ -33,7 +33,7 @@ void THINC_primitive_0
     P3[j+1] =   p[j];
   }
 
-  printf("####%d####\n", K+(1-half));
+  //printf("####%d####\n", K+(1-half));
 
   if(bod < 0)
   {
@@ -266,7 +266,7 @@ void THINC_conservative_0
     P3[j+1] = ene[j];
   }
 
-  printf("####%d####\n", K+(1-half));
+  //printf("####%d####\n", K+(1-half));
 
   if(bod < 0)
   {
