@@ -101,15 +101,15 @@ void WENO_5
 
     if(WENOD)
     {
-      local_WENO_5_inter_d(h, Q1, DQQ[0]);
-      local_WENO_5_inter_d(h, Q2, DQQ[1]);
-      local_WENO_5_inter_d(h, Q3, DQQ[2]);
+      local_WENO_5_inter_d_Z(h, Q1, DQQ[0]);
+      local_WENO_5_inter_d_Z(h, Q2, DQQ[1]);
+      local_WENO_5_inter_d_Z(h, Q3, DQQ[2]);
     }
     else
     {
-      local_WENO_5_inter(h, Q1);
-      local_WENO_5_inter(h, Q2);
-      local_WENO_5_inter(h, Q3);
+      local_WENO_5_inter_Z(h, Q1);
+      local_WENO_5_inter_Z(h, Q2);
+      local_WENO_5_inter_Z(h, Q3);
       DQQ[0][0] = (15*(Q1[3] - Q1[2]) + Q1[1] - Q1[4]) / (12*h);
       DQQ[1][0] = (15*(Q2[3] - Q2[2]) + Q2[1] - Q2[4]) / (12*h);
       DQQ[2][0] = (15*(Q3[3] - Q3[2]) + Q3[1] - Q3[4]) / (12*h);
@@ -155,14 +155,14 @@ void WENO_5
 
     deltaP = threshold*fabs(rho_L[j-3] - rho_R[j-3]);
     DP = 1e-5+fabs(10*(W1[j]-W1[j-1]) + 5*(W1[j-2]-W1[j+1]) + (W1[j+2]-W1[j-3]));
-    if(deltaP > DP) flag = +4*limiter;
+    if(deltaP > DP) flag += 4*limiter;
 
     for(k = 0; k < 6; ++k)
       Q1[k] = Entp[j-3+k];
     local_WENO_5_inter(h, Q3);
     deltaP = threshold*fabs(Q1[6] - Q1[7]);
     DP = 1e-5+fabs(10*(Q1[3]-Q1[2]) + 5*(Q1[1]-Q1[4]) + (Q1[5]-Q1[0]));
-    if(deltaP > DP) flag = +5*limiter;
+    if(deltaP > DP) flag += 5*limiter;
 
     if(j-3)
       trouble[j-4] += flag;
@@ -349,15 +349,15 @@ void WENO_50
 
     if(WENOD)
     {
-      local_WENO_5_inter_d(h, Q1, DQQ[0]);
-      local_WENO_5_inter_d(h, Q2, DQQ[1]);
-      local_WENO_5_inter_d(h, Q3, DQQ[2]);
+      local_WENO_5_inter_d_Z(h, Q1, DQQ[0]);
+      local_WENO_5_inter_d_Z(h, Q2, DQQ[1]);
+      local_WENO_5_inter_d_Z(h, Q3, DQQ[2]);
     }
     else
     {
-      local_WENO_5_inter(h, Q1);
-      local_WENO_5_inter(h, Q2);
-      local_WENO_5_inter(h, Q3);
+      local_WENO_5_inter_Z(h, Q1);
+      local_WENO_5_inter_Z(h, Q2);
+      local_WENO_5_inter_Z(h, Q3);
       DQQ[0][0] = (15*(Q1[3] - Q1[2]) + Q1[1] - Q1[4]) / (12*h);
       DQQ[1][0] = (15*(Q2[3] - Q2[2]) + Q2[1] - Q2[4]) / (12*h);
       DQQ[2][0] = (15*(Q3[3] - Q3[2]) + Q3[1] - Q3[4]) / (12*h);
@@ -564,9 +564,9 @@ void WENO_5_noD
   //=========Charactoristic Decomposition=========
     decomposition(H_star, u_star, c_square, c_star, gamma1, m, j, 6, 3, decomp, W1, W2, W3, Q1, Q2, Q3);
 
-    local_WENO_5_inter(h, Q1);
-    local_WENO_5_inter(h, Q2);
-    local_WENO_5_inter(h, Q3);
+    local_WENO_5_inter_Z(h, Q1);
+    local_WENO_5_inter_Z(h, Q2);
+    local_WENO_5_inter_Z(h, Q3);
 
   //=====Recomposition========
     QL[0] = Q1[6]; QR[0] = Q1[7];
@@ -736,9 +736,9 @@ void WENO_5_LF
   //=========Charactoristic Decomposition=========
     decomposition(H_star, u_star, c_square, c_star, gamma1, m, j, 6, 3, decomp, W1, W2, W3, Q1, Q2, Q3);
 
-    local_WENO_5_inter(h, Q1);
-    local_WENO_5_inter(h, Q2);
-    local_WENO_5_inter(h, Q3);
+    local_WENO_5_inter_Z(h, Q1);
+    local_WENO_5_inter_Z(h, Q2);
+    local_WENO_5_inter_Z(h, Q3);
 
   //=====Recomposition========
     QL[0] = Q1[6]; QR[0] = Q1[7];

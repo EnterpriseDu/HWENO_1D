@@ -3,15 +3,15 @@
 #include <stdlib.h>
 
 
-void local_HWENO_5_inter_d(double h, double Q[6], double DQ[6])
+void local_HWENO_5_inter_d_Z(double h, double Q[6], double DQ[6])
 {
-  double eps = 1e-6;
+  double eps = 1e-40;
   double Dneg[3] = {0.1125, 0.525, 0.3625};
   double Dpos[3] = {0.525, 0.1125, 0.3625};
   double dDneg[3] = {1.0/18.0, 5.0/6.0, 1.0/9.0};
   double dDpos[3] = {5.0/6.0, 1.0/18.0, 1.0/9.0};
 
-  double alp[3], omg[3], beta[3], sum;
+  double alp[3], omg[3], beta[3], tau, sum;
   double Qneg[3], Qpos[3], dQneg[3], dQpos[3];
 
 
@@ -38,9 +38,14 @@ void local_HWENO_5_inter_d(double h, double Q[6], double DQ[6])
   beta[1] += 9.75*(-2.0*(Q[2] - Q[1]) + DQ[2] + DQ[1])*(-2.0*(Q[2] - Q[1]) + DQ[2] + DQ[1]);
   beta[2]  = (Q[0] - 2.0*Q[1] + Q[2])*(Q[0] - 2.0*Q[1] + Q[2]);
   beta[2] += 2.4375*(Q[2] - Q[0] - 2.0*DQ[1])*(Q[2] - Q[0] - 2.0*DQ[1]);
-  alp[0] = dDneg[0] / ((eps+beta[0])*(eps+beta[0]));
-  alp[1] = dDneg[1] / ((eps+beta[1])*(eps+beta[1]));
-  alp[2] = dDneg[2] / ((eps+beta[2])*(eps+beta[2]));
+  tau = fabs(beta[1] - beta[0]);
+  beta[0] = tau / (beta[0] + eps);
+  beta[1] = tau / (beta[1] + eps);
+  beta[2] = tau / (beta[2] + eps);
+
+  alp[0] = dDneg[0] * (1 + beta[0]*beta[0]);
+  alp[1] = dDneg[1] * (1 + beta[1]*beta[1]);
+  alp[2] = dDneg[2] * (1 + beta[2]*beta[2]);
   sum = alp[0] + alp[1] + alp[2];
   omg[0] = alp[0] / sum;
   omg[1] = alp[1] / sum;
@@ -53,9 +58,14 @@ void local_HWENO_5_inter_d(double h, double Q[6], double DQ[6])
   beta[1]+= (13.0/3.0)*( Q[2] -     Q[1] - DQ[2])*(     Q[2] -     Q[1] - DQ[2]);
   beta[2] = (13.0/12.0)*(Q[0] - 2.0*Q[1] + Q[2])*(Q[0] - 2.0*Q[1] + Q[2]);
   beta[2]+= 0.25*(Q[0] - Q[2])*(Q[0] - Q[2]);
-  alp[0] = Dneg[0] / ((eps+beta[0])*(eps+beta[0]));
-  alp[1] = Dneg[1] / ((eps+beta[1])*(eps+beta[1]));
-  alp[2] = Dneg[2] / ((eps+beta[2])*(eps+beta[2]));
+  tau = fabs(beta[1] - beta[0]);
+  beta[0] = tau / (beta[0] + eps);
+  beta[1] = tau / (beta[1] + eps);
+  beta[2] = tau / (beta[2] + eps);
+
+  alp[0] = Dneg[0] * (1 + beta[0]*beta[0]);
+  alp[1] = Dneg[1] * (1 + beta[1]*beta[1]);
+  alp[2] = Dneg[2] * (1 + beta[2]*beta[2]);
   sum = alp[0] + alp[1] + alp[2];
   omg[0] = alp[0] / sum;
   omg[1] = alp[1] / sum;
@@ -79,9 +89,14 @@ void local_HWENO_5_inter_d(double h, double Q[6], double DQ[6])
   beta[1] += 9.75*(-2.0*(Q[3] - Q[2]) + DQ[3] + DQ[2])*(-2.0*(Q[3] - Q[2]) + DQ[3] + DQ[2]);
   beta[2]  = (Q[1] - 2.0*Q[2] + Q[3])*(Q[1] - 2.0*Q[2] + Q[3]);
   beta[2] += 2.4375*(Q[3] - Q[1] - 2.0*DQ[2])*(Q[3] - Q[1] - 2.0*DQ[2]);
-  alp[0] = dDpos[0] / ((eps+beta[0])*(eps+beta[0]));
-  alp[1] = dDpos[1] / ((eps+beta[1])*(eps+beta[1]));
-  alp[2] = dDpos[2] / ((eps+beta[2])*(eps+beta[2]));
+  tau = fabs(beta[1] - beta[0]);
+  beta[0] = tau / (beta[0] + eps);
+  beta[1] = tau / (beta[1] + eps);
+  beta[2] = tau / (beta[2] + eps);
+
+  alp[0] = dDpos[0] * (1 + beta[0]*beta[0]);
+  alp[1] = dDpos[1] * (1 + beta[1]*beta[1]);
+  alp[2] = dDpos[2] * (1 + beta[2]*beta[2]);
   sum = alp[0] + alp[1] + alp[2];
   omg[0] = alp[0] / sum;
   omg[1] = alp[1] / sum;
@@ -94,9 +109,14 @@ void local_HWENO_5_inter_d(double h, double Q[6], double DQ[6])
   beta[1]+= (13.0/3.0)*( Q[3] -     Q[2] - DQ[3])*(     Q[3] -     Q[2] - DQ[3]);
   beta[2] = (13.0/12.0)*(Q[1] - 2.0*Q[2] + Q[3])*(Q[1] - 2.0*Q[2] + Q[3]);
   beta[2]+= 0.25*(Q[1] - Q[3])*(Q[1] - Q[3]);
-  alp[0] = Dpos[0] / ((eps+beta[0])*(eps+beta[0]));
-  alp[1] = Dpos[1] / ((eps+beta[1])*(eps+beta[1]));
-  alp[2] = Dpos[2] / ((eps+beta[2])*(eps+beta[2]));
+  tau = fabs(beta[1] - beta[0]);
+  beta[0] = tau / (beta[0] + eps);
+  beta[1] = tau / (beta[1] + eps);
+  beta[2] = tau / (beta[2] + eps);
+
+  alp[0] = Dpos[0] * (1 + beta[0]*beta[0]);
+  alp[1] = Dpos[1] * (1 + beta[1]*beta[1]);
+  alp[2] = Dpos[2] * (1 + beta[2]*beta[2]);
   sum = alp[0] + alp[1] + alp[2];
   omg[0] = alp[0] / sum;
   omg[1] = alp[1] / sum;
@@ -106,15 +126,14 @@ void local_HWENO_5_inter_d(double h, double Q[6], double DQ[6])
 
 
 
-void local_HWENO_5_inter(double h, double Q[6], double DQ[4])
+void local_HWENO_5_inter_Z(double h, double Q[6], double DQ[4])
 {
   double eps = 1e-40;
   double Dneg[3] = {0.1125, 0.525, 0.3625};
   double Dpos[3] = {0.525, 0.1125, 0.3625};
 
-  double alp[3], omg[3], beta[3], sum;
+  double alp[3], omg[3], beta[3], tau, sum;
   double Qneg[3], Qpos[3];
-
 
   /*
    * Stencil
@@ -135,9 +154,14 @@ void local_HWENO_5_inter(double h, double Q[6], double DQ[4])
   beta[1]+= (13.0/3.0)*( Q[2] -     Q[1] - DQ[2])*(     Q[2] -     Q[1] - DQ[2]);
   beta[2] = (13.0/12.0)*(Q[0] - 2.0*Q[1] + Q[2])*(Q[0] - 2.0*Q[1] + Q[2]);
   beta[2]+= 0.25*(Q[0] - Q[2])*(Q[0] - Q[2]);
-  alp[0] = Dneg[0] / ((eps+beta[0])*(eps+beta[0]));
-  alp[1] = Dneg[1] / ((eps+beta[1])*(eps+beta[1]));
-  alp[2] = Dneg[2] / ((eps+beta[2])*(eps+beta[2]));
+  tau = fabs(beta[1] - beta[0]);
+  beta[0] = tau / (beta[0] + eps);
+  beta[1] = tau / (beta[1] + eps);
+  beta[2] = tau / (beta[2] + eps);
+
+  alp[0] = Dneg[0] * (1 + beta[0]*beta[0]);
+  alp[1] = Dneg[1] * (1 + beta[1]*beta[1]);
+  alp[2] = Dneg[2] * (1 + beta[2]*beta[2]);
   sum = alp[0] + alp[1] + alp[2];
   omg[0] = alp[0] / sum;
   omg[1] = alp[1] / sum;
@@ -157,9 +181,14 @@ void local_HWENO_5_inter(double h, double Q[6], double DQ[4])
   beta[1]+= (13.0/3.0)*( Q[3] -     Q[2] - DQ[3])*(     Q[3] -     Q[2] - DQ[3]);
   beta[2] = (13.0/12.0)*(Q[1] - 2.0*Q[2] + Q[3])*(Q[1] - 2.0*Q[2] + Q[3]);
   beta[2]+= 0.25*(Q[1] - Q[3])*(Q[1] - Q[3]);
-  alp[0] = Dpos[0] / ((eps+beta[0])*(eps+beta[0]));
-  alp[1] = Dpos[1] / ((eps+beta[1])*(eps+beta[1]));
-  alp[2] = Dpos[2] / ((eps+beta[2])*(eps+beta[2]));
+  tau = fabs(beta[1] - beta[0]);
+  beta[0] = tau / (beta[0] + eps);
+  beta[1] = tau / (beta[1] + eps);
+  beta[2] = tau / (beta[2] + eps);
+
+  alp[0] = Dpos[0] * (1 + beta[0]*beta[0]);
+  alp[1] = Dpos[1] * (1 + beta[1]*beta[1]);
+  alp[2] = Dpos[2] * (1 + beta[2]*beta[2]);
   sum = alp[0] + alp[1] + alp[2];
   omg[0] = alp[0] / sum;
   omg[1] = alp[1] / sum;

@@ -302,13 +302,14 @@ void HWENO_5
   int const    decomp    = (int)running_info[5];
   int const    limiter   = (int)running_info[6];
   double const threshold =      running_info[7];
+  double const thickness =      running_info[8];
   int j, k;
 
   double Q1[6], Q2[6], Q3[6], QI1[5], QI2[5], QI3[5], DQ1[6], DQ2[6], DQ3[6];
   double QL[3], QR[3], PL[3], PR[3];
   double u[m+4], p[m+4], H[m+4], Entp[m+4], EntpI[m+5];
   double EntpL, EntpR;
-  double deltaP, DP, theta = 25.0;
+  double deltaP, DP;
   double Qn1, Q0, Qp1, SL, SR, S0;
   int flag;
 
@@ -420,15 +421,15 @@ void HWENO_5
     }
     if(WENOD)
     {
-      local_HWENO_5_inter_d(h, Q1, DQ1);
-      local_HWENO_5_inter_d(h, Q2, DQ2);
-      local_HWENO_5_inter_d(h, Q3, DQ3);
+      local_HWENO_5_inter_d_Z(h, Q1, DQ1);
+      local_HWENO_5_inter_d_Z(h, Q2, DQ2);
+      local_HWENO_5_inter_d_Z(h, Q3, DQ3);
     }
     else
     {
-      local_HWENO_5_inter(h, Q1, DQ1);
-      local_HWENO_5_inter(h, Q2, DQ2);
-      local_HWENO_5_inter(h, Q3, DQ3);
+      local_HWENO_5_inter_Z(h, Q1, DQ1);
+      local_HWENO_5_inter_Z(h, Q2, DQ2);
+      local_HWENO_5_inter_Z(h, Q3, DQ3);
       DQ1[4] = (15*(Q1[2] - Q1[1]) + Q1[0] - Q1[3]) / (12*h);
       DQ2[4] = (15*(Q2[2] - Q2[1]) + Q2[0] - Q2[3]) / (12*h);
       DQ3[4] = (15*(Q3[2] - Q3[1]) + Q3[0] - Q3[3]) / (12*h);
@@ -485,7 +486,7 @@ void HWENO_5
     //*/
     deltaP = threshold*fabs(rho_L[j-2] - rho_R[j-2]);
     DP = 1e-5+fabs(30.0*(W1[j]-W1[j-1]) + (520.0/27.0)*(W1[j-2]-W1[j+1]) + (20.0/3.0)*(WI1[j+2]-WI1[j+1]+WI1[j-1]-WI1[j-2]));
-    if(deltaP > DP) flag = +4*limiter;
+    if(deltaP > DP) flag += 4*limiter;
     /*
     for(k = 0; k < 5; ++k)
       QI1[k] = EntpI[j-2+k];
@@ -506,12 +507,16 @@ void HWENO_5
     //if(deltaP > DP) flag = 5*limiter;
     //if(deltaP > DP) trouble[j-2] = 6*limiter;
     //*/
+
     if(j-2)
       trouble[j-3] += flag;
     if(m+2-j)
       trouble[j-2] += flag;
   }
 
+
+  THINC_primitive_0(running_info, m, h, thickness, rho+2, u+2, p+2, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, trouble);
+  /*
   for(j = 0; j < m; ++j)
   {
     if(trouble[j])
@@ -605,6 +610,7 @@ void HWENO_5
       }
     }
   }
+  */
 }
 
 
