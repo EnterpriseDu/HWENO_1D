@@ -27,15 +27,15 @@ echo "-----------------"
 
 cd ../GRP_fix/
 gcc -c ./ADER2_fix.c    -I ../\
-                        -I ../../file_io/inc/\
+                        -I ../../file_io-new/inc/\
                         -I ../../Riemann_solver/inc/\
                         -g
 gcc -c ./GRP2_fix.c    -I ../\
-                       -I ../../file_io/inc/\
+                       -I ../../file_io-new/inc/\
                        -I ../../Riemann_solver/inc/\
                        -g
 gcc -c ./THINC_fix.c    -I ../\
-                        -I ../../file_io/inc/\
+                        -I ../../file_io-new/inc/\
                         -I ../../Riemann_solver/inc/\
                         -g
 
@@ -46,15 +46,15 @@ echo "-----------------"
 
 cd ../GRP_HWENO_fix/
 gcc -c ./ADER4_HWENO_fix.c    -I ../\
-                              -I ../../file_io/inc/\
+                              -I ../../file_io-new/inc/\
                               -I ../../Riemann_solver/inc/\
                               -g
 gcc -c ./GRP4_HWENO_fix.c    -I ../\
-                             -I ../../file_io/inc/\
+                             -I ../../file_io-new/inc/\
                              -I ../../Riemann_solver/inc/\
                              -g
 gcc -c ./GRP4_minmod_fix.c    -I ../\
-                              -I ../../file_io/inc/\
+                              -I ../../file_io-new/inc/\
                               -I ../../Riemann_solver/inc/\
                               -g
 
@@ -65,15 +65,15 @@ echo "-----------------"
 
 cd ../FD_WENO/
 gcc -c ./FV_WENO_fix.c    -I ../\
-                          -I ../../file_io/inc/\
+                          -I ../../file_io-new/inc/\
                           -I ../../Riemann_solver/inc/\
                           -g
 gcc -c ./LF4_WENO_fix.c    -I ../\
-                           -I ../../file_io/inc/\
+                           -I ../../file_io-new/inc/\
                            -I ../../Riemann_solver/inc/\
                            -g
 gcc -c ./RF4_WENO_fix.c    -I ../\
-                           -I ../../file_io/inc/\
+                           -I ../../file_io-new/inc/\
                            -I ../../Riemann_solver/inc/\
                            -g
 gcc -c ./flux_RF.c         -g
