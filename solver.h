@@ -22,7 +22,7 @@ int THINC_primitive_fix
 int THINC_conservative_fix
 (double const CONFIG[], double const OPT[], int const m, double const h,
  double *rho[], double *u[], double *p[], runList * runhist, char *scheme);
-//======================fixed GRPWENO=================================
+//======================fixed GRPHWENO=================================
 int ADER4_HWENO_fix
 (double const CONFIG[], double const OPT[], int const m, double const h,
  double *rho[], double *u[], double *p[], runList * runhist, char *scheme);
@@ -34,6 +34,13 @@ int GRP4_HWENO_fix
 int GRP4_minmod_fix
 (double const CONFIG[], double const OPT[], int const m, double const h,
  double *rho[], double *u[], double *p[], runList * runhist, char *scheme);
+
+
+//======================fixed GRPWENO=================================
+int GRP4_WENO_fix
+(double const CONFIG[], double const OPT[], int const m, double const h,
+ double *rho[], double *u[], double *p[], runList * runhist, char *scheme);
+
 
 
 

@@ -44,6 +44,17 @@ ranlib GRP_fix.a
 echo "-----------------"
 
 
+cd ../GRP_WENO_fix/
+gcc -c ./GRP4_WENO5_fix.c    -I ../\
+                             -I ../../file_io/inc/\
+                             -I ../../Riemann_solver/inc/\
+                             -g
+
+ar crv GRP_WENO_fix.a GRP4_WENO5_fix.o
+ranlib GRP_WENO_fix.a
+echo "-----------------"
+
+
 cd ../GRP_HWENO_fix/
 gcc -c ./ADER4_HWENO_fix.c    -I ../\
                               -I ../../file_io/inc/\
