@@ -515,8 +515,8 @@ void HWENO_5
   }
 
 
-  THINC_primitive_0(running_info, m, h, thickness, rho+2, u+2, p+2, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, trouble);
-  /*
+  //THINC_primitive_0(running_info, m, h, thickness, rho+2, u+2, p+2, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, trouble);
+  //*
   for(j = 0; j < m; ++j)
   {
     if(trouble[j])
@@ -610,7 +610,7 @@ void HWENO_5
       }
     }
   }
-  */
+  //*/
 }
 
 

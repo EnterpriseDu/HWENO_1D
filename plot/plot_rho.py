@@ -7,11 +7,11 @@ from matplotlib import cm
 
 
 fname = '0000'
-label = 'wood'
+label = 'Shu'
 scheme = 'G4H5'
-version = 'dev-1.1'
-m = '800'
-switches = 'FWDY'
+version = 'devZ'
+m = '400'
+switches = 'FSDN'
 label = label + '_' + scheme + '_' + version + '_' + m + '_' + switches
 #label = 'DM_GRP-H-fixed_limiter-test_240x60_002010'
 add = '../SOLUTION/' + label
