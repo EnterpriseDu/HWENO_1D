@@ -85,9 +85,9 @@ void WENO_30
     local_WENO_3_inter_Z(h, Q1);
     local_WENO_3_inter_Z(h, Q2);
     local_WENO_3_inter_Z(h, Q3);
-    DQQ[0][0] = (Q1[3] - Q1[2]) / h;
-    DQQ[1][0] = (Q2[3] - Q2[2]) / h;
-    DQQ[2][0] = (Q3[3] - Q3[2]) / h;
+    DQQ[0][0] = (Q1[2] - Q1[1]) / h;
+    DQQ[1][0] = (Q2[2] - Q2[1]) / h;
+    DQQ[2][0] = (Q3[2] - Q3[1]) / h;
     DQQ[0][1] = DQQ[0][0];
     DQQ[1][1] = DQQ[1][0];
     DQQ[2][1] = DQQ[2][0];

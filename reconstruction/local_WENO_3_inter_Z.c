@@ -41,7 +41,9 @@ void local_WENO_3_inter_Z(double h, double Q[6])
     sum = alp[0] + alp[1];
     omg[0] = alp[0] / sum;
     omg[1] = alp[1] / sum;
-    Q[4] = Qneg[0]*omg[0] + Qneg[1]*omg[1];
+    //Q[4] = Qneg[0]*omg[0] + Qneg[1]*omg[1];
+    Q[4] = Qneg[0]*Dneg[0] + Qneg[1]*Dneg[1];
+    Q[4] = (-Q[0] + 5.0*Q[1] + 2.0*Q[2])/6.0;
 
 
   /*
@@ -66,5 +68,7 @@ void local_WENO_3_inter_Z(double h, double Q[6])
     sum = alp[0] + alp[1];
     omg[0] = alp[0] / sum;
     omg[1] = alp[1] / sum;
-    Q[5] = Qpos[0]*omg[0] + Qpos[1]*omg[1];
+    //Q[5] = Qpos[0]*omg[0] + Qpos[1]*omg[1];
+    Q[5] = Qpos[0]*Dpos[0] + Qpos[1]*Dpos[1];
+    Q[5] = (2.0*Q[1] + 5.0*Q[2] - 1.0*Q[3])/6.0;
 }
