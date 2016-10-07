@@ -6,6 +6,7 @@ gcc -o MainEngine\
        FD_WENO/FD_WENO.a\
        GRP_fix/GRP_fix.a\
        GRP_HWENO_fix/GRP_HWENO_fix.a\
+       GRP_WENO_fix/GRP_WENO_fix.a\
        reconstruction/reconstruction.a\
        file_io_local/file_o_local.o\
        ../file_io/file_io.a\
