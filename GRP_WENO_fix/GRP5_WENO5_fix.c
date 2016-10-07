@@ -79,12 +79,11 @@ int GRP5_WENO5_fix
   double rho2[m], u2[m], p2[m], mom2[m], ene2[m];
 
   double f01[m+1], f02[m+1], f03[m+1];
-  double f11[m+1], f12[m+1], f13[m+1];
-  double f21[m+1], f22[m+1], f23[m+1];
   double g01[m+1], g02[m+1], g03[m+1];
   double g11[m+1], g12[m+1], g13[m+1];
   double g21[m+1], g22[m+1], g23[m+1];
-  double F1[m+1], F2[m+1], F3[m+1];
+  double F11[m+1], F12[m+1], F13[m+1];
+  double F21[m+1], F22[m+1], F23[m+1];
 
   double sigma, speed_max;  /* speed_max denote the largest character
 			     * speed at each time step
@@ -223,6 +222,10 @@ int GRP5_WENO5_fix
       g13[j] = (D[3]*U[1] + U[3]*D[1])*gamma/(gamma-1.0);
       g13[j] = g13[j] + 0.5*D[0]*U[1]*U[1]*U[1] + 1.5*U[0]*U[1]*U[1]*D[1];
 
+      F11[j] = f01[j] + 0.5*tau*(D10*g01[j] + D11*g11[j]);
+      F12[j] = f02[j] + 0.5*tau*(D10*g02[j] + D11*g12[j]);
+      F13[j] = f03[j] + 0.5*tau*(D10*g03[j] + D11*g13[j]);
+
       //rhoI2[j] = rhoI[j] + tau*D[0];
       //momI2[j] = momI[j] + tau*(D[1]*U[0] + D[0]*U[1]);
       //eneI2[j] = eneI[j] + tau*(0.5*D[0]*U[1]*U[1] + U[0]*U[1]*D[1] + D[3]/(gamma-1.0));
@@ -232,9 +235,12 @@ int GRP5_WENO5_fix
     }
     for(j = 0; j < m; ++j)
     {
-      rho2[j] = rho[vk0][j] - nu*((f01[j+1]-f01[j]) + 0.5*tau*(D10*(g01[j+1]-g01[j])+D11*(g11[j+1]-g11[j])));
-      mom2[j] =      mom[j] - nu*((f02[j+1]-f02[j]) + 0.5*tau*(D10*(g02[j+1]-g02[j])+D11*(g12[j+1]-g12[j])));
-      ene2[j] =      ene[j] - nu*((f03[j+1]-f03[j]) + 0.5*tau*(D10*(g03[j+1]-g03[j])+D11*(g13[j+1]-g13[j])));
+      rho2[j] = rho[vk0][j] - nu*(F11[j+1]-F11[j]);
+      mom2[j] =      mom[j] - nu*(F12[j+1]-F12[j]);
+      ene2[j] =      ene[j] - nu*(F13[j+1]-F13[j]);
+      //rho2[j] = rho[vk0][j] - nu*((f01[j+1]-f01[j]) + 0.5*tau*(D10*(g01[j+1]-g01[j])+D11*(g11[j+1]-g11[j])));
+      //mom2[j] =      mom[j] - nu*((f02[j+1]-f02[j]) + 0.5*tau*(D10*(g02[j+1]-g02[j])+D11*(g12[j+1]-g12[j])));
+      //ene2[j] =      ene[j] - nu*((f03[j+1]-f03[j]) + 0.5*tau*(D10*(g03[j+1]-g03[j])+D11*(g13[j+1]-g13[j])));
 
       u2[j] = mom2[j] / rho2[j];
       p2[j] = (ene2[j] - 0.5*mom2[j]*u2[j])*(gamma-1.0);
@@ -263,9 +269,9 @@ int GRP5_WENO5_fix
       g23[j] = (D[3]*U[1] + U[3]*D[1])*gamma/(gamma-1.0);
       g23[j] = g13[j] + 0.5*D[0]*U[1]*U[1]*U[1] + 1.5*U[0]*U[1]*U[1]*D[1];
 
-      F1[j] = f01[j] + 0.5*tau*(D20*g01[j] + D21*g11[j] + D22*g21[j]);
-      F2[j] = f02[j] + 0.5*tau*(D20*g02[j] + D21*g12[j] + D22*g22[j]);
-      F3[j] = f03[j] + 0.5*tau*(D20*g03[j] + D21*g13[j] + D22*g23[j]);
+      F21[j] = f01[j] + 0.5*tau*(D20*g01[j] + D21*g11[j] + D22*g21[j]);
+      F22[j] = f02[j] + 0.5*tau*(D20*g02[j] + D21*g12[j] + D22*g22[j]);
+      F23[j] = f03[j] + 0.5*tau*(D20*g03[j] + D21*g13[j] + D22*g23[j]);
 
       //rhoI[j] = rhoI[j] + tau*D[0];
       //momI[j] = momI[j] + tau*(D[1]*U[0] + D[0]*U[1]);
@@ -276,9 +282,9 @@ int GRP5_WENO5_fix
     }
     for(j = 0; j < m; ++j)
     {
-      rho[vk1][j] = rho[vk0][j] - nu*(F1[j+1]-F1[j]);
-           mom[j] =      mom[j] - nu*(F2[j+1]-F2[j]);
-           ene[j] =      ene[j] - nu*(F3[j+1]-F3[j]);
+      rho[vk1][j] = rho[vk0][j] - nu*(F21[j+1]-F21[j]);
+           mom[j] =      mom[j] - nu*(F22[j+1]-F22[j]);
+           ene[j] =      ene[j] - nu*(F23[j+1]-F23[j]);
 
       u[vk1][j] = mom[j] / rho[vk1][j];
       p[vk1][j] = (ene[j] - 0.5*mom[j]*u[vk1][j])*(gamma-1.0);
