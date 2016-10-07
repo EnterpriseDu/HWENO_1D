@@ -3,19 +3,23 @@
 
 cd ./reconstruction/
 gcc -c ./GRP_minmod.c -I ../ -g
+gcc -c ./local_WENO_3_inter_Z.c -I ../ -g
 gcc -c ./local_WENO_5_inter.c -I ../ -g
 gcc -c ./local_WENO_5_inter_Z.c -I ../ -g
 gcc -c ./local_HWENO_5_inter.c -I ../ -g
 gcc -c ./local_HWENO_5_inter_Z.c -I ../ -g
+gcc -c ./WENO_3.c -I ../ -g
 gcc -c ./WENO_5.c -I ../ -g
 gcc -c ./HWENO_5.c -I ../ -g
 gcc -c ./THINC.c -I ../ -g
 
 ar crv reconstruction.a GRP_minmod.o \
+                        local_WENO_3_inter_Z.o \
                         local_WENO_5_inter.o \
                         local_WENO_5_inter_Z.o \
                         local_HWENO_5_inter.o \
                         local_HWENO_5_inter_Z.o \
+                        WENO_3.o \
                         WENO_5.o \
                         HWENO_5.o \
                         THINC.o
@@ -45,6 +49,10 @@ echo "-----------------"
 
 
 cd ../GRP_WENO_fix/
+gcc -c ./GRP3_WENO3_fix.c    -I ../\
+                             -I ../../file_io/inc/\
+                             -I ../../Riemann_solver/inc/\
+                             -g
 gcc -c ./GRP4_WENO5_fix.c    -I ../\
                              -I ../../file_io/inc/\
                              -I ../../Riemann_solver/inc/\
@@ -54,7 +62,7 @@ gcc -c ./GRP5_WENO5_fix.c    -I ../\
                              -I ../../Riemann_solver/inc/\
                              -g
 
-ar crv GRP_WENO_fix.a GRP4_WENO5_fix.o GRP5_WENO5_fix.o
+ar crv GRP_WENO_fix.a GRP3_WENO3_fix.o GRP4_WENO5_fix.o GRP5_WENO5_fix.o
 ranlib GRP_WENO_fix.a
 echo "-----------------"
 
