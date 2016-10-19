@@ -53,6 +53,10 @@ gcc -c ./GRP3_WENO3_fix.c    -I ../\
                              -I ../../file_io/inc/\
                              -I ../../Riemann_solver/inc/\
                              -g
+gcc -c ./GRP3_WENO5_fix.c    -I ../\
+                             -I ../../file_io/inc/\
+                             -I ../../Riemann_solver/inc/\
+                             -g
 gcc -c ./GRP4_WENO5_fix.c    -I ../\
                              -I ../../file_io/inc/\
                              -I ../../Riemann_solver/inc/\
@@ -62,7 +66,7 @@ gcc -c ./GRP5_WENO5_fix.c    -I ../\
                              -I ../../Riemann_solver/inc/\
                              -g
 
-ar crv GRP_WENO_fix.a GRP3_WENO3_fix.o GRP4_WENO5_fix.o GRP5_WENO5_fix.o
+ar crv GRP_WENO_fix.a GRP3_WENO3_fix.o GRP3_WENO5_fix.o GRP4_WENO5_fix.o GRP5_WENO5_fix.o
 ranlib GRP_WENO_fix.a
 echo "-----------------"
 
