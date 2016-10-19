@@ -100,6 +100,7 @@ int LOG_OUTPUT(char * err_msg, runHist * runhist, char ITEM[N_CONF][L_STR], int 
       fprintf(fp_write, "\n");
     }
 
+    sum_cpu = write_runHist(runhist, fp_write, (int)(CONFIG[13]), CONFIG[19]);
 
     fclose(fp_write);
 
