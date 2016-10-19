@@ -18,7 +18,7 @@ int ADER2_fix
 int THINC_fix
 (double const CONFIG[], int const m, double const h,
  double rho[], double u[], double p[], runHist *runhist, char *scheme);
-//======================fixed GRPWENO=================================
+//======================fixed GRP-HWENO=================================
 int ADER4_HWENO5_fix
 (double const CONFIG[], int const m, double const h,
  double rho[], double u[], double p[], runHist * runhist, char *scheme);
@@ -32,10 +32,22 @@ int GRP4_minmod_fix
  double rho[], double u[], double p[], runHist * runhist, char *scheme);
 
 
-//======================fixed GRPWENO=================================
-int GRP4_WENO_fix
-(double const CONFIG[], double const OPT[], int const m, double const h,
- double *rho[], double *u[], double *p[], runList * runhist, char *scheme);
+//======================fixed GRP-WENO=================================
+int GRP3_WENO3_fix
+(double const CONFIG[], int const m, double const h,
+ double rho[], double u[], double p[], runHist *runhist, char *scheme);
+
+int GRP3_WENO5_fix
+(double const CONFIG[], int const m, double const h,
+ double rho[], double u[], double p[], runHist *runhist, char *scheme);
+
+int GRP4_WENO5_fix
+(double const CONFIG[], int const m, double const h,
+ double rho[], double u[], double p[], runHist *runhist, char *scheme);
+
+int GRP5_WENO5_fix
+(double const CONFIG[], int const m, double const h,
+ double rho[], double u[], double p[], runHist *runhist, char *scheme);
 
 
 

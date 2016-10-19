@@ -13,7 +13,7 @@
 
 
 int GRP3_WENO5_fix
-(double const CONFIG[], double const OPT[], int const m, double const h,
+(double const CONFIG[], int const m, double const h,
  double rho[], double u[], double p[], runHist *runhist, char *scheme)
 {
   delete_runHist(runhist);

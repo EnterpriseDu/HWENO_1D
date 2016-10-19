@@ -70,14 +70,12 @@ int main(int argc, char *argv[])
   double scaling = CONFIG[19];
 
 
-  int nInitValue = 6;
+  int nInitValue = 4;
   char addInitValue[nInitValue][L_STR];
   strcpy(addInitValue[0], "RHO\0");
   strcpy(addInitValue[1], "U\0\0");
   strcpy(addInitValue[2], "P\0");
   strcpy(addInitValue[3], "X\0");
-  strcpy(addInitValue[4], "A\0");
-  strcpy(addInitValue[5], "VOL\0");
   int sizeInitValue[nInitValue];
   realArray InitValue[nInitValue];
 
@@ -129,38 +127,6 @@ int main(int argc, char *argv[])
     printf("NOT enough memory! P\n");
     exit(13);
   }
-  double * a;
-  a = (double *)malloc(m * sizeof(double));
-  if(a == NULL)
-  {
-    free(rho);
-    rho = NULL;
-    free(u);
-    u = NULL;
-    free(p);
-    p = NULL;
-    for(k = 0; k < nInitValue; ++k)
-      delete_realArray(InitValue +k);
-    printf("NOT enough memory! P\n");
-    exit(14);
-  }
-  double * vol;
-  vol = (double *)malloc(m * sizeof(double));
-  if(vol == NULL)
-  {
-    free(rho);
-    rho = NULL;
-    free(u);
-    u = NULL;
-    free(p);
-    p = NULL;
-    free(a);
-    a = NULL;
-    for(k = 0; k < nInitValue; ++k)
-      delete_realArray(InitValue +k);
-    printf("NOT enough memory! P\n");
-    exit(15);
-  }
 
   int vm = adp*m+1;
   double * x, * xc;
@@ -175,10 +141,6 @@ int main(int argc, char *argv[])
     u = NULL;
     free(p);
     p = NULL;
-    free(a);
-    a = NULL;
-    free(vol);
-    vol = NULL;
     for(k = 0; k < nInitValue; ++k)
       delete_realArray(InitValue +k);
     printf("NOT enough memory! X\n");
@@ -193,10 +155,6 @@ int main(int argc, char *argv[])
     u = NULL;
     free(p);
     p = NULL;
-    free(a);
-    a = NULL;
-    free(vol);
-    vol = NULL;
     free(x);
     x = NULL;
     for(k = 0; k < nInitValue; ++k)
@@ -212,8 +170,6 @@ int main(int argc, char *argv[])
   DATA_OUT[1] = u;
   DATA_OUT[2] = p;
   DATA_OUT[3] = x;
-  DATA_OUT[4] = a;
-  DATA_OUT[5] = vol;
   
   for(it = 0; it < nInitValue; ++it)
     for(j = 0; j < sizeInitValue[it]; ++j)
@@ -242,8 +198,8 @@ int main(int argc, char *argv[])
   runHist runhist;
   init_runHist(&runhist);
   int K = 0;
-  char scheme[100];
-  char version[100] = "dev";
+  char scheme[L_STR];
+  char version[L_STR] = "dev";
   printf("The present version is [%s]\n", version);
   K = GRP3_WENO5_fix(CONFIG, m, h, rho, u, p, &runhist, scheme);
 
@@ -270,8 +226,6 @@ int main(int argc, char *argv[])
   output_flag[1] = 1; //u
   output_flag[2] = 1; //p
   output_flag[3] = 0; //x
-  output_flag[4] = 0; //section
-  output_flag[5] = 0; //volume
 
   int output_idx[nInitValue];
   for(it = 0; it < nInitValue; ++it)
@@ -288,14 +242,10 @@ int main(int argc, char *argv[])
     free(u);
     free(p);
     free(x);
-    free(a);
-    free(vol);
     rho = NULL;
     u = NULL;
     p = NULL;
     x = NULL;
-    a = NULL;
-    vol = NULL;
     if(adp)
     {
       free(xc);
@@ -311,14 +261,10 @@ int main(int argc, char *argv[])
   free(u);
   free(p);
   free(x);
-  free(a);
-  free(vol);
   rho = NULL;
   u = NULL;
   p = NULL;
   x = NULL;
-  a = NULL;
-  vol = NULL;
   if(adp)
   {
     free(xc);
