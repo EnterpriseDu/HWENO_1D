@@ -99,8 +99,9 @@ int LOG_OUTPUT(char * err_msg, runHist * runhist, char ITEM[N_CONF][L_STR], int 
 	fprintf(fp_write, "  (default)");
       fprintf(fp_write, "\n");
     }
-
-    sum_cpu = write_runHist(runhist, fp_write, (int)(CONFIG[13]), CONFIG[19]);
+    
+    sum_cpu = write_runHist(runhist, fp_write, (int)(CONFIG[13]), CONFIG[19], 0);
+    fprintf(fp_write, "The cost of cpu time is %.18lf.\n", sum_cpu);
 
     fclose(fp_write);
 

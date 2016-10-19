@@ -218,7 +218,7 @@ int main(int argc, char *argv[])
   char add_mkdir[L_STR+L_STR];
   strcpy(add_mkdir, "../SOLUTION/\0");
   stat_mkdir = make_directory(add_mkdir, argv[2], scheme, version, m, 1, CONFIG);
-
+  printf("Directory made.\n");
 
   
   int output_flag[nInitValue];
@@ -253,10 +253,16 @@ int main(int argc, char *argv[])
     }
     return output_state;
   }
+  printf("DATA OUT.\n");
+
+  
   output_state = LOG_OUTPUT(err_msg, &runhist, ITEM, already_read, CONFIG, m, 1, K, scheme, version, argv[1], add_mkdir);
+  printf("LOG OUT.\n");
 
 
   delete_runHist(&runhist);
+  
+  printf("RUN DELETE.\n");
   free(rho);
   free(u);
   free(p);
