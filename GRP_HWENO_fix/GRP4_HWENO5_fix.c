@@ -16,6 +16,8 @@ int GRP4_HWENO5_fix
 (double const CONFIG[], int const m, double const h,
  double rho[], double u[], double p[], runHist *runhist, char *scheme)
 {
+  delete_runHist(runhist);
+  int state;
   int i = 0, j = 0, k = 1, it = 0;
 
   char scheme_local[50] = "G4H5\0";
@@ -130,13 +132,18 @@ int GRP4_HWENO5_fix
       break;
 
 
-    insert_runHist(runhist);
-    if(!runhist->tail)
+    state = insert_runHist(runhist);
+    if(state)
     {
       printf("Not enough memory for the runhist node!\n\n");
-      exit(100);
+      exit(100);//remains to modify the error code.
     }
-    locate_runHist(k-1, runhist);
+    state = locate_runHist(k-1, runhist);
+    if(state)
+    {
+      printf("The record has only %d compunonts while trying to reach runhist[%d].\n\n", state-1, k);
+      exit(100);//remains to modify the error code.
+    }
     runhist->current->trouble0 = (int *)malloc(sizeof(int) * m);
     runhist->current->trouble1 = (int *)malloc(sizeof(int) * m);
     if((!runhist->current->trouble0) || (!runhist->current->trouble1))

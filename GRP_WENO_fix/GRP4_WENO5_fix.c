@@ -13,10 +13,12 @@
 
 
 int GRP4_WENO5_fix
-(double const CONFIG[], double const OPT[], int const m, double const h,
- double *rho[], double *u[], double *p[], runList *runhist, char *scheme)
+(double const CONFIG[], int const m, double const h,
+ double rho[], double u[], double p[], runHist *runhist, char *scheme)
 {
+  delete_runHist(runhist);
   int i = 0, j = 0, k = 1, it = 0;
+  int state;
 
   char scheme_local[50] = "G4W5\0";
   printf("===========================\n");
@@ -31,7 +33,7 @@ int GRP4_WENO5_fix
 
   clock_t tic, toc;
   double sum = 0.0, T = 0.0;
-  int vk0, vk1;
+  
   
   double const gamma     = CONFIG[0];  // the constant of the perfect gas
   double const CFL       = CONFIG[1];  // CFL number
@@ -44,23 +46,20 @@ int GRP4_WENO5_fix
   double const tol       = CONFIG[8];
   double const threshold = CONFIG[9];
   double const thickness = CONFIG[10];
-
-  int const    MaxStp     = (int)(OPT[0]);  // the number of time steps
-  double const TIME       = OPT[1];
-  int const    inter_data = (int)OPT[2];
-  int const    bod        = (int)OPT[4];
-  int const    Riemann    = (int)OPT[5];
-  int const    WENOD      = (int)OPT[6];
-  int const    decomp     = (int)OPT[7];
-  int const    limiter    = (int)OPT[8];
+  int const    MaxStp    = (int)(CONFIG[11]);  // the number of time steps
+  double const TIME      = CONFIG[12];
+  int const    bod       = (int)CONFIG[14];
+  int const    Primative = (int)CONFIG[15];
+  int const    Deri      = (int)CONFIG[16];
+  int const    Limiter   = (int)CONFIG[17];
+  int const    Decomp    = (int)CONFIG[18];
 
   double running_info[N_RUNNING];
-  running_info[3] = OPT[4];  // the boundary condition
-  running_info[4] = OPT[6];  // the choice of the direvative reconstruction
-  running_info[5] = OPT[7];  // use the charactoristic decomposition or not
-  running_info[6] = OPT[8];    // use the limiter or not
+  running_info[3] = CONFIG[14];    // the boundary condition
+  running_info[4] = CONFIG[16];    // the choice of the direvative reconstruction
+  running_info[5] = CONFIG[18];    // use the charactoristic decomposition or not
+  running_info[6] = CONFIG[17];    // use the limiter or not
   running_info[7] = CONFIG[9]; // threshold
-  running_info[8] = CONFIG[10]; //thickness
 
 
 
@@ -90,25 +89,27 @@ int GRP4_WENO5_fix
   double D0 = 1.0/6.0, D1 = 0.5-D0;
 
 
-  if(Riemann)
+
+
+  if(Primative)
     for(j = 0; j < m; ++j)
     {
-      mom[j] = rho[0][j]*u[0][j];
-      ene[j] = p[0][j]/(gamma-1.0)+0.5*mom[j]*u[0][j];
+      mom[j] = rho[j]*u[j];
+      ene[j] = p[j]/(gamma-1.0)+0.5*mom[j]*u[j];
     }
   else
     for(j = 0; j < m; ++j)
     {
-      mom[j] = u[0][j];
-      ene[j] = p[0][j];
-      u[0][j] = mom[j]/rho[0][j];
-      p[0][j] = (ene[j]-0.5*mom[j]*u[0][j])*(gamma-1.0);
+      mom[j] = u[j];
+      ene[j] = p[j];
+      u[j] = mom[j]/rho[j];
+      p[j] = (ene[j]-0.5*mom[j]*u[j])*(gamma-1.0);
     }
 
   running_info[0] = 0.0;  // k
   running_info[1] = 0.0;  // time
   running_info[2] = 0.0;  // not half
-  WENO_50(running_info, m, h, eps, alp2, gamma, rho[0], mom, ene, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
+  WENO_50(running_info, m, h, eps, alp2, gamma, rho, mom, ene, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
   /*
   write_column(m, rho[0], "rho", "running");
   write_column(m, ene, "ene", "running");
@@ -133,13 +134,18 @@ int GRP4_WENO5_fix
       break;
 
 
-    insert_runList(runhist);
-    if(!runhist->tail)
+    state = insert_runHist(runhist);
+    if(state)
     {
       printf("Not enough memory for the runhist node!\n\n");
-      exit(100);
+      exit(100);//remains to modify the error code.
     }
-    locate_runList(k, runhist);
+    state = locate_runHist(k-1, runhist);
+    if(state)
+    {
+      printf("The record has only %d compunonts while trying to reach runhist[%d].\n\n", state-1, k);
+      exit(100);//remains to modify the error code.
+    }
     runhist->current->trouble0 = (int *)malloc(sizeof(int) * m);
     runhist->current->trouble1 = (int *)malloc(sizeof(int) * m);
     if((!runhist->current->trouble0) || (!runhist->current->trouble1))
@@ -148,15 +154,13 @@ int GRP4_WENO5_fix
       exit(100);
     }
 
-    vk0 = (k-1)*inter_data;  // vk0==0 or vk0==k-1
-    vk1 =     k*inter_data;  // vk1==0 or vk1==k
     running_info[0] = (double)k;
     //printf("-----------------%d-----------------", k);
     speed_max = 0.0;
     for(j = 0; j < m; ++j)
     {
-      c = sqrt(gamma * p[vk0][j] / rho[vk0][j]);
-      sigma = fabs(c) + fabs(u[vk0][j]);
+      c = sqrt(gamma * p[j] / rho[j]);
+      sigma = fabs(c) + fabs(u[j]);
       if(speed_max < sigma)
 	speed_max = sigma;
     }
@@ -204,7 +208,7 @@ int GRP4_WENO5_fix
     }
     for(j = 0; j < m; ++j)
     {
-      half_rho[j] = rho[vk0][j] - half_nu*((f01[j+1]-f01[j]) + 0.5*half_tau*(g01[j+1]-g01[j]));
+      half_rho[j] = rho[j] - half_nu*((f01[j+1]-f01[j]) + 0.5*half_tau*(g01[j+1]-g01[j]));
       half_mom[j] =      mom[j] - half_nu*((f02[j+1]-f02[j]) + 0.5*half_tau*(g02[j+1]-g02[j]));
       half_ene[j] =      ene[j] - half_nu*((f03[j+1]-f03[j]) + 0.5*half_tau*(g03[j+1]-g03[j]));
 
@@ -248,19 +252,19 @@ int GRP4_WENO5_fix
 //===============THE CORE ITERATION=================
     for(j = 0; j < m; ++j)
     {
-      rho[vk1][j] = rho[vk0][j] - nu*(F1[j+1]-F1[j]);
+      rho[j] = rho[j] - nu*(F1[j+1]-F1[j]);
            mom[j] =      mom[j] - nu*(F2[j+1]-F2[j]);
 	   ene[j] =      ene[j] - nu*(F3[j+1]-F3[j]);
-	u[vk1][j] = mom[j] / rho[vk1][j];
-	p[vk1][j] = (ene[j] - 0.5*mom[j]*u[vk1][j])*(gamma-1.0);
+	u[j] = mom[j] / rho[j];
+	p[j] = (ene[j] - 0.5*mom[j]*u[j])*(gamma-1.0);
 
-      if(p[vk1][j] < 0.0)
-        printf("    (%d,%d), %g\n", k, j, p[vk1][j]);
+      if(p[j] < 0.0)
+        printf("    (%d,%d), %g\n", k, j, p[j]);
     }
 
     running_info[1] = T;
     running_info[2] = 0.0;  // not half
-    WENO_5(running_info, m, h, eps, alp2, gamma, rho[vk1], mom, ene, rhoI, uI, pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, runhist->current->trouble0);
+    WENO_5(running_info, m, h, eps, alp2, gamma, rho, mom, ene, rhoI, uI, pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, runhist->current->trouble0);
 
     toc = clock();
     runhist->current->time[1] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;
@@ -268,9 +272,9 @@ int GRP4_WENO5_fix
   }
   k = k-1;
 
-  if(check_runList(runhist))
+  if(check_runHist(runhist))
   {
-    printf("The runhist->length is %d.\nBut the number of the runNodes are %d.\n\n", runhist->length, runhist->length - check_runList(runhist));
+    printf("The runhist->length is %d.\nBut the number of the runNodes are %d.\n\n", runhist->length, runhist->length - check_runHist(runhist));
     exit(100);
   }
   if(k - runhist->length)

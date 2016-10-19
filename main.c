@@ -245,7 +245,7 @@ int main(int argc, char *argv[])
   char scheme[100];
   char version[100] = "dev";
   printf("The present version is [%s]\n", version);
-  K = GRP4_HWENO5_fix(CONFIG, m, h, rho, u, p, &runhist, scheme);
+  K = GRP3_WENO5_fix(CONFIG, m, h, rho, u, p, &runhist, scheme);
 
 
   int len;

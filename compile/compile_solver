@@ -50,19 +50,19 @@ echo "-----------------"
 
 cd ../GRP_WENO_fix/
 gcc -c ./GRP3_WENO3_fix.c    -I ../\
-                             -I ../../file_io/inc/\
+                             -I ../../file_io-new/inc/\
                              -I ../../Riemann_solver/inc/\
                              -g
 gcc -c ./GRP3_WENO5_fix.c    -I ../\
-                             -I ../../file_io/inc/\
+                             -I ../../file_io-new/inc/\
                              -I ../../Riemann_solver/inc/\
                              -g
 gcc -c ./GRP4_WENO5_fix.c    -I ../\
-                             -I ../../file_io/inc/\
+                             -I ../../file_io-new/inc/\
                              -I ../../Riemann_solver/inc/\
                              -g
 gcc -c ./GRP5_WENO5_fix.c    -I ../\
-                             -I ../../file_io/inc/\
+                             -I ../../file_io-new/inc/\
                              -I ../../Riemann_solver/inc/\
                              -g
 
