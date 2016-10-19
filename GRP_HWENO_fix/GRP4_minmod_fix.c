@@ -1,37 +1,3 @@
-/**************************************************************************
- * This function use the fourth-order GRP scheme combined with the
- * fifth-order HWENO reconstructions to solve 1-D Euler eqautions:
- *                    w_t + f(w)_x = 0
- * on fixed meshes, where
- *      / rho  \       /   rho*u   \
- * w = | rho*u |  f = | rho*u^2+p  |   E=0.5*rho*u^2 + p/(gamma-1)
- *     \   E  / ,     \ rho*(E+p) / ,                             .
- *
- *
- * CONFIG[0] is the constant of the perfect gas
- * CONFIG[1] is the CFL number
- * CONFIG[2] is the largest value can be seen as zero
- * CONFIG[3] is the first limiter of the slope
- * CONFIG[4] is the second limiter of the slope
- * CONFIG[5] is the first parameter of the monitor function
- * CONFIG[6] is the second parameter of the monitor function
- * CONFIG[7] is the modifier of the mesh redistribution
- * CONFIG[8] is the tolerance of the mesh redistribution
- *
- * OPT[0] is the maximal step to compute.
- * OPT[1] is the time to stop the computation
- * OPT[2] is the switch of whether keep the inter-data during the computation
- * OPT[3] is the switch of wether use an adaptive mesh
- * OPT[4] controls the choice of the boundary condition
- *
- * m    is the number of the spatial grids
- * h    is the size of the spatial grids
- * rho  is the density
- * u    is the velocity
- * p    is the pressure
- * runhist_n
- **************************************************************************/
-
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
@@ -49,8 +15,8 @@
 
 
 int GRP4_minmod_fix
-(double const CONFIG[], double const OPT[], int const m, double const h,
- double *rho[], double *u[], double *p[], runList *runhist, char *scheme)
+(double const CONFIG[], int const m, double const h,
+ double rho[], double u[], double p[], runList *runhist, char *scheme)
 {
   int i = 0, j = 0, k = 1, it = 0;
 
@@ -67,7 +33,7 @@ int GRP4_minmod_fix
 
   clock_t tic, toc;
   double sum = 0.0, T = 0.0;
-  int vk0, vk1;
+  
   
   double const gamma     = CONFIG[0];  // the constant of the perfect gas
   double const CFL       = CONFIG[1];  // CFL number
@@ -80,23 +46,20 @@ int GRP4_minmod_fix
   double const tol       = CONFIG[8];
   double const threshold = CONFIG[9];
   double const thickness = CONFIG[10];
-
-  int const    MaxStp     = (int)(OPT[0]);  // the number of time steps
-  double const TIME       = OPT[1];
-  int const    inter_data = (int)OPT[2];
-  int const    bod        = (int)OPT[4];
-  int const    Riemann    = (int)OPT[5];
-  int const    WENOD      = (int)OPT[6];
-  int const    decomp     = (int)OPT[7];
-  int const    limiter    = (int)OPT[8];
+  int const    MaxStp    = (int)(CONFIG[11]);  // the number of time steps
+  double const TIME      = CONFIG[12];
+  int const    bod       = (int)CONFIG[14];
+  int const    Primative = (int)CONFIG[15];
+  int const    Deri      = (int)CONFIG[16];
+  int const    Limiter   = (int)CONFIG[17];
+  int const    Decomp    = (int)CONFIG[18];
 
   double running_info[N_RUNNING];
-  running_info[3] = OPT[4];  // the boundary condition
-  running_info[4] = OPT[6];  // the choice of the direvative reconstruction
-  running_info[5] = OPT[7];  // use the charactoristic decomposition or not
-  running_info[6] = OPT[8];    // use the limiter or not
+  running_info[3] = CONFIG[14];    // the boundary condition
+  running_info[4] = CONFIG[16];    // the choice of the direvative reconstruction
+  running_info[5] = CONFIG[18];    // use the charactoristic decomposition or not
+  running_info[6] = CONFIG[17];    // use the limiter or not
   running_info[7] = CONFIG[9]; // threshold
-  running_info[8] = CONFIG[10]; //thickness
 
 
   double c, stmp, D[4], U[4], wave_speed[2];
@@ -125,25 +88,25 @@ int GRP4_minmod_fix
   double D0 = 1.0/6.0, D1 = 0.5-D0;
 
 
-  if(Riemann)
+  if(Primative)
     for(j = 0; j < m; ++j)
     {
-      mom[j] = rho[0][j]*u[0][j];
-      ene[j] = p[0][j]/(gamma-1.0)+0.5*mom[j]*u[0][j];
+      mom[j] = rho[j]*u[j];
+      ene[j] = p[j]/(gamma-1.0)+0.5*mom[j]*u[j];
     }
   else
     for(j = 0; j < m; ++j)
     {
-      mom[j] = u[0][j];
-      ene[j] = p[0][j];
-      u[0][j] = mom[j]/rho[0][j];
-      p[0][j] = (ene[j]-0.5*mom[j]*u[0][j])*(gamma-1.0);
+      mom[j] = u[j];
+      ene[j] = p[j];
+      u[j] = mom[j]/rho[j];
+      p[j] = (ene[j]-0.5*mom[j]*u[j])*(gamma-1.0);
     }
 
   running_info[0] = 0.0;
   running_info[1] = 0.0;
   running_info[2] = 0.0;
-  WENO_50(running_info, m, h, eps, alp2, gamma, rho[0], mom, ene, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
+  WENO_50(running_info, m, h, eps, alp2, gamma, rho, mom, ene, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
 //------------THE MAIN LOOP-------------
   for(k = 1; k <= MaxStp; ++k)
   {
@@ -151,24 +114,23 @@ int GRP4_minmod_fix
       break;
 
 
-    insert_runList(runhist);
+    insert_runHist(runhist);
     if(!runhist->tail)
     {
       printf("Not enough memory for the runhist node!\n\n");
       exit(100);
     }
-    locate_runList(k, runhist);
+    locate_runList(k-1, runhist);
 
 
-    vk0 = (k-1)*inter_data;  // vk0==0 or vk0==k-1
-    vk1 =     k*inter_data;  // vk1==0 or vk1==k
+
     running_info[0] = k;
     //printf("-----------------%d-----------------", k);
     speed_max = 0.0;
     for(j = 0; j < m; ++j)
     {
-      c = sqrt(gamma * p[vk0][j] / rho[vk0][j]);
-      sigma = fabs(c) + fabs(u[vk0][j]);
+      c = sqrt(gamma * p[j] / rho[j]);
+      sigma = fabs(c) + fabs(u[j]);
       if(speed_max < sigma)
 	speed_max = sigma;
     }
@@ -215,9 +177,9 @@ int GRP4_minmod_fix
     }
     for(j = 0; j < m; ++j)
     {
-      half_rho[j] = rho[vk0][j] - half_nu*((f01[j+1]-f01[j]) + 0.5*half_tau*(g01[j+1]-g01[j]));
-      half_mom[j] =      mom[j] - half_nu*((f02[j+1]-f02[j]) + 0.5*half_tau*(g02[j+1]-g02[j]));
-      half_ene[j] =      ene[j] - half_nu*((f03[j+1]-f03[j]) + 0.5*half_tau*(g03[j+1]-g03[j]));
+      half_rho[j] = rho[j] - half_nu*((f01[j+1]-f01[j]) + 0.5*half_tau*(g01[j+1]-g01[j]));
+      half_mom[j] = mom[j] - half_nu*((f02[j+1]-f02[j]) + 0.5*half_tau*(g02[j+1]-g02[j]));
+      half_ene[j] = ene[j] - half_nu*((f03[j+1]-f03[j]) + 0.5*half_tau*(g03[j+1]-g03[j]));
 
       half_u[j] = half_mom[j] / half_rho[j];
       half_p[j] = (half_ene[j] - 0.5*half_mom[j]*half_u[j]) * (gamma-1.0);
@@ -259,19 +221,19 @@ int GRP4_minmod_fix
 //===============THE CORE ITERATION=================
     for(j = 0; j < m; ++j)
     {
-	rho[vk1][j] = rho[vk0][j] - nu*(F1[j+1]-F1[j]);
-	     mom[j] =      mom[j] - nu*(F2[j+1]-F2[j]);
-	     ene[j] =      ene[j] - nu*(F3[j+1]-F3[j]);
-	u[vk1][j] = mom[j] / rho[vk1][j];
-	p[vk1][j] = (ene[j] - 0.5*mom[j]*u[vk1][j])*(gamma-1.0);
+	rho[j] = rho[j] - nu*(F1[j+1]-F1[j]);
+	mom[j] = mom[j] - nu*(F2[j+1]-F2[j]);
+	ene[j] = ene[j] - nu*(F3[j+1]-F3[j]);
+	u[j] = mom[j] / rho[j];
+	p[j] = (ene[j] - 0.5*mom[j]*u[j])*(gamma-1.0);
 
-      if(p[vk1][j] < 0.0)
-        printf("    (%d,%d), %g\n", k, j, p[vk1][j]);
+      if(p[j] < 0.0)
+        printf("    (%d,%d), %g\n", k, j, p[j]);
     }
 
     running_info[1] = T;
     running_info[2] = 0.0;
-    GRP_minmod(running_info, m, h, alp2, rho[vk1], u[vk1], p[vk1], rhoI, uI, pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
+    GRP_minmod(running_info, m, h, alp2, rho, u, p, rhoI, uI, pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
 
     toc = clock();
     runhist->current->time[1] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;;
@@ -279,9 +241,9 @@ int GRP4_minmod_fix
   }
   k = k-1;
 
-  if(check_runList(runhist))
+  if(check_runHist(runhist))
   {
-    printf("The runhist->length is %d.\nBut the number of the runNodes are %d.\n\n", runhist->length, runhist->length - check_runList(runhist));
+    printf("The runhist->length is %d.\nBut the number of the runNodes are %d.\n\n", runhist->length, runhist->length - check_runHist(runhist));
     exit(100);
   }
   if(k - runhist->length)

@@ -3,31 +3,64 @@
 
 
 #include "file_io.h"
+#ifndef L_STR
+#include "file_io_local.h"
+#endif
 
 
 
-
-extern double * RHO0;
-extern double * U0;
-extern double * V0;
-extern double * P0;
-extern double * X0;
-extern double * Y0;
-extern int L_STR;
-extern int bit_shift;
-
-
-int configurate(double * CONFIG, char * add, char * err_msg)
+/* CONFIG[0]  is the constant of the perfect gas
+ * CONFIG[1]  is the CFL number
+ * CONFIG[2]  is the largest value can be seen as zero
+ * CONFIG[3]  is the first limiter of the slope
+ * CONFIG[4]  is the second limiter of the slope
+ * CONFIG[5]  is the first parameter of the monitor function
+ * CONFIG[6]  is the second parameter of the monitor function
+ * CONFIG[7]  is the modifier of the mesh redistribution
+ * CONFIG[8]  is the tolerance of the mesh redistribution
+ * CONFIG[9]  is the parameter of identifying the discontinuities
+ * CONFIG[10] is the parameter of the thickness in the THINC reconstruction
+ * CONFIG[11] is the maximal step to compute.
+ * CONFIG[12] is the time to stop the computation
+ * CONFIG[13] is the switch of whether use an adaptive mesh
+ * CONFIG[14] denote the kind of boundary condition
+ * CONFIG[15] indicates whether the initial data are the primitive
+ *            variables [1], or the conservative ones [0]
+ * CONFIG[16] indicates whether we use the smooth derivatives [0],
+ *            or the WENO-type ones in the reconstruction
+ * CONFIG[17] is the switch of whether use the limiter in the reconstruction
+ * CONFIG[18] is the switch of whether use the characteristic decomposition
+ * CONFIG[19] is the scaling
+ */
+int configurate(double CONFIG[N_CONF], char ITEM[N_CONF][L_STR], int already_read[N_CONF], char * err_msg, char * addCONF, char * prob)
 {
   int err_code = 01;
+  char extend[5] = ".txt\0";
+  char add[L_STR+L_STR];
+  int len_prob = 0, len_CONF = 0, i, j, k, l, count, idx;
   FILE * fp_data;
-  int i, j, k, l, count, idx;
-  int already_read[N_CONF];
+  strcpy(add, "../DATA/\0");
+
+  while(prob[len_prob] != '\0')
+    ++len_prob;
+  while(addCONF[len_CONF] != '\0')
+    ++len_CONF;
+
+  idx = 8;
+  for(i = 0; i < len_prob; ++i)
+    add[idx++] = prob[i];
+  add[idx++] = '/';
+  for(i = 0; i < len_CONF; ++i)
+    add[idx++] = addCONF[i];
+  for(i = 0; i < len_prob; ++i)
+    add[idx++] = prob[i];
+  for(i = 0; i < 5; ++i)
+    add[idx++] = extend[i];
+
   for(i = 0; i < N_CONF; ++i)
     already_read[i] = 0;
+  //the value of already_read[idx] is the position of ITEM[idx] occured in the file
   int read_flag = 0;//0 for an item, 1 for a value
-
-  char ITEM[N_CONF][L_STR];
   double up_bound[2][N_CONF];
   double low_bound[N_CONF];
   double default_value[N_CONF];
@@ -47,12 +80,12 @@ int configurate(double * CONFIG, char * add, char * err_msg)
   low_bound[2]     = 0.0;
   default_value[2] = 1e-9;
   strcpy(ITEM[3], "alp1\0");
-  up_bound[0][3]   = 2.0;
+  up_bound[0][3]   = 1.0;
   up_bound[1][3]   = 1.0;
   low_bound[3]     = 0.0;
   default_value[3] = 1.8;
   strcpy(ITEM[4], "alp2\0");
-  up_bound[0][4]   = 1.0;
+  up_bound[0][4]   = 2.0;
   up_bound[1][4]   = 1.0;
   low_bound[4]     = 0.0;
   default_value[4] = 0.9;
@@ -126,6 +159,11 @@ int configurate(double * CONFIG, char * add, char * err_msg)
   up_bound[1][18]   = 0.0;
   low_bound[18]     = 0.0;
   default_value[18] = 0.0;
+  strcpy(ITEM[19], "scaling\0");
+  up_bound[0][19]   = 0.0;
+  up_bound[1][19]   = 0.0;
+  low_bound[19]     = 1.0;
+  default_value[19] = 1.0;
 
   char comment = '#';
   int n_digit_real = 15;
@@ -140,7 +178,7 @@ int configurate(double * CONFIG, char * add, char * err_msg)
 
   if((fp_data = fopen(add, "r")) == 0)
   {
-    printf("Cannot open configuration data file: %s!\n", add);
+    sprintf(err_msg, "Cannot open configuration data file: %s!\n", add);
     return err_code;
   }
 
@@ -178,9 +216,9 @@ int configurate(double * CONFIG, char * add, char * err_msg)
 	return err_code + ((03) << bit_shift);
       }
 
-      //printf("%d-th entry, %d-th item, %s\n", count, idx, text.current->words);
       read_flag = 1;
       already_read[idx] = count;
+      //the value of already_read[idx] is the position of ITEM[idx] occured in the file
     }
     else
     {
@@ -246,6 +284,7 @@ void display_config(double * CONFIG, char * prob)
   printf("  CFL       = %g\n", CONFIG[1]);
   printf("  eps       = %g\n", CONFIG[2]);
   printf("  tol       = %g\n", CONFIG[8]);
+  printf("  scaling   = %g\n", CONFIG[19]);
 
 
   printf("  alpha1    = %g\tthe first  limiter of the slope\n", CONFIG[3]);
@@ -314,4 +353,75 @@ void display_config(double * CONFIG, char * prob)
   else
     printf("  Decomposition    NOT used\n");
   printf("\n");
+}
+
+
+
+int initialize(int nInitValue,  realArray InitValue[nInitValue], int sizeInitValue[nInitValue], char * err_msg, char addInitValue[nInitValue][L_STR], char * prob)
+{
+  int err_code = 02;
+  FILE * fp_data;
+  char extend[5] = ".txt\0";
+  char add[L_STR+L_STR];
+  strcpy(add, "../DATA/\0");
+  int len_prob = 0, len_IV = 0, i, j, k, l;
+  int it, idx;
+
+  int n_digit_real = 15;
+  char digit_real[] = {'0','1','2','3','4','5','6','7','8','9','-','+','.','e','E'};
+  int n_space = 4;
+  char space[] = {' ', '\t', '\n', '\r'};
+  int read_state;
+  char buffer[L_BUFF], number[L_BUFF], end_mark;
+  int sign;
+
+  while(prob[len_prob] != '\0')
+    ++len_prob;
+  for(it = 0; it < nInitValue; ++it)
+  {
+    len_IV = 0;
+    while(addInitValue[it][len_IV] != '\0')
+      ++len_IV;
+
+
+    idx = 8;
+    for(i = 0; i < len_prob; ++i)
+      add[idx++] = prob[i];
+    add[idx++] = '/';
+    for(i = 0; i < len_IV; ++i)
+      add[idx++] = addInitValue[it][i];
+    for(i = 0; i < len_prob; ++i)
+      add[idx++] = prob[i];
+    for(i = 0; i < 5; ++i)
+      add[idx++] = extend[i];
+
+
+
+
+    if((fp_data = fopen(add, "r")) == 0)
+    {
+      sprintf(err_msg, "Cannot open initial value data file: %s!\n", add);
+      return err_code;
+    }
+
+    init_realArray(InitValue +it);
+    read_state = real_read(InitValue +it, &end_mark, fp_data, buffer, number, '#', EOF, space, n_space, digit_real, n_digit_real, err_msg);
+    if(read_state)
+    {
+      //strcat(err_msg, sprintf(" (the %d-th item)\n", read_state));
+      sprintf(err_msg, "%s (reading %s's %d-th item)\n", err_msg, addInitValue[it], read_state);
+      for(k = 0; k < it; ++k)
+	delete_realArray(InitValue +k);
+      return err_code + ((it+1) << bit_shift);
+    }
+
+    //display_realArray(InitValue +it);
+    //printf("\n");
+
+    //delete_realArray(InitValue +it);
+
+    sizeInitValue[it] = (InitValue[it].n_box-1)*InitValue[it].box_size+InitValue[it].tail_capacity;
+  }
+
+  return 0;
 }

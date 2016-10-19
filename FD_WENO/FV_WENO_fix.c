@@ -23,15 +23,15 @@
 
 
 int FV_WENO_fix
-(double const CONFIG[], double const OPT[], int const m, double const h,
- double *rho[], double *u[], double *p[], runList *runhist, char *scheme)
+(double const CONFIG[], int const m, double const h,
+ double rho[], double u[], double p[], runHist *runhist, char *scheme)
 {
   int i = 0, j = 0, k = 1, it = 0;  /* j is a frequently used index for
 				     * spatial variables. n is a frequ-
 				     * ently used index for the time
 				     * step.
 				     */
-  char scheme_local[50] = "WENO-5-RF-4\0";
+  char scheme_local[50] = "RF4W5\0";
   printf("===========================\n");
   printf("The scheme [%s] started.\n", scheme_local);
   int len = 0;
@@ -44,7 +44,7 @@ int FV_WENO_fix
 
   clock_t tic, toc;
   double sum = 0.0, T = 0.0;
-  int vk0, vk1;
+  
   
   double const gamma     = CONFIG[0];  // the constant of the perfect gas
   double const CFL       = CONFIG[1];  // CFL number
@@ -56,21 +56,20 @@ int FV_WENO_fix
   double const modifier  = CONFIG[7];
   double const tol       = CONFIG[8];
   double const threshold = CONFIG[9];
-
-  int const    MaxStp     = (int)(OPT[0]);  // the number of time steps
-  double const TIME       = OPT[1];
-  int const    inter_data = (int)OPT[2];
-  int const    bod        = (int)OPT[4];
-  int const    Riemann    = (int)OPT[5];
-  int const    WENOD      = (int)OPT[6];
-  int const    decomp     = (int)OPT[7];
-  int const    limiter    = (int)OPT[8];
+  double const thickness = CONFIG[10];
+  int const    MaxStp    = (int)(CONFIG[11]);  // the number of time steps
+  double const TIME      = CONFIG[12];
+  int const    bod       = (int)CONFIG[14];
+  int const    Primative = (int)CONFIG[15];
+  int const    Deri      = (int)CONFIG[16];
+  int const    Limiter   = (int)CONFIG[17];
+  int const    Decomp    = (int)CONFIG[18];
 
   double running_info[N_RUNNING];
-  running_info[3] = OPT[4];  // the boundary condition
-  running_info[4] = OPT[6];  // the choice of the direvative reconstruction
-  running_info[5] = OPT[7];  // use the charactoristic decomposition or not
-  running_info[6] = OPT[8];    // use the limiter or not
+  running_info[3] = CONFIG[14];    // the boundary condition
+  running_info[4] = CONFIG[16];    // the choice of the direvative reconstruction
+  running_info[5] = CONFIG[18];    // use the charactoristic decomposition or not
+  running_info[6] = CONFIG[17];    // use the limiter or not
   running_info[7] = CONFIG[9]; // threshold
 
   double c, stmp, D[4], U[4], wave_speed[2];
@@ -108,19 +107,19 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
 
 
 
-  if(Riemann)
+  if(Primative)
     for(j = 0; j < m; ++j)
     {
-      mom[j] = rho[0][j]*u[0][j];
-      ene[j] = p[0][j]/(gamma-1.0)+0.5*mom[j]*u[0][j];
+      mom[j] = rho[j]*u[j];
+      ene[j] = p[j]/(gamma-1.0)+0.5*mom[j]*u[j];
     }
   else
     for(j = 0; j < m; ++j)
     {
-      mom[j] = u[0][j];
-      ene[j] = p[0][j];
-      u[0][j] = mom[j]/rho[0][j];
-      p[0][j] = (ene[j]-0.5*mom[j]*u[0][j])*(gamma-1.0);
+      mom[j] = u[j];
+      ene[j] = p[j];
+      u[j] = mom[j]/rho[j];
+      p[j] = (ene[j]-0.5*mom[j]*u[j])*(gamma-1.0);
     }
 
 //------------THE MAIN LOOP-------------
@@ -130,23 +129,21 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
       break;
 
 
-    insert_runList(runhist);
+    insert_runHist(runhist);
     if(!runhist->tail)
     {
       printf("Not enough memory for the runhist node!\n\n");
       exit(100);
     }
-    locate_runList(k, runhist);
+    locate_runHist(k, runhist);
 
-    vk0 = (k-1)*inter_data;  // vk0==0 or vk0==k-1
-    vk1 =     k*inter_data;  // vk1==0 or vk1==k
     running_info[0] = (double)k;
     //printf("-----------------%d-----------------", k);
     speed_max = 0.0;
     for(j = 0; j < m; ++j)
       {
-	c = sqrt(gamma * p[vk0][j] / rho[vk0][j]);
-	sigma = fabs(c) + fabs(u[vk0][j]);
+	c = sqrt(gamma * p[j] / rho[j]);
+	sigma = fabs(c) + fabs(u[j]);
 	speed_max = ((speed_max < sigma) ? sigma : speed_max);
       }
     tau = (CFL * h) / speed_max;
@@ -161,7 +158,7 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
     //======FIRST=====================
     running_info[1] = T - tau;
     running_info[2] = 0.0;
-    WENO_5_noD(running_info, m, h, eps, alp2, gamma, rho[vk0], mom, ene, rho_L, rho_R, u_L, u_R, p_L, p_R);
+    WENO_5_noD(running_info, m, h, eps, alp2, gamma, rho, mom, ene, rho_L, rho_R, u_L, u_R, p_L, p_R);
     for(j = 0; j < m+1; ++j)
     {
       linear_GRP_solver(wave_speed, D, U, 0.0, gamma, eps,
@@ -177,9 +174,9 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
 
     for(j = 0; j < m; ++j)
     {
-      rho_1[j] = rho[vk0][j] - half_tau*(f01[j+1]-f01[j])/h;
-      mom_1[j] =      mom[j] - half_tau*(f02[j+1]-f02[j])/h;
-      ene_1[j] =      ene[j] - half_tau*(f03[j+1]-f03[j])/h;
+      rho_1[j] = rho[j] - half_tau*(f01[j+1]-f01[j])/h;
+      mom_1[j] = mom[j] - half_tau*(f02[j+1]-f02[j])/h;
+      ene_1[j] = ene[j] - half_tau*(f03[j+1]-f03[j])/h;
     }
 
     //======SECOND=====================
@@ -201,9 +198,9 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
 
     for(j = 0; j < m; ++j)
     {
-      rho_2[j] = (a20*rho[vk0][j]+a21*rho_1[j]) - tau*(b20*(f01[j+1]-f01[j])+b21*(f11[j+1]-f11[j]))/h;
-      mom_2[j] = (a20*     mom[j]+a21*mom_1[j]) - tau*(b20*(f02[j+1]-f02[j])+b21*(f12[j+1]-f12[j]))/h;
-      ene_2[j] = (a20*     ene[j]+a21*ene_1[j]) - tau*(b20*(f03[j+1]-f03[j])+b21*(f13[j+1]-f13[j]))/h;
+      rho_2[j] = (a20*rho[j]+a21*rho_1[j]) - tau*(b20*(f01[j+1]-f01[j])+b21*(f11[j+1]-f11[j]))/h;
+      mom_2[j] = (a20*mom[j]+a21*mom_1[j]) - tau*(b20*(f02[j+1]-f02[j])+b21*(f12[j+1]-f12[j]))/h;
+      ene_2[j] = (a20*ene[j]+a21*ene_1[j]) - tau*(b20*(f03[j+1]-f03[j])+b21*(f13[j+1]-f13[j]))/h;
     }
 
     //======THIRD=====================
@@ -225,9 +222,9 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
 
     for(j = 0; j < m; ++j)
     {
-      rho_3[j] = (a30*rho[vk0][j]+a31*rho_1[j]+a32*rho_2[j]) - tau*(b30*(f01[j+1]-f01[j])+b31*(f11[j+1]-f11[j])+b32*(f21[j+1]-f21[j]))/h;
-      mom_3[j] = (a30*     mom[j]+a31*mom_1[j]+a32*mom_2[j]) - tau*(b30*(f02[j+1]-f02[j])+b31*(f12[j+1]-f12[j])+b32*(f22[j+1]-f22[j]))/h;
-      ene_3[j] = (a30*     ene[j]+a31*ene_1[j]+a32*ene_2[j]) - tau*(b30*(f03[j+1]-f03[j])+b31*(f13[j+1]-f13[j])+b32*(f23[j+1]-f23[j]))/h;
+      rho_3[j] = (a30*rho[j]+a31*rho_1[j]+a32*rho_2[j]) - tau*(b30*(f01[j+1]-f01[j])+b31*(f11[j+1]-f11[j])+b32*(f21[j+1]-f21[j]))/h;
+      mom_3[j] = (a30*mom[j]+a31*mom_1[j]+a32*mom_2[j]) - tau*(b30*(f02[j+1]-f02[j])+b31*(f12[j+1]-f12[j])+b32*(f22[j+1]-f22[j]))/h;
+      ene_3[j] = (a30*ene[j]+a31*ene_1[j]+a32*ene_2[j]) - tau*(b30*(f03[j+1]-f03[j])+b31*(f13[j+1]-f13[j])+b32*(f23[j+1]-f23[j]))/h;
     }
 
     //======FORTH=====================
@@ -254,22 +251,22 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
 //*
     for(j = 0; j < m; ++j)
     {
-      rho[vk1][j] = (a40*rho[vk0][j]+a41*rho_1[j]+a42*rho_2[j]+a43*rho_3[j]) - tau*(b40*(f01[j+1]-f01[j])+b41*(f11[j+1]-f11[j])+b42*(f21[j+1]-f21[j])+b43*(f31[j+1]-f31[j]))/h;
-           mom[j] = (a40*     mom[j]+a41*mom_1[j]+a42*mom_2[j]+a43*mom_3[j]) - tau*(b40*(f02[j+1]-f02[j])+b41*(f12[j+1]-f12[j])+b42*(f22[j+1]-f22[j])+b43*(f32[j+1]-f32[j]))/h;
-           ene[j] = (a40*     ene[j]+a41*ene_1[j]+a42*ene_2[j]+a43*ene_3[j]) - tau*(b40*(f03[j+1]-f03[j])+b41*(f13[j+1]-f13[j])+b42*(f23[j+1]-f23[j])+b43*(f33[j+1]-f33[j]))/h;
+      rho[j] = (a40*rho[j]+a41*rho_1[j]+a42*rho_2[j]+a43*rho_3[j]) - tau*(b40*(f01[j+1]-f01[j])+b41*(f11[j+1]-f11[j])+b42*(f21[j+1]-f21[j])+b43*(f31[j+1]-f31[j]))/h;
+      mom[j] = (a40*mom[j]+a41*mom_1[j]+a42*mom_2[j]+a43*mom_3[j]) - tau*(b40*(f02[j+1]-f02[j])+b41*(f12[j+1]-f12[j])+b42*(f22[j+1]-f22[j])+b43*(f32[j+1]-f32[j]))/h;
+      ene[j] = (a40*ene[j]+a41*ene_1[j]+a42*ene_2[j]+a43*ene_3[j]) - tau*(b40*(f03[j+1]-f03[j])+b41*(f13[j+1]-f13[j])+b42*(f23[j+1]-f23[j])+b43*(f33[j+1]-f33[j]))/h;
 
-      u[vk1][j] = mom[j] / rho[vk1][j];
-      p[vk1][j] = (ene[j] - 0.5*mom[j]*u[vk1][j])*(gamma-1.0);
+      u[j] = mom[j] / rho[j];
+      p[j] = (ene[j] - 0.5*mom[j]*u[j])*(gamma-1.0);
     }
     /*/
     for(j = 0; j < m; ++j)
     {
-      rho[vk1][j] = rho[vk0][j] - tau*(f01[j+1]-f01[j])/h;
+      rho[j] = rho[j] - tau*(f01[j+1]-f01[j])/h;
            mom[j] =      mom[j] - tau*(f02[j+1]-f02[j])/h;
            ene[j] =      ene[j] - tau*(f03[j+1]-f03[j])/h;
 
-      u[vk1][j] = mom[j] / rho[vk1][j];
-      p[vk1][j] = (ene[j] - 0.5*mom[j]*u[vk1][j])*(gamma-1.0);
+      u[j] = mom[j] / rho[j];
+      p[j] = (ene[j] - 0.5*mom[j]*u[j])*(gamma-1.0);
     }
     //*/
 
@@ -279,9 +276,9 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
   }
   k = k-1;
 
-  if(check_runList(runhist))
+  if(check_runHist(runhist))
   {
-    printf("The runhist->length is %d.\nBut the number of the runNodes are %d.\n\n", runhist->length, runhist->length - check_runList(runhist));
+    printf("The runhist->length is %d.\nBut the number of the runNodes are %d.\n\n", runhist->length, runhist->length - check_runHist(runhist));
     exit(100);
   }
   if(k - runhist->length)

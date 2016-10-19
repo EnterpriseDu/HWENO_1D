@@ -45,20 +45,20 @@ echo "-----------------"
 
 
 cd ../GRP_HWENO_fix/
-gcc -c ./ADER4_HWENO_fix.c    -I ../\
+gcc -c ./ADER4_HWENO5_fix.c    -I ../\
+                               -I ../../file_io-new/inc/\
+                               -I ../../Riemann_solver/inc/\
+                               -g
+gcc -c ./GRP4_HWENO5_fix.c    -I ../\
                               -I ../../file_io-new/inc/\
                               -I ../../Riemann_solver/inc/\
                               -g
-gcc -c ./GRP4_HWENO_fix.c    -I ../\
-                             -I ../../file_io-new/inc/\
-                             -I ../../Riemann_solver/inc/\
-                             -g
 gcc -c ./GRP4_minmod_fix.c    -I ../\
                               -I ../../file_io-new/inc/\
                               -I ../../Riemann_solver/inc/\
                               -g
 
-ar crv GRP_HWENO_fix.a GRP4_HWENO_fix.o GRP4_minmod_fix.o ADER4_HWENO_fix.o
+ar crv GRP_HWENO_fix.a GRP4_HWENO5_fix.o GRP4_minmod_fix.o ADER4_HWENO5_fix.o
 ranlib GRP_HWENO_fix.a
 echo "-----------------"
 
