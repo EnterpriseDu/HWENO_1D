@@ -20,5 +20,6 @@ reconstruction/*~
 mesh_redistribution/*~
 data/
 *.backup
+main
 MainEngine
 driverList
