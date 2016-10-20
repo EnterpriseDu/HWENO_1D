@@ -410,7 +410,7 @@ int initialize(int nInitValue,  realArray InitValue[nInitValue], int sizeInitVal
     {
       //strcat(err_msg, sprintf(" (the %d-th item)\n", read_state));
       sprintf(err_msg, "%s (reading %s's %d-th item)\n", err_msg, addInitValue[it], read_state);
-      for(k = 0; k < it; ++k)
+      for(k = 0; k <= it; ++k)
 	delete_realArray(InitValue +k);
       return err_code + ((it+1) << bit_shift);
     }
@@ -419,7 +419,7 @@ int initialize(int nInitValue,  realArray InitValue[nInitValue], int sizeInitVal
     //printf("\n");
 
     //delete_realArray(InitValue +it);
-
+    fclose(fp_data);
     sizeInitValue[it] = (InitValue[it].n_box-1)*InitValue[it].box_size+InitValue[it].tail_capacity;
   }
 

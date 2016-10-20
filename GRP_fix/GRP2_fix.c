@@ -36,7 +36,8 @@ int GRP2_fix
 
 
   clock_t tic, toc;
-  double sum = 0.0, T = 0.0;
+  int num_print_1 = 0, num_print_2 = 0, it_print;
+  double current_cpu_time = 0.0, sum_cpu_time = 0.0, T = 0.0;
   
   
   double const gamma     = CONFIG[0];  // the constant of the perfect gas
@@ -123,7 +124,7 @@ int GRP2_fix
     
     
     running_info[0] = (double)k;
-    //printf("-----------------%d-----------------", k);
+
     speed_max = 0.0;
     for(j = 0; j < m; ++j)
     {
@@ -138,7 +139,15 @@ int GRP2_fix
     half_tau = 0.5*tau;
     nu = tau/h;
     runhist->current->time[0] = tau;
-    printf("%g, %g, %g\n", tau, T, sum);
+
+
+    for(it_print = 0; it_print < num_print_1; ++it_print)
+      printf(" ");
+    printf("\r");
+    fflush(stdout);
+    num_print_1 = printf("%d | %g : %g | %g : %g", k, tau, T, current_cpu_time, sum_cpu_time);
+    fflush(stdout);
+    printf("\r");
     tic = clock();
 
 
@@ -178,8 +187,9 @@ int GRP2_fix
 
 
     toc = clock();
-    runhist->current->time[1] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;;
-    sum += runhist->current->time[1];
+    runhist->current->time[1] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;
+    current_cpu_time = runhist->current->time[1];
+    sum_cpu_time += runhist->current->time[1];
   }
   k = k-1;
   if(check_runHist(runhist))
@@ -194,7 +204,7 @@ int GRP2_fix
   }
   
 
-  printf("The cost of CPU time for [%s] solving this problem by %d steps is %g seconds.\n", scheme, k, sum);
+  printf("The cost of CPU time for [%s] solving this problem by %d steps is %g seconds.\n", scheme, k, sum_cpu_time);
   printf("===========================\n");
 //------------END OFQ THE MAIN LOOP-------------
 
