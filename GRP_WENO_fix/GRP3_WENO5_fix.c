@@ -191,8 +191,8 @@ int GRP3_WENO5_fix
     for(j = 0; j < m; ++j)
     {
       half_rho[j] = rho[j] - nu*((f01[j+1]-f01[j]) + 0.5*tau*(g01[j+1]-g01[j]));
-      half_mom[j] =      mom[j] - nu*((f02[j+1]-f02[j]) + 0.5*tau*(g02[j+1]-g02[j]));
-      half_ene[j] =      ene[j] - nu*((f03[j+1]-f03[j]) + 0.5*tau*(g03[j+1]-g03[j]));
+      half_mom[j] = mom[j] - nu*((f02[j+1]-f02[j]) + 0.5*tau*(g02[j+1]-g02[j]));
+      half_ene[j] = ene[j] - nu*((f03[j+1]-f03[j]) + 0.5*tau*(g03[j+1]-g03[j]));
 
       half_u[j] = half_mom[j] / half_rho[j];
       half_p[j] = (half_ene[j] - 0.5*half_mom[j]*half_u[j]) * (gamma-1.0);

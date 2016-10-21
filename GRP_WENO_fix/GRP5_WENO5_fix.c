@@ -190,8 +190,8 @@ int GRP5_WENO5_fix
     for(j = 0; j < m; ++j)
     {
       rho1[j] = rho[j] - nu1*((f01[j+1]-f01[j]) + 0.5*tau1*(g01[j+1]-g01[j]));
-      mom1[j] =      mom[j] - nu1*((f02[j+1]-f02[j]) + 0.5*tau1*(g02[j+1]-g02[j]));
-      ene1[j] =      ene[j] - nu1*((f03[j+1]-f03[j]) + 0.5*tau1*(g03[j+1]-g03[j]));
+      mom1[j] = mom[j] - nu1*((f02[j+1]-f02[j]) + 0.5*tau1*(g02[j+1]-g02[j]));
+      ene1[j] = ene[j] - nu1*((f03[j+1]-f03[j]) + 0.5*tau1*(g03[j+1]-g03[j]));
 
       u1[j] = mom1[j] / rho1[j];
       p1[j] = (ene1[j] - 0.5*mom1[j]*u1[j]) * (gamma-1.0);
@@ -233,8 +233,8 @@ int GRP5_WENO5_fix
     for(j = 0; j < m; ++j)
     {
       rho2[j] = rho[j] - nu*(F11[j+1]-F11[j]);
-      mom2[j] =      mom[j] - nu*(F12[j+1]-F12[j]);
-      ene2[j] =      ene[j] - nu*(F13[j+1]-F13[j]);
+      mom2[j] = mom[j] - nu*(F12[j+1]-F12[j]);
+      ene2[j] = ene[j] - nu*(F13[j+1]-F13[j]);
       //rho2[j] = rho[j] - nu*((f01[j+1]-f01[j]) + 0.5*tau*(D10*(g01[j+1]-g01[j])+D11*(g11[j+1]-g11[j])));
       //mom2[j] =      mom[j] - nu*((f02[j+1]-f02[j]) + 0.5*tau*(D10*(g02[j+1]-g02[j])+D11*(g12[j+1]-g12[j])));
       //ene2[j] =      ene[j] - nu*((f03[j+1]-f03[j]) + 0.5*tau*(D10*(g03[j+1]-g03[j])+D11*(g13[j+1]-g13[j])));
