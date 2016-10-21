@@ -34,7 +34,9 @@ int GRP4_minmod_fix
 
 
   clock_t tic, toc;
-  double sum = 0.0, T = 0.0;
+  int num_print_1 = 0, num_print_2 = 0, it_print;
+  double current_cpu_time = 0.0, sum_cpu_time = 0.0, T = 0.0;
+
   
   
   double const gamma     = CONFIG[0];  // the constant of the perfect gas
@@ -130,9 +132,8 @@ int GRP4_minmod_fix
     }
 
 
-
     running_info[0] = k;
-    //printf("-----------------%d-----------------", k);
+    
     speed_max = 0.0;
     for(j = 0; j < m; ++j)
     {
@@ -147,8 +148,15 @@ int GRP4_minmod_fix
     nu = tau/h;
     half_nu = 0.5*nu;
     runhist->current->time[0] = tau;
-    //printf("%g, %g\n", tau, T);
 
+
+    for(it_print = 0; it_print < num_print_1; ++it_print)
+      printf(" ");
+    printf("\r");
+    fflush(stdout);
+    num_print_1 = printf("%d | %g : %g | %g : %g", k, tau, T, current_cpu_time, sum_cpu_time);
+    fflush(stdout);
+    printf("\r");
     tic = clock();
 
 
@@ -243,8 +251,9 @@ int GRP4_minmod_fix
     GRP_minmod(running_info, m, h, alp2, rho, u, p, rhoI, uI, pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
 
     toc = clock();
-    runhist->current->time[1] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;;
-    sum += runhist->current->time[1];
+    runhist->current->time[1] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;
+    current_cpu_time = runhist->current->time[1];
+    sum_cpu_time += runhist->current->time[1];
   }
   k = k-1;
 
@@ -260,7 +269,8 @@ int GRP4_minmod_fix
   }
 
 
-  printf("The cost of CPU time for [%s] solving this problem by %d steps is %g seconds.\n", scheme, k, sum);
+  printf("The cost of CPU time for [%s] computing this\n", scheme);
+  printf("problem to time %g with %d steps is %g seconds.\n", T, k, sum_cpu_time);
   printf("===========================\n");
 //------------END OFQ THE MAIN LOOP-------------
 

@@ -26,12 +26,13 @@ int FV_WENO_fix
 (double const CONFIG[], int const m, double const h,
  double rho[], double u[], double p[], runHist *runhist, char *scheme)
 {
+  int state;
   int i = 0, j = 0, k = 1, it = 0;  /* j is a frequently used index for
 				     * spatial variables. n is a frequ-
 				     * ently used index for the time
 				     * step.
 				     */
-  char scheme_local[50] = "RF4W5\0";
+  char scheme_local[50] = "FV4W5\0";
   printf("===========================\n");
   printf("The scheme [%s] started.\n", scheme_local);
   int len = 0;
@@ -43,7 +44,8 @@ int FV_WENO_fix
 
 
   clock_t tic, toc;
-  double sum = 0.0, T = 0.0;
+  int num_print_1 = 0, num_print_2 = 0, it_print;
+  double current_cpu_time = 0.0, sum_cpu_time = 0.0, T = 0.0;
   
   
   double const gamma     = CONFIG[0];  // the constant of the perfect gas
@@ -129,16 +131,22 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
       break;
 
 
-    insert_runHist(runhist);
-    if(!runhist->tail)
+    state = insert_runHist(runhist);
+    if(state)
     {
       printf("Not enough memory for the runhist node!\n\n");
-      exit(100);
+      exit(100);//remains to modify the error code.
     }
-    locate_runHist(k, runhist);
+    state = locate_runHist(k-1, runhist);
+    if(state)
+    {
+      printf("The record has only %d compunonts while trying to reach runhist[%d].\n\n", state-1, k);
+      exit(100);//remains to modify the error code.
+    }
+    
 
     running_info[0] = (double)k;
-    //printf("-----------------%d-----------------", k);
+    
     speed_max = 0.0;
     for(j = 0; j < m; ++j)
       {
@@ -150,8 +158,15 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
     if(T+tau > TIME){tau = TIME-T; T = TIME;} else{T += tau;}
     half_tau = 0.5*tau;
     runhist->current->time[0] = tau;
-    //printf("%g, %g\n", tau, T);
 
+
+    for(it_print = 0; it_print < num_print_1; ++it_print)
+      printf(" ");
+    printf("\r");
+    fflush(stdout);
+    num_print_1 = printf("%d | %g : %g | %g : %g", k, tau, T, current_cpu_time, sum_cpu_time);
+    fflush(stdout);
+    printf("\r");
     tic = clock();
 
 
@@ -271,8 +286,9 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
     //*/
 
     toc = clock();
-    runhist->current->time[1] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;;
-    sum += runhist->current->time[1];
+    runhist->current->time[1] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;
+    current_cpu_time = runhist->current->time[1];
+    sum_cpu_time += runhist->current->time[1];
   }
   k = k-1;
 
@@ -288,7 +304,8 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
   }
 
 
-  printf("The cost of CPU time for [%s] solving this problem by %d steps is %g seconds.\n", scheme, k, sum);
+  printf("The cost of CPU time for [%s] computing this\n", scheme);
+  printf("problem to time %g with %d steps is %g seconds.\n", T, k, sum_cpu_time);
   printf("===========================\n");
 //------------END OFQ THE MAIN LOOP-------------
 

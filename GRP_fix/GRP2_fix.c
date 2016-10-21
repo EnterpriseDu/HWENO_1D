@@ -204,7 +204,8 @@ int GRP2_fix
   }
   
 
-  printf("The cost of CPU time for [%s] solving this problem by %d steps is %g seconds.\n", scheme, k, sum_cpu_time);
+  printf("The cost of CPU time for [%s] computing this\n", scheme);
+  printf("problem to time %g with %d steps is %g seconds.\n", T, k, sum_cpu_time);
   printf("===========================\n");
 //------------END OFQ THE MAIN LOOP-------------
 
