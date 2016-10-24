@@ -54,6 +54,7 @@ int LOG_OUTPUT(char * err_msg, runHist * runhist, char ITEM[N_CONF][L_STR], int 
   time_t t;
   struct tm * local_time;
   double sum_tau = 0.0, sum_cpu = 0.0;
+  int flag_time[4] = {0,0,0,0}, flag_extra[2] = {0,0};
 
   if(check_runHist(runhist))
   {
@@ -99,9 +100,14 @@ int LOG_OUTPUT(char * err_msg, runHist * runhist, char ITEM[N_CONF][L_STR], int 
 	fprintf(fp_write, "  (default)");
       fprintf(fp_write, "\n");
     }
-    
-    sum_cpu = write_runHist(runhist, fp_write, (int)(CONFIG[13]), CONFIG[19], 0);
-    fprintf(fp_write, "The cost of cpu time is %.18lf.\n", sum_cpu);
+
+    //flag_time = {0,0,0,0}; //tau, T, current cpu, total cpu
+    //flag_extra = {0,0}; //int, double
+    sum_cpu = write_runHist(runhist, fp_write, 0, flag_time, flag_extra, (int)(CONFIG[13]), CONFIG[19], '\t');
+    fprintf(fp_write, "The cost of cpu time is %.18lf.\n\n", sum_cpu);
+    //flag_time[1] = 1; // output T
+    //flag_extra[0] = 1; // output the INT
+    //sum_cpu = write_runHist(runhist, fp_write, 0, flag_time, flag_extra, (int)(CONFIG[13]), CONFIG[19], '\t');
 
     fclose(fp_write);
 
