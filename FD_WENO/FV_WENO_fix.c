@@ -14,10 +14,13 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "file_io.h"
+
 #include "Riemann_solver.h"
 
+#ifndef L_STR
 #include "file_io_local.h"
+#endif
+
 #include "reconstruction.h"
 
 

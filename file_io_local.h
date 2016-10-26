@@ -1,3 +1,7 @@
+#ifndef L_BUFF
+#include "file_io.h"
+#endif
+
 #define L_STR 1000
 #define bit_shift 8
 #define N_CONF 20

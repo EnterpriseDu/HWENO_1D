@@ -78,6 +78,8 @@ int main(int argc, char *argv[])
   strcpy(addInitValue[3], "X\0");
   int sizeInitValue[nInitValue];
   realArray InitValue[nInitValue];
+  for(it = 0; it < nInitValue; ++it)
+    InitValue[it].n_box = 0;
 
 
   read_state = initialize(nInitValue, InitValue, sizeInitValue, err_msg, addInitValue, argv[1]);
