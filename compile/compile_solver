@@ -34,6 +34,10 @@ gcc -c ./ADER2_fix.c    -I ../\
                         -I ../../file_io-new/inc/\
                         -I ../../Riemann_solver/inc/\
                         -g
+gcc -c ./GRP1_fix.c    -I ../\
+                       -I ../../file_io-new/inc/\
+                       -I ../../Riemann_solver/inc/\
+                       -g
 gcc -c ./GRP2_fix.c    -I ../\
                        -I ../../file_io-new/inc/\
                        -I ../../Riemann_solver/inc/\
@@ -43,13 +47,17 @@ gcc -c ./THINC_fix.c    -I ../\
                         -I ../../Riemann_solver/inc/\
                         -g
 
-ar crv GRP_fix.a GRP2_fix.o ADER2_fix.o THINC_fix.o
+ar crv GRP_fix.a GRP1_fix.o GRP2_fix.o ADER2_fix.o THINC_fix.o
 ranlib GRP_fix.a
 echo "-----------------"
 
 
 cd ../GRP_WENO_fix/
-gcc -c ./GRP3_WENO3_fix.c    -I ../\
+gcc -c ./GRP1_WENO5_fix.c    -I ../\
+                             -I ../../file_io-new/inc/\
+                             -I ../../Riemann_solver/inc/\
+                             -g
+gcc -c ./GRP2_WENO5_fix.c    -I ../\
                              -I ../../file_io-new/inc/\
                              -I ../../Riemann_solver/inc/\
                              -g
@@ -66,7 +74,7 @@ gcc -c ./GRP5_WENO5_fix.c    -I ../\
                              -I ../../Riemann_solver/inc/\
                              -g
 
-ar crv GRP_WENO_fix.a GRP3_WENO3_fix.o GRP3_WENO5_fix.o GRP4_WENO5_fix.o GRP5_WENO5_fix.o
+ar crv GRP_WENO_fix.a GRP1_WENO5_fix.o GRP2_WENO5_fix.o GRP3_WENO5_fix.o GRP4_WENO5_fix.o GRP5_WENO5_fix.o
 ranlib GRP_WENO_fix.a
 echo "-----------------"
 

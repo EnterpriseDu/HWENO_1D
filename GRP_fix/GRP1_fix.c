@@ -15,7 +15,7 @@
 
 
 
-int GRP2_WENO5_fix
+int GRP1_fix
 (double const CONFIG[], int const m, double const h,
  double rho[], double u[], double p[], runHist *runhist, char *scheme)
 {
@@ -26,7 +26,7 @@ int GRP2_WENO5_fix
 				     * ently used index for the time
 				     * step.
 				     */
-  char scheme_local[50] = "G2W5\0";
+  char scheme_local[50] = "G1m2\0";
   printf("===========================\n");
   printf("The scheme [%s] started.\n", scheme_local);
   int len = 0;
@@ -103,8 +103,7 @@ int GRP2_WENO5_fix
   running_info[0] = 0.0;
   running_info[1] = 0.0;
   running_info[1] = 0.0;
-  //GRP_minmod0(running_info, m, h, alp2, rho, u, p, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
-  WENO_50(running_info, m, h, eps, alp2, gamma, rho, mom, ene, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
+  GRP_minmod0(running_info, m, h, alp2, rho, u, p, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
 //------------THE MAIN LOOP-------------
   for(k = 1; k <= MaxStp; ++k)
   {
@@ -123,13 +122,6 @@ int GRP2_WENO5_fix
     {
       printf("The record has only %d compunonts while trying to reach runhist[%d].\n\n", state-1, k);
       exit(100);//remains to modify the error code.
-    }
-    runhist->current->trouble0 = (int *)malloc(sizeof(int) * m);
-    runhist->current->trouble1 = (int *)malloc(sizeof(int) * m);
-    if((!runhist->current->trouble0) || (!runhist->current->trouble1))
-    {
-      printf("Not enough memory for the runhist node!\n\n");
-      exit(100);
     }
     
     
@@ -170,14 +162,14 @@ int GRP2_WENO5_fix
 			D_rho_R[j], D_u_R[j], 0.0, D_p_R[j],
 			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
-      F1[j] = U[0]*U[1] + half_tau*(D[0]*U[1]+U[0]*D[1]);
-      F2[j] = U[0]*U[1]*U[1] + half_tau*(D[0]*U[1]*U[1]+2.0*U[0]*U[1]*D[1]) + U[3]+half_tau*D[3];
-      F3[j] = (U[3]*U[1]+half_tau*(D[3]*U[1]+U[3]*D[1]))*gamma/(gamma-1.0);
-      F3[j] = 0.5*U[0]*U[1]*U[1]*U[1] + half_tau*(0.5*D[0]*U[1]*U[1]*U[1]+1.5*U[0]*U[1]*U[1]*D[1]) + F3[j];
+      F1[j] = U[0]*U[1];
+      F2[j] = U[0]*U[1]*U[1]  + U[3];
+      F3[j] = U[3]*U[1]*gamma/(gamma-1.0);
+      F3[j] = 0.5*U[0]*U[1]*U[1]*U[1] + F3[j];
 
-      rhoI[j] = U[0] + tau*D[0];
-        uI[j] = U[1] + tau*D[1];
-        pI[j] = U[3] + tau*D[3];
+      rhoI[j] = U[0];
+        uI[j] = U[1];
+        pI[j] = U[3];
     }
 
 //===============THE CORE ITERATION=================
@@ -193,7 +185,7 @@ int GRP2_WENO5_fix
 
     running_info[1] = T;
     running_info[2] = 0.0;
-    WENO_5(running_info, m, h, eps, alp2, gamma, rho, mom, ene, rhoI, uI, pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, runhist->current->trouble0);
+    GRP_minmod(running_info, m, h, alp2, rho, u, p, rhoI, uI, pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
 
 
     toc = clock();
