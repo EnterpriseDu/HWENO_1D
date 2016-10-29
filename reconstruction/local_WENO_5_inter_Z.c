@@ -46,7 +46,7 @@ void local_WENO_5_inter_d_Z(double h, double Q[8], double DQQ[2])
   double dDneg[3] = {0.5, 5.0/12.0, 1.0/12.0};//dDR
   double dDpos[3] = {1.0/12.0, 5.0/12.0, 0.5};//dDL
 
-  double alp[3], omg[3], beta[3], tau, sum;
+  double alp[3], omg[3], beta[3], zeta[3], tau, sum;
   double Qneg[3], Qpos[3], dQneg[3], dQpos[3];
 
 
@@ -72,13 +72,13 @@ void local_WENO_5_inter_d_Z(double h, double Q[8], double DQQ[2])
     beta[1] = (Q[1] - 2.0*Q[2] + Q[3])*(Q[1] - 2.0*Q[2] + Q[3]);
     beta[2] = (Q[0] - 2.0*Q[1] + Q[2])*(Q[0] - 2.0*Q[1] + Q[2]);
     tau = fabs(beta[2] - beta[0]);
-    beta[0] = tau / (beta[0] + eps);
-    beta[1] = tau / (beta[1] + eps);
-    beta[2] = tau / (beta[2] + eps);
+    zeta[0] = tau / (beta[0] + eps);
+    zeta[1] = tau / (beta[1] + eps);
+    zeta[2] = tau / (beta[2] + eps);
 
-    alp[0] = dDneg[0] * (1 + beta[0]*beta[0]);
-    alp[1] = dDneg[1] * (1 + beta[1]*beta[1]);
-    alp[2] = dDneg[2] * (1 + beta[2]*beta[2]);
+    alp[0] = dDneg[0] * (1 + zeta[0]*zeta[0]);
+    alp[1] = dDneg[1] * (1 + zeta[1]*zeta[1]);
+    alp[2] = dDneg[2] * (1 + zeta[2]*zeta[2]);
     sum = alp[0] + alp[1] + alp[2];
     omg[0] = alp[0] / sum;
     omg[1] = alp[1] / sum;
@@ -89,13 +89,13 @@ void local_WENO_5_inter_d_Z(double h, double Q[8], double DQQ[2])
     beta[1] = (13.0/12.0)*beta[1] + 0.25*(    Q[1]                - Q[3])*(    Q[1]                - Q[3]);
     beta[2] = (13.0/12.0)*beta[2] + 0.25*(    Q[0] - 4.0*Q[1] + 3.0*Q[2])*(    Q[0] - 4.0*Q[1] + 3.0*Q[2]);
     tau = fabs(beta[2] - beta[0]);
-    beta[0] = tau / (beta[0] + eps);
-    beta[1] = tau / (beta[1] + eps);
-    beta[2] = tau / (beta[2] + eps);
+    zeta[0] = tau / (beta[0] + eps);
+    zeta[1] = tau / (beta[1] + eps);
+    zeta[2] = tau / (beta[2] + eps);
 
-    alp[0] = Dneg[0] * (1 + beta[0]*beta[0]);
-    alp[1] = Dneg[1] * (1 + beta[1]*beta[1]);
-    alp[2] = Dneg[2] * (1 + beta[2]*beta[2]);
+    alp[0] = Dneg[0] * (1 + zeta[0]*zeta[0]);
+    alp[1] = Dneg[1] * (1 + zeta[1]*zeta[1]);
+    alp[2] = Dneg[2] * (1 + zeta[2]*zeta[2]);
     sum = alp[0] + alp[1] + alp[2];
     omg[0] = alp[0] / sum;
     omg[1] = alp[1] / sum;
@@ -125,13 +125,13 @@ void local_WENO_5_inter_d_Z(double h, double Q[8], double DQQ[2])
     beta[1] = (Q[2] - 2.0*Q[3] + Q[4])*(Q[2] - 2.0*Q[3] + Q[4]);
     beta[2] = (Q[1] - 2.0*Q[2] + Q[3])*(Q[1] - 2.0*Q[2] + Q[3]);
     tau = fabs(beta[2] - beta[0]);
-    beta[0] = tau / (beta[0] + eps);
-    beta[1] = tau / (beta[1] + eps);
-    beta[2] = tau / (beta[2] + eps);
+    zeta[0] = tau / (beta[0] + eps);
+    zeta[1] = tau / (beta[1] + eps);
+    zeta[2] = tau / (beta[2] + eps);
 
-    alp[0] = dDpos[0] * (1 + beta[0]*beta[0]);
-    alp[1] = dDpos[1] * (1 + beta[1]*beta[1]);
-    alp[2] = dDpos[2] * (1 + beta[2]*beta[2]);
+    alp[0] = dDpos[0] * (1 + zeta[0]*zeta[0]);
+    alp[1] = dDpos[1] * (1 + zeta[1]*zeta[1]);
+    alp[2] = dDpos[2] * (1 + zeta[2]*zeta[2]);
     sum = alp[0] + alp[1] + alp[2];
     omg[0] = alp[0] / sum;
     omg[1] = alp[1] / sum;
@@ -142,13 +142,13 @@ void local_WENO_5_inter_d_Z(double h, double Q[8], double DQQ[2])
     beta[1] = (13.0/12.0)*beta[1] + 0.25*(    Q[2]                - Q[4])*(    Q[2]                - Q[4]);
     beta[2] = (13.0/12.0)*beta[2] + 0.25*(    Q[1] - 4.0*Q[2] + 3.0*Q[3])*(    Q[1] - 4.0*Q[2] + 3.0*Q[3]);
     tau = fabs(beta[2] - beta[0]);
-    beta[0] = tau / (beta[0] + eps);
-    beta[1] = tau / (beta[1] + eps);
-    beta[2] = tau / (beta[2] + eps);
+    zeta[0] = tau / (beta[0] + eps);
+    zeta[1] = tau / (beta[1] + eps);
+    zeta[2] = tau / (beta[2] + eps);
 
-    alp[0] = Dpos[0] * (1 + beta[0]*beta[0]);
-    alp[1] = Dpos[1] * (1 + beta[1]*beta[1]);
-    alp[2] = Dpos[2] * (1 + beta[2]*beta[2]);
+    alp[0] = Dpos[0] * (1 + zeta[0]*zeta[0]);
+    alp[1] = Dpos[1] * (1 + zeta[1]*zeta[1]);
+    alp[2] = Dpos[2] * (1 + zeta[2]*zeta[2]);
     sum = alp[0] + alp[1] + alp[2];
     omg[0] = alp[0] / sum;
     omg[1] = alp[1] / sum;
