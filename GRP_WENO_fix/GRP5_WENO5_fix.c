@@ -74,12 +74,12 @@ int GRP5_WENO5_fix
   double rho_star, u_star, p_star, E_star;
   double rhoI[m+1], momI[m+1], eneI[m+1], uI[m+1], pI[m+1];//, half_rhoI[m+1], half_momI[m+1], half_eneI[m+1], half_uI[m+1], half_pI[m+1];
   double rhoI1[m+1], momI1[m+1], eneI1[m+1], uI1[m+1], pI1[m+1];
-  double rhoI2[m+1], momI2[m+1], eneI2[m+1], uI2[m+1], pI2[m+1];
+  double rhot1[m+1], momt1[m+1], enet1[m+1], ut1[m+1], pt1[m+1];
+  double rhot2[m+1], momt2[m+1], enet2[m+1], ut2[m+1], pt2[m+1];
   double rho_L[m+1], rho_R[m+1], u_L[m+1], u_R[m+1], p_L[m+1], p_R[m+1];
   double D_rho_L[m+1], D_rho_R[m+1], D_u_L[m+1], D_u_R[m+1], D_p_L[m+1], D_p_R[m+1];
 
   double rho1[m], u1[m], p1[m], mom1[m], ene1[m];
-  double rho2[m], u2[m], p2[m], mom2[m], ene2[m];
 
   double f01[m+1], f02[m+1], f03[m+1];
   double g01[m+1], g02[m+1], g03[m+1];
@@ -138,6 +138,13 @@ int GRP5_WENO5_fix
       printf("The record has only %d compunonts while trying to reach runhist[%d].\n\n", state-1, k);
       exit(100);//remains to modify the error code.
     }
+    runhist->current->trouble0 = (int *)malloc(sizeof(int) * m);
+    runhist->current->trouble1 = (int *)malloc(sizeof(int) * m);
+    if((!runhist->current->trouble0) || (!runhist->current->trouble1))
+    {
+      printf("Not enough memory for the runhist node!\n\n");
+      exit(100);
+    }
 
     running_info[0] = (double)k;
     
@@ -186,17 +193,23 @@ int GRP5_WENO5_fix
       g03[j] = (D[3]*U[1] + U[3]*D[1])*gamma/(gamma-1.0);
       g03[j] = g03[j] + 0.5*D[0]*U[1]*U[1]*U[1] + 1.5*U[0]*U[1]*U[1]*D[1];
 
+      rhot1[j] = D[0];
+      ut1[j] = D[1];
+      pt1[j] = D[3];
+      momt1[j] = D[1]*U[0] + D[0]*U[1];
+      enet1[j] = 0.5*D[0]*U[1]*U[1] + U[0]*U[1]*D[1] + D[3]/(gamma-1.0);
+
       rhoI[j] = U[0];
       momI[j] = U[0]*U[1];
       eneI[j] = 0.5*U[0]*U[1]*U[1] + U[3]/(gamma-1.0);
-      //rhoI1[j] = rhoI[j] + tau1*D[0];
-      //momI1[j] = momI[j] + tau1*(D[1]*U[0] + D[0]*U[1]);
-      //eneI1[j] = eneI[j] + tau1*(0.5*D[0]*U[1]*U[1] + U[0]*U[1]*D[1] + D[3]/(gamma-1.0));
+      rhoI1[j] = rhoI[j] + tau1*rhot1[j];
+      momI1[j] = momI[j] + tau1*momt1[j];
+      eneI1[j] = eneI[j] + tau1*enet1[j];
 
       uI[j] = U[1];
       pI[j] = U[3];
-      //uI1[j] = U[1] + tau1*D[1];
-      //pI1[j] = U[3] + tau1*D[3];
+      uI1[j] = U[1] + tau1*ut1[j];
+      pI1[j] = U[3] + tau1*pt1[j];
     }
     for(j = 0; j < m; ++j)
     {
@@ -212,8 +225,8 @@ int GRP5_WENO5_fix
 
     running_info[1] = T - tau + tau1;  // time
     running_info[2] = 1.0;           // half
-    //WENO_5(running_info, m, h, eps, alp2, gamma, rho1, mom1, ene1, rhoI1, uI1, pI1, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, runhist->current->trouble1);
-    WENO_50(running_info, m, h, eps, alp2, gamma, rho1, mom1, ene1, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
+    WENO_5(running_info, m, h, eps, alp2, gamma, rho1, mom1, ene1, rhoI1, uI1, pI1, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, runhist->current->trouble1);
+    //WENO_50(running_info, m, h, eps, alp2, gamma, rho1, mom1, ene1, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
 
 
     for(j = 0; j < m+1; ++j)
@@ -234,33 +247,36 @@ int GRP5_WENO5_fix
       F12[j] = f02[j] + 0.5*tau*(D10*g02[j] + D11*g12[j]);
       F13[j] = f03[j] + 0.5*tau*(D10*g03[j] + D11*g13[j]);
 
-      //rhoI2[j] = rhoI[j] + tau*D[0];
-      //momI2[j] = momI[j] + tau*(D[1]*U[0] + D[0]*U[1]);
-      //eneI2[j] = eneI[j] + tau*(0.5*D[0]*U[1]*U[1] + U[0]*U[1]*D[1] + D[3]/(gamma-1.0));
+      rhot2[j] = D[0];
+      ut2[j] = D[1];
+      pt2[j] = D[3];
+      momt2[j] = D[1]*U[0] + D[0]*U[1];
+      enet2[j] = 0.5*D[0]*U[1]*U[1] + U[0]*U[1]*D[1] + D[3]/(gamma-1.0);
 
-      //uI2[j] = uI[j] + tau*D[1];
-      //pI2[j] = pI[j] + tau*D[3];
+      rhoI1[j] = rhoI[j] + tau*(5.0*rhot2[j] - rhot1[j]);
+      momI1[j] = momI[j] + tau*(5.0*momt2[j] - momt1[j]);
+      eneI1[j] = eneI[j] + tau*(5.0*enet2[j] - enet1[j]);
+
+      uI1[j] = uI[j] + 0.25*tau*(5.0*ut2[j] - ut1[j]);
+      pI1[j] = pI[j] + 0.25*tau*(5.0*pt2[j] - pt1[j]);
     }
     for(j = 0; j < m; ++j)
     {
-      rho2[j] = rho[j] - nu*(F11[j+1]-F11[j]);
-      mom2[j] = mom[j] - nu*(F12[j+1]-F12[j]);
-      ene2[j] = ene[j] - nu*(F13[j+1]-F13[j]);
-      //rho2[j] = rho[j] - nu*((f01[j+1]-f01[j]) + 0.5*tau*(D10*(g01[j+1]-g01[j])+D11*(g11[j+1]-g11[j])));
-      //mom2[j] =      mom[j] - nu*((f02[j+1]-f02[j]) + 0.5*tau*(D10*(g02[j+1]-g02[j])+D11*(g12[j+1]-g12[j])));
-      //ene2[j] =      ene[j] - nu*((f03[j+1]-f03[j]) + 0.5*tau*(D10*(g03[j+1]-g03[j])+D11*(g13[j+1]-g13[j])));
+      rho1[j] = rho[j] - nu*(F11[j+1]-F11[j]);
+      mom1[j] = mom[j] - nu*(F12[j+1]-F12[j]);
+      ene1[j] = ene[j] - nu*(F13[j+1]-F13[j]);
 
-      u2[j] = mom2[j] / rho2[j];
-      p2[j] = (ene2[j] - 0.5*mom2[j]*u2[j])*(gamma-1.0);
+      u1[j] = mom1[j] / rho1[j];
+      p1[j] = (ene1[j] - 0.5*mom1[j]*u1[j])*(gamma-1.0);
 
-      if(p[j] < 0.0)
+      if(p1[j] < 0.0)
         printf("    (%d,%d), %g\n", k, j, p[j]);
     }
 
     running_info[1] = T;
     running_info[2] = 2.0;  // not half
-    //WENO_5(running_info, m, h, eps, alp2, gamma, rho2, mom2, ene2, rhoI2, uI2, pI2, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, runhist->current->trouble0);
-    WENO_50(running_info, m, h, eps, alp2, gamma, rho2, mom2, ene2, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
+    WENO_5(running_info, m, h, eps, alp2, gamma, rho1, mom1, ene1, rhoI1, uI1, pI1, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, runhist->current->trouble0);
+    //WENO_50(running_info, m, h, eps, alp2, gamma, rho2, mom2, ene2, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
 
 
     for(j = 0; j < m+1; ++j)
@@ -281,12 +297,12 @@ int GRP5_WENO5_fix
       F22[j] = f02[j] + 0.5*tau*(D20*g02[j] + D21*g12[j] + D22*g22[j]);
       F23[j] = f03[j] + 0.5*tau*(D20*g03[j] + D21*g13[j] + D22*g23[j]);
 
-      //rhoI[j] = rhoI[j] + tau*D[0];
-      //momI[j] = momI[j] + tau*(D[1]*U[0] + D[0]*U[1]);
-      //eneI[j] = eneI[j] + tau*(0.5*D[0]*U[1]*U[1] + U[0]*U[1]*D[1] + D[3]/(gamma-1.0));
+      rhoI[j] = rhoI[j] + tau*(3.0*rhot1[j] + 25.0*rhot2[j] + 8.0*D[0])/36.0;
+      momI[j] = momI[j] + tau*(3.0*momt1[j] + 25.0*momt2[j] + 8.0*(D[1]*U[0] + D[0]*U[1]))/36.0;
+      eneI[j] = eneI[j] + tau*(3.0*enet1[j] + 25.0*enet2[j] + 8.0*(0.5*D[0]*U[1]*U[1] + U[0]*U[1]*D[1] + D[3]/(gamma-1.0)))/36.0;
 
-      //uI[j] = uI[j] + tau*D[1];
-      //pI[j] = pI[j] + tau*D[3];
+      uI[j] = uI[j] + tau*(3.0*ut1[j] + 25.0*ut2[j] + 8.0*D[1])/36.0;
+      pI[j] = pI[j] + tau*(3.0*pt1[j] + 25.0*pt2[j] + 8.0*D[3])/36.0;
     }
     for(j = 0; j < m; ++j)
     {
@@ -304,8 +320,8 @@ int GRP5_WENO5_fix
 
     running_info[1] = T;
     running_info[2] = 0.0;  // not half
-    //WENO_5(running_info, m, h, eps, alp2, gamma, rho, mom, ene, rhoI, uI, pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, runhist->current->trouble0);
-    WENO_50(running_info, m, h, eps, alp2, gamma, rho, mom, ene, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
+    WENO_5(running_info, m, h, eps, alp2, gamma, rho, mom, ene, rhoI, uI, pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, runhist->current->trouble0);
+    //WENO_50(running_info, m, h, eps, alp2, gamma, rho, mom, ene, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
 
     toc = clock();
     runhist->current->time[1] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;
