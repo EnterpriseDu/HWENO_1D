@@ -116,15 +116,13 @@ int LOG_OUTPUT(char * err_msg, runHist * runhist, char ITEM[N_CONF][L_STR], int 
 
 
 /*
-void file_write_trouble(int m, int K, runHist * runhist, char * directory)
+void file_write_trouble(int m, int K, runHist *runhist, char * directory)
 {
   FILE * fp_write;
   char add_data[100] = "";
   int j = 0, i = 0, k = 0;
 
   
-
-
   if(check_runHist(runhist))
   {
     printf("In the function [file_write_trouble]: the runhist->length is %d.\nBut the number of the runNodes is %d.\n\n", runhist->length, runhist->length - check_runHist(runhist));
@@ -198,38 +196,8 @@ void file_write_trouble(int m, int K, runHist * runhist, char * directory)
   }
   
 }
-*/
+//*/
 
 
 
 
-
-
-void write_column(int m, double data[], char * source, char * sol_name)
-{
-  FILE * fp_write;
-  char add_data[100] = "";
-
-//===================Write solution File=========================
-
-  strcat(add_data, "../SOLUTION/");
-  strcat(add_data, sol_name);
-  strcat(add_data, "/");
-  strcat(add_data, source);
-  strcat(add_data, ".txt");
-
-
-  int j = 0, i = 0;
-
-  if((fp_write = fopen(add_data, "w")) == 0)
-  {
-    printf("Cannot open solution output file: %s!\n", add_data);
-    exit(1);
-  }
-
-  for(j = 0; j < m; ++j)
-    fprintf(fp_write, "%.10lf\n", data[j]);
-
-
-  fclose(fp_write);
-}

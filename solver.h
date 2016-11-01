@@ -6,48 +6,59 @@
 #endif /* U_MIN_BURGERS */
 
 
+
 //======================fixed GRP=================================
 int GRP2_fix
 (double const CONFIG[], int const m, double const h,
- double rho[], double u[], double p[], runHist *runhist, char *scheme);
+ double rho[], double u[], double p[], runHist *runhist,
+ char *add_mkdir, char *label);
 
 int ADER2_fix
 (double const CONFIG[], int const m, double const h,
- double rho[], double u[], double p[], runHist *runhist, char *scheme);
+ double rho[], double u[], double p[], runHist *runhist,
+ char *add_mkdir, char *label);
 
 int THINC_fix
 (double const CONFIG[], int const m, double const h,
- double rho[], double u[], double p[], runHist *runhist, char *scheme);
+ double rho[], double u[], double p[], runHist *runhist,
+ char *add_mkdir, char *label);
 //======================fixed GRP-HWENO=================================
 int ADER4_HWENO5_fix
 (double const CONFIG[], int const m, double const h,
- double rho[], double u[], double p[], runHist * runhist, char *scheme);
+ double rho[], double u[], double p[], runHist *runhist,
+ char *add_mkdir, char *label);
 
 int GRP4_HWENO5_fix
 (double const CONFIG[], int const m, double const h,
- double rho[], double u[], double p[], runHist * runhist, char *scheme);
+ double rho[], double u[], double p[], runHist *runhist,
+ char *add_mkdir, char *label);
 
 int GRP4_minmod_fix
 (double const CONFIG[], int const m, double const h,
- double rho[], double u[], double p[], runHist * runhist, char *scheme);
+ double rho[], double u[], double p[], runHist *runhist,
+ char *add_mkdir, char *label);
 
 
 //======================fixed GRP-WENO=================================
 int GRP3_WENO3_fix
 (double const CONFIG[], int const m, double const h,
- double rho[], double u[], double p[], runHist *runhist, char *scheme);
+ double rho[], double u[], double p[], runHist *runhist,
+ char *add_mkdir, char *label);
 
 int GRP3_WENO5_fix
 (double const CONFIG[], int const m, double const h,
- double rho[], double u[], double p[], runHist *runhist, char *scheme);
+ double rho[], double u[], double p[], runHist *runhist,
+ char *add_mkdir, char *label);
 
 int GRP4_WENO5_fix
 (double const CONFIG[], int const m, double const h,
- double rho[], double u[], double p[], runHist *runhist, char *scheme);
+ double rho[], double u[], double p[], runHist *runhist,
+ char *add_mkdir, char *label);
 
 int GRP5_WENO5_fix
 (double const CONFIG[], int const m, double const h,
- double rho[], double u[], double p[], runHist *runhist, char *scheme);
+ double rho[], double u[], double p[], runHist *runhist,
+ char *add_mkdir, char *label);
 
 
 

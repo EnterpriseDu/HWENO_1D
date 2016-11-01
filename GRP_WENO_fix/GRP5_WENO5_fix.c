@@ -17,21 +17,66 @@
 
 int GRP5_WENO5_fix
 (double const CONFIG[], int const m, double const h,
- double rho[], double u[], double p[], runHist *runhist, char *scheme)
+ double rho[], double u[], double p[], runHist *runhist,
+ char *add_mkdir, char *label)
 {
   delete_runHist(runhist);
   int i = 0, j = 0, k = 1, it = 0;
-  int state;
+  int state, len = 0;
+  char scheme[L_STR] = "G5W5\0";
+  char version[L_STR];
+  strcpy(version, add_mkdir);
+  strcpy(add_mkdir, "../SOLUTION/\0");
+  state = make_directory(add_mkdir, label, scheme, version, m, 1, CONFIG);
+  if(state)
+    exit(state);
 
-  char scheme_local[50] = "G5W5\0";
+  int trouble0[m], trouble1[m], trouble2[m];
+  FILE * fp_tr0, * fp_tr1, * fp_tr2;
+  char add_tr0[L_STR+L_STR], add_tr1[L_STR+L_STR], add_tr2[L_STR+L_STR];
+  strcpy(add_tr0, add_mkdir);
+  strcat(add_tr0, "trouble0.txt\0");
+  if((fp_tr0 = fopen(add_tr0, "w+")) == 0)
+  {
+    printf("Cannot open solution output file: %s!\n", add_tr0);
+    exit(99);
+  }
+  if(ftruncate(fp_tr0, 0))
+  {
+    printf("Fail to truncate %s!\n", add_tr0);
+    exit(99);
+  }
+  rewind(fp_tr0);
+  strcpy(add_tr1, add_mkdir);
+  strcat(add_tr1, "trouble1.txt\0");
+  if((fp_tr1 = fopen(add_tr1, "w+")) == 0)
+  {
+    printf("Cannot open solution output file: %s!\n", add_tr1);
+    exit(99);
+  }
+  if(ftruncate(fp_tr1, 0))
+  {
+    printf("Fail to truncate %s!\n", add_tr1);
+    exit(99);
+  }
+  rewind(fp_tr1);
+  strcpy(add_tr2, add_mkdir);
+  strcat(add_tr2, "trouble2.txt\0");
+  if((fp_tr2 = fopen(add_tr2, "w+")) == 0)
+  {
+    printf("Cannot open solution output file: %s!\n", add_tr2);
+    exit(99);
+  }
+  if(ftruncate(fp_tr2, 0))
+  {
+    printf("Fail to truncate %s!\n", add_tr2);
+    exit(99);
+  }
+  rewind(fp_tr2);
+
+
   printf("===========================\n");
-  printf("The scheme [%s] started.\n", scheme_local);
-  int len = 0;
-  while(scheme_local[len] != '\0')
-    ++len;
-  ++len;
-  for(k = 0; k < len; ++k)
-    scheme[k] = scheme_local[k];
+  printf("The scheme [%s] started.\n", scheme);
 
 
   clock_t tic, toc;
@@ -138,13 +183,6 @@ int GRP5_WENO5_fix
       printf("The record has only %d compunonts while trying to reach runhist[%d].\n\n", state-1, k);
       exit(100);//remains to modify the error code.
     }
-    runhist->current->trouble0 = (int *)malloc(sizeof(int) * m);
-    runhist->current->trouble1 = (int *)malloc(sizeof(int) * m);
-    if((!runhist->current->trouble0) || (!runhist->current->trouble1))
-    {
-      printf("Not enough memory for the runhist node!\n\n");
-      exit(100);
-    }
 
     running_info[0] = (double)k;
     
@@ -225,7 +263,7 @@ int GRP5_WENO5_fix
 
     running_info[1] = T - tau + tau1;  // time
     running_info[2] = 1.0;           // half
-    WENO_5(running_info, m, h, eps, alp2, gamma, rho1, mom1, ene1, rhoI1, uI1, pI1, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, runhist->current->trouble1);
+    WENO_5(running_info, m, h, eps, alp2, gamma, rho1, mom1, ene1, rhoI1, uI1, pI1, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, trouble1);
     //WENO_50(running_info, m, h, eps, alp2, gamma, rho1, mom1, ene1, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
 
 
@@ -275,7 +313,7 @@ int GRP5_WENO5_fix
 
     running_info[1] = T;
     running_info[2] = 2.0;  // not half
-    WENO_5(running_info, m, h, eps, alp2, gamma, rho1, mom1, ene1, rhoI1, uI1, pI1, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, runhist->current->trouble0);
+    WENO_5(running_info, m, h, eps, alp2, gamma, rho1, mom1, ene1, rhoI1, uI1, pI1, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, trouble2);
     //WENO_50(running_info, m, h, eps, alp2, gamma, rho2, mom2, ene2, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
 
 
@@ -320,13 +358,15 @@ int GRP5_WENO5_fix
 
     running_info[1] = T;
     running_info[2] = 0.0;  // not half
-    WENO_5(running_info, m, h, eps, alp2, gamma, rho, mom, ene, rhoI, uI, pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, runhist->current->trouble0);
+    WENO_5(running_info, m, h, eps, alp2, gamma, rho, mom, ene, rhoI, uI, pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, trouble0);
     //WENO_50(running_info, m, h, eps, alp2, gamma, rho, mom, ene, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
 
     toc = clock();
     runhist->current->time[1] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;
     current_cpu_time = runhist->current->time[1];
     sum_cpu_time += runhist->current->time[1];
+
+    write_vec_int(m, trouble0, fp_tr0);
   }
   k = k-1;
 
@@ -346,6 +386,12 @@ int GRP5_WENO5_fix
   printf("problem to time %g with %d steps is %g seconds.\n", T, k, sum_cpu_time);
   printf("===========================\n");
 //------------END OFQ THE MAIN LOOP-------------
+  if(fp_tr0)
+    fclose(fp_tr0);
+  if(fp_tr1)
+    fclose(fp_tr1);
+  if(fp_tr2)
+    fclose(fp_tr2);
 
 
   return k;

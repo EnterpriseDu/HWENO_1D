@@ -26,24 +26,24 @@
 
 
 int LF4_WENO_fix
-(double const CONFIG[], double const OPT[], int const m, double const h,
- double rho[], double u[], double p[], runHist *runhist, char *scheme)
+(double const CONFIG[], int const m, double const h,
+ double rho[], double u[], double p[], runHist *runhist,
+ char *add_mkdir, char *label)
 {
-  int state;
-  int i = 0, j = 0, k = 1, it = 0;  /* j is a frequently used index for
-				     * spatial variables. n is a frequ-
-				     * ently used index for the time
-				     * step.
-				     */
-  char scheme_local[50] = "LF4W5\0";
+  delete_runHist(runhist);
+  int i = 0, j = 0, k = 1, it = 0;
+  int state, len = 0;
+  char scheme[L_STR] = "LF4W5\0";
+  char version[L_STR];
+  strcpy(version, add_mkdir);
+  strcpy(add_mkdir, "../SOLUTION/\0");
+  state = make_directory(add_mkdir, label, scheme, version, m, 1, CONFIG);
+  if(state)
+    exit(state);
+
+
   printf("===========================\n");
-  printf("The scheme [%s] started.\n", scheme_local);
-  int len = 0;
-  while(scheme_local[len] != '\0')
-    ++len;
-  ++len;
-  for(k = 0; k < len; ++k)
-    scheme[k] = scheme_local[k];
+  printf("The scheme [%s] started.\n", scheme);
 
 
   clock_t tic, toc;

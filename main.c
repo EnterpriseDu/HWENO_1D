@@ -201,9 +201,11 @@ int main(int argc, char *argv[])
   init_runHist(&runhist);
   int K = 0;
   char scheme[L_STR];
-  char version[L_STR] = "dev";
+  char version[L_STR] = "dev\0";
+  char add_mkdir[L_STR+L_STR];
+  strcpy(add_mkdir, version);
   printf("The present version is [%s]\n", version);
-  K = GRP4_WENO5_fix(CONFIG, m, h, rho, u, p, &runhist, scheme);
+  K = GRP5_WENO5_fix(CONFIG, m, h, rho, u, p, &runhist, add_mkdir, argv[2]);
   //K = GRP2_fix(CONFIG, m, h, rho, u, p, &runhist, scheme);
 
 
@@ -217,20 +219,13 @@ int main(int argc, char *argv[])
       addInitValue[it][i] += 32;
     addInitValue[it][len] = '\0';
   }
-  int stat_mkdir = 0, output_state = 0;
-  char add_mkdir[L_STR+L_STR];
-  strcpy(add_mkdir, "../SOLUTION/\0");
-  stat_mkdir = make_directory(add_mkdir, argv[2], scheme, version, m, 1, CONFIG);
-  printf("Directory made.\n");
 
-  
-  int output_flag[nInitValue];
+
+  int output_flag[nInitValue], output_idx[nInitValue], output_state;
   output_flag[0] = 1; //rho
   output_flag[1] = 1; //u
   output_flag[2] = 1; //p
   output_flag[3] = 0; //x
-
-  int output_idx[nInitValue];
   for(it = 0; it < nInitValue; ++it)
     output_idx[it] = 0;
   
