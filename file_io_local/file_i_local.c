@@ -137,7 +137,7 @@ int configurate(double CONFIG[N_CONF], char ITEM[N_CONF][L_STR], int already_rea
   strcpy(ITEM[14], "Boundary\0");
   up_bound[0][14]   = 0.0;
   up_bound[1][14]   = 0.0;
-  low_bound[14]     = 0.0;
+  low_bound[14]     = -1.0;
   default_value[14] = 1.0;
   strcpy(ITEM[15], "Primative\0");
   up_bound[0][15]   = 0.0;

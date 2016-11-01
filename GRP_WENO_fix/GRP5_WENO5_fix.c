@@ -253,12 +253,12 @@ int GRP5_WENO5_fix
       momt2[j] = D[1]*U[0] + D[0]*U[1];
       enet2[j] = 0.5*D[0]*U[1]*U[1] + U[0]*U[1]*D[1] + D[3]/(gamma-1.0);
 
-      rhoI1[j] = rhoI[j] + tau*(5.0*rhot2[j] - rhot1[j]);
-      momI1[j] = momI[j] + tau*(5.0*momt2[j] - momt1[j]);
-      eneI1[j] = eneI[j] + tau*(5.0*enet2[j] - enet1[j]);
+      rhoI1[j] = rhoI[j] + 0.25*tau*(5.0*rhot2[j] - rhot1[j]);//tau*rhot2[j];//
+      momI1[j] = momI[j] + 0.25*tau*(5.0*momt2[j] - momt1[j]);//tau*momt2[j];//
+      eneI1[j] = eneI[j] + 0.25*tau*(5.0*enet2[j] - enet1[j]);//tau*enet2[j];//
 
-      uI1[j] = uI[j] + 0.25*tau*(5.0*ut2[j] - ut1[j]);
-      pI1[j] = pI[j] + 0.25*tau*(5.0*pt2[j] - pt1[j]);
+      uI1[j] = uI[j] + 0.25*tau*(5.0*ut2[j] - ut1[j]);//tau*ut2[j];//
+      pI1[j] = pI[j] + 0.25*tau*(5.0*pt2[j] - pt1[j]);//tau*pt2[j];//
     }
     for(j = 0; j < m; ++j)
     {

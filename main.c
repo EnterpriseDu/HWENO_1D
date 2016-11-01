@@ -203,8 +203,8 @@ int main(int argc, char *argv[])
   char scheme[L_STR];
   char version[L_STR] = "dev";
   printf("The present version is [%s]\n", version);
-  K = GRP5_WENO5_fix(CONFIG, m, h, rho, u, p, &runhist, scheme);
-  //K = GRP1_fix(CONFIG, m, h, rho, u, p, &runhist, scheme);
+  K = GRP4_WENO5_fix(CONFIG, m, h, rho, u, p, &runhist, scheme);
+  //K = GRP2_fix(CONFIG, m, h, rho, u, p, &runhist, scheme);
 
 
   int len;
