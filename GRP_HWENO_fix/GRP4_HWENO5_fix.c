@@ -23,12 +23,25 @@ int GRP4_HWENO5_fix
   int i = 0, j = 0, k = 1, it = 0;
   int state, len = 0;
   char scheme[L_STR] = "G4H5\0";
-  char version[L_STR];
+  char version[L_STR], err_msg[L_STR];
   strcpy(version, add_mkdir);
   strcpy(add_mkdir, "../SOLUTION/\0");
-  state = make_directory(add_mkdir, label, scheme, version, m, 1, CONFIG);
+  state = make_directory(add_mkdir, err_msg, label, scheme, version, m, 1, CONFIG);
   if(state)
+  {
+    printf("%s", err_msg);
     exit(state);
+  }
+
+  int trouble0[m], trouble1[m];
+  FILE * fp_tr0, * fp_tr1;
+  char add_tr0[L_STR+L_STR], add_tr1[L_STR+L_STR];
+  strcpy(add_tr0, add_mkdir);
+  strcat(add_tr0, "trouble0.txt\0");
+  open_fruncate(err_msg, add_tr0, fp_tr0);
+  strcpy(add_tr1, add_mkdir);
+  strcat(add_tr1, "trouble1.txt\0");
+  open_fruncate(err_msg, add_tr1, fp_tr1);
 
 
   printf("===========================\n");
@@ -149,13 +162,6 @@ int GRP4_HWENO5_fix
       printf("The record has only %d compunonts while trying to reach runhist[%d].\n\n", state-1, k);
       exit(100);//remains to modify the error code.
     }
-    runhist->current->trouble0 = (int *)malloc(sizeof(int) * m);
-    runhist->current->trouble1 = (int *)malloc(sizeof(int) * m);
-    if((!runhist->current->trouble0) || (!runhist->current->trouble1))
-    {
-      printf("Not enough memory for the runhist node!\n\n");
-      exit(100);
-    }
 
     
     running_info[0] = (double)k;
@@ -262,7 +268,7 @@ int GRP4_HWENO5_fix
     for(i = 0; i < m+1; ++i)
       printf("%.10lf  ", pI[i]);
       printf("\n\n");//*/
-    HWENO_5(running_info, m, h, eps, alp2, gamma, half_rho, half_mom, half_ene, half_rhoI, half_momI, half_eneI, half_uI, half_pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, runhist->current->trouble1);
+    HWENO_5(running_info, m, h, eps, alp2, gamma, half_rho, half_mom, half_ene, half_rhoI, half_momI, half_eneI, half_uI, half_pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, trouble1);
     /*
   write_column(m, half_rho, "rho", "running");
   write_column(m, half_u, "u", "running");
@@ -354,7 +360,7 @@ int GRP4_HWENO5_fix
     for(i = 0; i < m+1; ++i)
       printf("%.10lf  ", pI[i]);
       printf("\n\n");//*/
-    HWENO_5(running_info, m, h, eps, alp2, gamma, rho, mom, ene, rhoI, momI, eneI, uI, pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, runhist->current->trouble0);
+    HWENO_5(running_info, m, h, eps, alp2, gamma, rho, mom, ene, rhoI, momI, eneI, uI, pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, trouble0);
     /*
   write_column(m, rho[vk1], "rho", "running");
   write_column(m, u[vk1], "u", "running");
@@ -399,6 +405,10 @@ int GRP4_HWENO5_fix
   printf("problem to time %g with %d steps is %g seconds.\n", T, k, sum_cpu_time);
   printf("===========================\n");
 //------------END OFQ THE MAIN LOOP-------------
+  if(fp_tr0)
+    fclose(fp_tr0);
+  if(fp_tr1)
+    fclose(fp_tr1);
 
 
   return k;

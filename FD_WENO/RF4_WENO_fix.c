@@ -34,12 +34,15 @@ int RF4_WENO_fix
   int i = 0, j = 0, k = 1, it = 0;
   int state, len = 0;
   char scheme[L_STR] = "RF4W5\0";
-  char version[L_STR];
+  char version[L_STR], err_msg[L_STR];
   strcpy(version, add_mkdir);
   strcpy(add_mkdir, "../SOLUTION/\0");
-  state = make_directory(add_mkdir, label, scheme, version, m, 1, CONFIG);
+  state = make_directory(add_mkdir, err_msg, label, scheme, version, m, 1, CONFIG);
   if(state)
+  {
+    printf("%s", err_msg);
     exit(state);
+  }
 
 
   printf("===========================\n");
@@ -265,12 +268,15 @@ int FD_1st_fix
   int i = 0, j = 0, k = 1, it = 0;
   int state, len = 0;
   char scheme[L_STR] = "RF1\0";
-  char version[L_STR];
+  char version[L_STR], err_msg[L_STR];
   strcpy(version, add_mkdir);
   strcpy(add_mkdir, "../SOLUTION/\0");
-  state = make_directory(add_mkdir, label, scheme, version, m, 1, CONFIG);
+  state = make_directory(add_mkdir, err_msg, label, scheme, version, m, 1, CONFIG);
   if(state)
+  {
+    printf("%s", err_msg);
     exit(state);
+  }
 
 
   printf("===========================\n");

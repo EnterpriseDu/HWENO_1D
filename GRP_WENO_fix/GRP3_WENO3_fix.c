@@ -23,12 +23,25 @@ int GRP3_WENO3_fix
   int i = 0, j = 0, k = 1, it = 0;
   int state, len = 0;
   char scheme[L_STR] = "G3W3\0";
-  char version[L_STR];
+  char version[L_STR], err_msg[L_STR];
   strcpy(version, add_mkdir);
   strcpy(add_mkdir, "../SOLUTION/\0");
-  state = make_directory(add_mkdir, label, scheme, version, m, 1, CONFIG);
+  state = make_directory(add_mkdir, err_msg, label, scheme, version, m, 1, CONFIG);
   if(state)
+  {
+    printf("%s", err_msg);
     exit(state);
+  }
+
+  int trouble0[m], trouble1[m];
+  FILE * fp_tr0, * fp_tr1;
+  char add_tr0[L_STR+L_STR], add_tr1[L_STR+L_STR];
+  strcpy(add_tr0, add_mkdir);
+  strcat(add_tr0, "trouble0.txt\0");
+  open_fruncate(err_msg, add_tr0, fp_tr0);
+  strcpy(add_tr1, add_mkdir);
+  strcat(add_tr1, "trouble1.txt\0");
+  open_fruncate(err_msg, add_tr1, fp_tr1);
 
 
   printf("===========================\n");
@@ -287,6 +300,10 @@ int GRP3_WENO3_fix
   printf("problem to time %g with %d steps is %g seconds.\n", T, k, sum_cpu_time);
   printf("===========================\n");
 //------------END OFQ THE MAIN LOOP-------------
+  if(fp_tr0)
+    fclose(fp_tr0);
+  if(fp_tr1)
+    fclose(fp_tr1);
 
 
   return k;
