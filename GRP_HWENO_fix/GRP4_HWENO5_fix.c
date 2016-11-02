@@ -28,20 +28,24 @@ int GRP4_HWENO5_fix
   strcpy(add_mkdir, "../SOLUTION/\0");
   state = make_directory(add_mkdir, err_msg, label, scheme, version, m, 1, CONFIG);
   if(state)
-  {
-    printf("%s", err_msg);
-    exit(state);
-  }
+  { printf("%s", err_msg);
+    exit(state); }
 
   int trouble0[m], trouble1[m];
   FILE * fp_tr0, * fp_tr1;
   char add_tr0[L_STR+L_STR], add_tr1[L_STR+L_STR];
   strcpy(add_tr0, add_mkdir);
   strcat(add_tr0, "trouble0.txt\0");
-  open_fruncate(err_msg, add_tr0, fp_tr0);
+  state = open_fruncate(err_msg, add_tr0, &fp_tr0);
+  if(state)
+  { printf("%s", err_msg);
+    exit(state); }
   strcpy(add_tr1, add_mkdir);
   strcat(add_tr1, "trouble1.txt\0");
-  open_fruncate(err_msg, add_tr1, fp_tr1);
+  state = open_fruncate(err_msg, add_tr1, &fp_tr1);
+  if(state)
+  { printf("%s", err_msg);
+    exit(state); }
 
 
   printf("===========================\n");

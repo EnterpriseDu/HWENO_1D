@@ -30,10 +30,8 @@ int GRP4_minmod_fix
   strcpy(add_mkdir, "../SOLUTION/\0");
   state = make_directory(add_mkdir, err_msg, label, scheme, version, m, 1, CONFIG);
   if(state)
-  {
-    printf("%s", err_msg);
-    exit(state);
-  }
+  { printf("%s", err_msg);
+    exit(state); }
 
 
   printf("===========================\n");
