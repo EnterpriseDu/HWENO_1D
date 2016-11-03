@@ -244,7 +244,6 @@ int GRP5_WENO5_fix
     running_info[1] = T - tau + tau1;  // time
     running_info[2] = 1.0;           // half
     WENO_5(running_info, m, h, eps, alp2, gamma, rho1, mom1, ene1, rhoI1, uI1, pI1, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, trouble1);
-    //WENO_50(running_info, m, h, eps, alp2, gamma, rho1, mom1, ene1, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
 
 
     for(j = 0; j < m+1; ++j)

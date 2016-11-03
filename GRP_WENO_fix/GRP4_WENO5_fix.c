@@ -242,7 +242,7 @@ int GRP4_WENO5_fix
 
     running_info[1] = T - half_tau;  // time
     running_info[2] = 1.0;           // half
-    WENO_5(running_info, m, h, eps, alp2, gamma, half_rho, half_mom, half_ene, half_rhoI, half_uI, half_pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, runhist->current->trouble1);
+    WENO_5(running_info, m, h, eps, alp2, gamma, half_rho, half_mom, half_ene, half_rhoI, half_uI, half_pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, trouble1);
 
 
     for(j = 0; j < m+1; ++j)
@@ -286,7 +286,7 @@ int GRP4_WENO5_fix
 
     running_info[1] = T;
     running_info[2] = 0.0;  // not half
-    WENO_5(running_info, m, h, eps, alp2, gamma, rho, mom, ene, rhoI, uI, pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, runhist->current->trouble0);
+    WENO_5(running_info, m, h, eps, alp2, gamma, rho, mom, ene, rhoI, uI, pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R, trouble0);
 
     toc = clock();
     runhist->current->time[1] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;
