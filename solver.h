@@ -8,6 +8,11 @@
 
 
 //======================fixed GRP=================================
+int GRP1_fix
+(double const CONFIG[], int const m, double const h,
+ double rho[], double u[], double p[], runHist *runhist,
+ char *add_mkdir, char *label);
+
 int GRP2_fix
 (double const CONFIG[], int const m, double const h,
  double rho[], double u[], double p[], runHist *runhist,
