@@ -15,7 +15,7 @@
 
 
 
-int GRP1_fix
+int HLL1_fix
 (double const CONFIG[], int const m, double const h,
  double rho[], double u[], double p[], runHist *runhist, char *scheme)
 {
@@ -26,7 +26,7 @@ int GRP1_fix
 				     * ently used index for the time
 				     * step.
 				     */
-  char scheme_local[50] = "G1L2\0";
+  char scheme_local[50] = "HLL1\0";
   printf("===========================\n");
   printf("The scheme [%s] started.\n", scheme_local);
   int len = 0;
@@ -103,7 +103,8 @@ int GRP1_fix
   running_info[0] = 0.0;
   running_info[1] = 0.0;
   running_info[1] = 0.0;
-  GRP_minmod0(running_info, m, h, alp2, rho, u, p, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
+  GRP_minmod0(running_info, m, h, 0.0, rho, u, p, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);//                    ^
+  //     the slope is always zero  |
 //------------THE MAIN LOOP-------------
   for(k = 1; k <= MaxStp; ++k)
   {
@@ -155,21 +156,12 @@ int GRP1_fix
 
     for(j = 0; j < m+1; ++j)
     {
-      linear_GRP_solver(wave_speed, D, U, 0.0, gamma, eps,
-			rho_L[j], u_L[j], 0.0, p_L[j],
-			rho_R[j], u_R[j], 0.0, p_R[j],
-			D_rho_L[j], D_u_L[j], 0.0, D_p_L[j],
-			D_rho_R[j], D_u_R[j], 0.0, D_p_R[j],
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-
-      F1[j] = U[0]*U[1];
-      F2[j] = U[0]*U[1]*U[1]  + U[3];
-      F3[j] = U[3]*U[1]*gamma/(gamma-1.0);
-      F3[j] = 0.5*U[0]*U[1]*U[1]*U[1] + F3[j];
-
-      rhoI[j] = U[0];
-        uI[j] = U[1];
-        pI[j] = U[3];
+	HLL(wave_speed, D, U, 0.0, gamma, eps,
+	    rho_L[j], u_L[j], 0.0, p_L[j],
+	    rho_R[j], u_R[j], 0.0, p_R[j]);
+	F1[j] = D[0];
+	F2[j] = D[1];
+	F3[j] = D[3];
     }
 
 //===============THE CORE ITERATION=================
@@ -185,7 +177,8 @@ int GRP1_fix
 
     running_info[1] = T;
     running_info[2] = 0.0;
-    GRP_minmod(running_info, m, h, alp2, rho, u, p, rhoI, uI, pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
+    GRP_minmod0(running_info, m, h, 0.0, rho, u, p, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);//                    ^
+    //     the slope is always zero  |
 
 
     toc = clock();
