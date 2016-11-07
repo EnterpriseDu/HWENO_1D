@@ -13,6 +13,13 @@ gcc -o main\
        ../file_io-new/file_io.a\
        ../Riemann_solver/Riemann_solver.a\
        -lm
+gcc -c ./riemann_sol.c -I ../file_io-new/inc/  -g
+gcc -o riemann_sol\
+       riemann_sol.o\
+       file_io_local/file_io_local.a\
+       ../file_io-new/file_io.a\
+       ../Riemann_solver/Riemann_solver.a\
+       -lm
 
 
 exit 0
