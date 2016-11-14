@@ -205,8 +205,8 @@ int main(int argc, char *argv[])
   char add_mkdir[L_STR+L_STR];
   strcpy(add_mkdir, version);
   printf("The present version is [%s]\n", version);
-  K = HLL1_fix(CONFIG, m, h, rho, u, p, &runhist, add_mkdir, argv[2]);
-  //K = GRP2_fix(CONFIG, m, h, rho, u, p, &runhist, scheme);
+  K = HLL2_2_fix(CONFIG, m, h, rho, u, p, &runhist, add_mkdir, argv[2]);
+  //K = GRP2_fix(CONFIG, m, h, rho, u, p, &runhist, add_mkdir, argv[2]);
 
 
   int len;
