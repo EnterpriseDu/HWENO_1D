@@ -42,8 +42,12 @@ gcc -c ./HLL2_2_fix.c    -I ../\
                          -I ../../file_io-new/inc/\
                          -I ../../Riemann_solver/inc/\
                          -g
+gcc -c ./Exct2_2_fix.c    -I ../\
+                          -I ../../file_io-new/inc/\
+                          -I ../../Riemann_solver/inc/\
+                          -g
 
-ar crv ARie_fix.a HLL1_1_fix.o HLL1_2_fix.o HLL2_2_fix.o
+ar crv ARie_fix.a HLL1_1_fix.o HLL1_2_fix.o HLL2_2_fix.o Exct2_2_fix.o
 ranlib ARie_fix.a
 echo "-----------------"
 
