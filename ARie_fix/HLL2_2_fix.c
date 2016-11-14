@@ -177,7 +177,7 @@ int HLL2_2_fix
 
     running_info[1] = T;
     running_info[2] = 1.0;
-    GRP_minmod0(running_info, m, h, alp2, rho, u, p, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
+    GRP_minmod0(running_info, m, h, alp2, rho1, u1, p1, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
 
 
     for(j = 0; j < m+1; ++j)
