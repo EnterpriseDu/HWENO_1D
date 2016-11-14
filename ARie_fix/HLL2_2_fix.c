@@ -193,9 +193,9 @@ int HLL2_2_fix
 //===============THE CORE ITERATION=================
     for(j = 0; j < m; ++j)
     {
-      rho[j] = (rho[j] + rho1[j]) - 0.5*nu*(F1[j+1]-F1[j]);
-      mom[j] = (mom[j] + mom1[j]) - 0.5*nu*(F2[j+1]-F2[j]);
-      ene[j] = (ene[j] + ene1[j]) - 0.5*nu*(F3[j+1]-F3[j]);
+      rho[j] = 0.5*((rho[j] + rho1[j]) - nu*(F1[j+1]-F1[j]));
+      mom[j] = 0.5*((mom[j] + mom1[j]) - nu*(F2[j+1]-F2[j]));
+      ene[j] = 0.5*((ene[j] + ene1[j]) - nu*(F3[j+1]-F3[j]));
 
 	u[j] = mom[j] / rho[j];
 	p[j] = (ene[j] - 0.5*mom[j]*u[j])*(gamma-1.0);
