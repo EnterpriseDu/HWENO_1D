@@ -78,6 +78,7 @@ int Exct2_2_fix
   double rho_L[m+1], rho_R[m+1], u_L[m+1], u_R[m+1], p_L[m+1], p_R[m+1];
   double D_rho_L[m+1], D_rho_R[m+1], D_u_L[m+1], D_u_R[m+1], D_p_L[m+1], D_p_R[m+1];
   double rho1[m], mom1[m], ene1[m], u1[m], p1[m];
+  double uL, uR, pL, pR, DuL, DuR, DpL, DpR;
 
   double F1[m+1], F2[m+1], F3[m+1], rhoI[m+1], uI[m+1], pI[m+1];
 
@@ -106,7 +107,7 @@ int Exct2_2_fix
   running_info[0] = 0.0;
   running_info[1] = 0.0;
   running_info[1] = 0.0;
-  GRP_minmod0(running_info, m, h, alp2, rho, u, p, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
+  GRP_minmod0(running_info, m, h, alp2, rho, mom, ene, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
 //------------THE MAIN LOOP-------------
   for(k = 1; k <= MaxStp; ++k)
   {
@@ -157,11 +158,16 @@ int Exct2_2_fix
 
     for(j = 0; j < m+1; ++j)
     {
+      uL = u_L[j]/rho_L[j];                           uR = u_R[j]/rho_R[j];
+      pL = (gamma-1.0)*(p_L[j] - 0.5*rho_L[j]*uL*uL); pR = (gamma-1.0)*(p_R[j] - 0.5*rho_R[j]*uR*uR);
+      DuL = (D_u_L[j] - D_rho_L[j]*uL)/rho_L[j];      DuR = (D_u_R[j] - D_rho_R[j]*uR)/rho_R[j];
+      DpL = (gamma-1.0)*(D_p_L[j] - 0.5*D_rho_L[j]*uL*uL - u_L[j]*DuL);
+      DpR = (gamma-1.0)*(D_p_R[j] - 0.5*D_rho_R[j]*uR*uR - u_R[j]*DuR);
       linear_GRP_solver(wave_speed, D, U, 0.0, gamma, eps,
-			rho_L[j], u_L[j], 0.0, p_L[j],
-			rho_R[j], u_R[j], 0.0, p_R[j],
-			D_rho_L[j], D_u_L[j], 0.0, D_p_L[j],
-			D_rho_R[j], D_u_R[j], 0.0, D_p_R[j],
+			rho_L[j], uL, 0.0, pL,
+			rho_R[j], uR, 0.0, pR,
+			D_rho_L[j], DuL, 0.0, DpL,
+			D_rho_R[j], DuR, 0.0, DpR,
 			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
       F1[j] = U[0]*U[1];
@@ -182,16 +188,21 @@ int Exct2_2_fix
 
     running_info[1] = T;
     running_info[2] = 1.0;
-    GRP_minmod0(running_info, m, h, alp2, rho1, u1, p1, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
+    GRP_minmod0(running_info, m, h, alp2, rho1, mom1, ene1, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
 
 
     for(j = 0; j < m+1; ++j)
     {
+      uL = u_L[j]/rho_L[j];                           uR = u_R[j]/rho_R[j];
+      pL = (gamma-1.0)*(p_L[j] - 0.5*rho_L[j]*uL*uL); pR = (gamma-1.0)*(p_R[j] - 0.5*rho_R[j]*uR*uR);
+      DuL = (D_u_L[j] - D_rho_L[j]*uL)/rho_L[j];      DuR = (D_u_R[j] - D_rho_R[j]*uR)/rho_R[j];
+      DpL = (gamma-1.0)*(D_p_L[j] - 0.5*D_rho_L[j]*uL*uL - u_L[j]*DuL);
+      DpR = (gamma-1.0)*(D_p_R[j] - 0.5*D_rho_R[j]*uR*uR - u_R[j]*DuR);
       linear_GRP_solver(wave_speed, D, U, 0.0, gamma, eps,
-			rho_L[j], u_L[j], 0.0, p_L[j],
-			rho_R[j], u_R[j], 0.0, p_R[j],
-			D_rho_L[j], D_u_L[j], 0.0, D_p_L[j],
-			D_rho_R[j], D_u_R[j], 0.0, D_p_R[j],
+			rho_L[j], uL, 0.0, pL,
+			rho_R[j], uR, 0.0, pR,
+			D_rho_L[j], DuL, 0.0, DpL,
+			D_rho_R[j], DuR, 0.0, DpR,
 			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
       F1[j] = U[0]*U[1];
@@ -213,7 +224,7 @@ int Exct2_2_fix
 
     running_info[1] = T;
     running_info[2] = 0.0;
-    GRP_minmod0(running_info, m, h, alp2, rho, u, p, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
+    GRP_minmod0(running_info, m, h, alp2, rho, mom, ene, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
 
 
     toc = clock();
