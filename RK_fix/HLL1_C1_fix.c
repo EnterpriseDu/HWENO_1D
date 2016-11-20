@@ -15,7 +15,7 @@
 
 
 
-int HLL2_2_fix
+int HLL1_C1_fix
 (double const CONFIG[], int const m, double const h,
  double rho[], double u[], double p[], runHist *runhist,
  char *add_mkdir, char *label)
@@ -23,7 +23,7 @@ int HLL2_2_fix
   delete_runHist(runhist);
   int i = 0, j = 0, k = 1, it = 0;
   int state, len = 0;
-  char scheme[L_STR] = "HLL2-2\0";
+  char scheme[L_STR] = "HLL1C1\0";
   char version[L_STR], err_msg[L_STR];
   strcpy(version, add_mkdir);
   strcpy(add_mkdir, "../SOLUTION/\0");
@@ -77,14 +77,13 @@ int HLL2_2_fix
   double mom[m], ene[m];
   double rho_L[m+1], rho_R[m+1], u_L[m+1], u_R[m+1], p_L[m+1], p_R[m+1];
   double D_rho_L[m+1], D_rho_R[m+1], D_u_L[m+1], D_u_R[m+1], D_p_L[m+1], D_p_R[m+1];
-  double rho1[m], mom1[m], ene1[m], u1[m], p1[m];
 
   double F1[m+1], F2[m+1], F3[m+1], rhoI[m+1], uI[m+1], pI[m+1];
 
   double sigma, speed_max;  /* speed_max denote the largest character
 					 * speed at each time step
 					 */
-  double tau, alp, bet, nu;
+  double tau, half_tau, alp, bet, nu;
 
 
   if(Primative)
@@ -106,7 +105,8 @@ int HLL2_2_fix
   running_info[0] = 0.0;
   running_info[1] = 0.0;
   running_info[1] = 0.0;
-  GRP_minmod0(running_info, m, h, alp2, rho, mom, ene, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
+  GRP_minmod0(running_info, m, h, 0.0, rho, u, p, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);//                    ^
+  //     the slope is always zero  |
 //------------THE MAIN LOOP-------------
   for(k = 1; k <= MaxStp; ++k)
   {
@@ -141,6 +141,7 @@ int HLL2_2_fix
     tau = (CFL * h) / speed_max;
 
     if(T+tau > TIME){tau = TIME-T; T = TIME;} else{T += tau;}
+    half_tau = 0.5*tau;
     nu = tau/h;
     runhist->current->time[0] = tau;
 
@@ -157,32 +158,7 @@ int HLL2_2_fix
 
     for(j = 0; j < m+1; ++j)
     {
-	HLL_consv(wave_speed, D, U, 0.0, gamma, eps,
-	    rho_L[j], u_L[j], 0.0, p_L[j],
-	    rho_R[j], u_R[j], 0.0, p_R[j]);
-	F1[j] = D[0];
-	F2[j] = D[1];
-	F3[j] = D[3];
-    }
-
-    for(j = 0; j < m; ++j)
-    {
-      rho1[j] = rho[j] - nu*(F1[j+1]-F1[j]);
-      mom1[j] = mom[j] - nu*(F2[j+1]-F2[j]);
-      ene1[j] = ene[j] - nu*(F3[j+1]-F3[j]);
-
-	u1[j] = mom1[j] / rho1[j];
-	p1[j] = (ene1[j] - 0.5*mom1[j]*u1[j])*(gamma-1.0);
-    }
-
-    running_info[1] = T;
-    running_info[2] = 1.0;
-    GRP_minmod0(running_info, m, h, alp2, rho1, mom1, ene1, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
-
-
-    for(j = 0; j < m+1; ++j)
-    {
-	HLL_consv(wave_speed, D, U, 0.0, gamma, eps,
+	HLL(wave_speed, D, U, 0.0, gamma, eps,
 	    rho_L[j], u_L[j], 0.0, p_L[j],
 	    rho_R[j], u_R[j], 0.0, p_R[j]);
 	F1[j] = D[0];
@@ -193,9 +169,9 @@ int HLL2_2_fix
 //===============THE CORE ITERATION=================
     for(j = 0; j < m; ++j)
     {
-      rho[j] = 0.5*((rho[j] + rho1[j]) - nu*(F1[j+1]-F1[j]));
-      mom[j] = 0.5*((mom[j] + mom1[j]) - nu*(F2[j+1]-F2[j]));
-      ene[j] = 0.5*((ene[j] + ene1[j]) - nu*(F3[j+1]-F3[j]));
+      rho[j] = rho[j] - nu*(F1[j+1]-F1[j]);
+      mom[j] = mom[j] - nu*(F2[j+1]-F2[j]);
+      ene[j] = ene[j] - nu*(F3[j+1]-F3[j]);
 
 	u[j] = mom[j] / rho[j];
 	p[j] = (ene[j] - 0.5*mom[j]*u[j])*(gamma-1.0);
@@ -203,7 +179,8 @@ int HLL2_2_fix
 
     running_info[1] = T;
     running_info[2] = 0.0;
-    GRP_minmod0(running_info, m, h, alp2, rho, mom, ene, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
+    GRP_minmod0(running_info, m, h, 0.0, rho, u, p, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);//                    ^
+    //     the slope is always zero  |
 
 
     toc = clock();

@@ -29,26 +29,26 @@ echo "-----------------"
 
 
 
-cd ../ARie_fix/
-gcc -c ./HLL1_1_fix.c    -I ../\
-                         -I ../../file_io-new/inc/\
-                         -I ../../Riemann_solver/inc/\
-                         -g
-gcc -c ./HLL1_2_fix.c    -I ../\
-                         -I ../../file_io-new/inc/\
-                         -I ../../Riemann_solver/inc/\
-                         -g
-gcc -c ./HLL2_2_fix.c    -I ../\
-                         -I ../../file_io-new/inc/\
-                         -I ../../Riemann_solver/inc/\
-                         -g
-gcc -c ./Exct2_2_fix.c    -I ../\
+cd ../RK_fix/
+gcc -c ./HLL1_C1_fix.c    -I ../\
                           -I ../../file_io-new/inc/\
                           -I ../../Riemann_solver/inc/\
                           -g
+gcc -c ./HLL1_L2_fix.c    -I ../\
+                          -I ../../file_io-new/inc/\
+                          -I ../../Riemann_solver/inc/\
+                          -g
+gcc -c ./HLL2_L2_fix.c    -I ../\
+                          -I ../../file_io-new/inc/\
+                          -I ../../Riemann_solver/inc/\
+                          -g
+gcc -c ./Exct2_L2_fix.c    -I ../\
+                           -I ../../file_io-new/inc/\
+                           -I ../../Riemann_solver/inc/\
+                           -g
 
-ar crv ARie_fix.a HLL1_1_fix.o HLL1_2_fix.o HLL2_2_fix.o Exct2_2_fix.o
-ranlib ARie_fix.a
+ar crv RK_fix.a HLL1_C1_fix.o HLL1_L2_fix.o HLL2_L2_fix.o Exct2_L2_fix.o
+ranlib RK_fix.a
 echo "-----------------"
 
 

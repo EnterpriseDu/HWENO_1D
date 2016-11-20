@@ -15,7 +15,7 @@
 
 
 
-int HLL1_1_fix
+int HLL1_L2_fix
 (double const CONFIG[], int const m, double const h,
  double rho[], double u[], double p[], runHist *runhist,
  char *add_mkdir, char *label)
@@ -23,7 +23,7 @@ int HLL1_1_fix
   delete_runHist(runhist);
   int i = 0, j = 0, k = 1, it = 0;
   int state, len = 0;
-  char scheme[L_STR] = "HLL1-1\0";
+  char scheme[L_STR] = "HLL1L2\0";
   char version[L_STR], err_msg[L_STR];
   strcpy(version, add_mkdir);
   strcpy(add_mkdir, "../SOLUTION/\0");
@@ -105,8 +105,7 @@ int HLL1_1_fix
   running_info[0] = 0.0;
   running_info[1] = 0.0;
   running_info[1] = 0.0;
-  GRP_minmod0(running_info, m, h, 0.0, rho, u, p, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);//                    ^
-  //     the slope is always zero  |
+  GRP_minmod0(running_info, m, h, alp2, rho, u, p, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
 //------------THE MAIN LOOP-------------
   for(k = 1; k <= MaxStp; ++k)
   {
@@ -179,8 +178,7 @@ int HLL1_1_fix
 
     running_info[1] = T;
     running_info[2] = 0.0;
-    GRP_minmod0(running_info, m, h, 0.0, rho, u, p, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);//                    ^
-    //     the slope is always zero  |
+    GRP_minmod0(running_info, m, h, alp2, rho, u, p, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
 
 
     toc = clock();

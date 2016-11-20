@@ -4,7 +4,7 @@ gcc -c ./main.c -I ../file_io-new/inc/  -g
 gcc -o main\
        main.o\
        FD_WENO/FD_WENO.a\
-       ARie_fix/ARie_fix.a\
+       RK_fix/RK_fix.a\
        GRP_fix/GRP_fix.a\
        GRP_HWENO_fix/GRP_HWENO_fix.a\
        GRP_WENO_fix/GRP_WENO_fix.a\

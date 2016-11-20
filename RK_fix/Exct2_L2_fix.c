@@ -15,7 +15,7 @@
 
 
 
-int Exct2_2_fix
+int Exct2_L2_fix
 (double const CONFIG[], int const m, double const h,
  double rho[], double u[], double p[], runHist *runhist,
  char *add_mkdir, char *label)
@@ -23,7 +23,7 @@ int Exct2_2_fix
   delete_runHist(runhist);
   int i = 0, j = 0, k = 1, it = 0;
   int state, len = 0;
-  char scheme[L_STR] = "Exct2-2\0";
+  char scheme[L_STR] = "Exct2L2\0";
   char version[L_STR], err_msg[L_STR];
   strcpy(version, add_mkdir);
   strcpy(add_mkdir, "../SOLUTION/\0");
