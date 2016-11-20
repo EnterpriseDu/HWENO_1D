@@ -4,7 +4,7 @@
 #define b(j,m) (j+m)%m
 
 
-#define N_RUNNING 9
+#define N_RUNNING 10
 
 
 void GRP_minmod

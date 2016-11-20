@@ -80,6 +80,8 @@ int LF4_WENO_fix
   running_info[5] = CONFIG[18];    // use the charactoristic decomposition or not
   running_info[6] = CONFIG[17];    // use the limiter or not
   running_info[7] = CONFIG[9]; // threshold
+  running_info[8] = CONFIG[10];
+  running_info[9] = CONFIG[2];
 
 
   double mom[m], ene[m];
