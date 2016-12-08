@@ -34,6 +34,16 @@ int GRP2_fix
     exit(state);
   }
 
+  int trouble0[m];
+  FILE * fp_tr0;
+  char add_tr0[L_STR+L_STR];
+  strcpy(add_tr0, add_mkdir);
+  strcat(add_tr0, "trouble0.txt\0");
+  state = open_fruncate(err_msg, add_tr0, &fp_tr0);
+  if(state)
+  { printf("%s", err_msg);
+    exit(state); }
+
 
   printf("===========================\n");
   printf("The scheme [%s] started.\n", scheme);
@@ -194,6 +204,8 @@ int GRP2_fix
     runhist->current->time[1] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;
     current_cpu_time = runhist->current->time[1];
     sum_cpu_time += runhist->current->time[1];
+
+    fprintf(fp_tr0, "%.10lf\t%.10lf\n", p[0], p[m-1]);
   }
   k = k-1;
   if(check_runHist(runhist))
@@ -213,6 +225,6 @@ int GRP2_fix
   printf("===========================\n");
 //------------END OFQ THE MAIN LOOP-------------
 
-
+  fclose(fp_tr0);
   return k;
 }
