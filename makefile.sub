@@ -1,0 +1,55 @@
+
+ARXIV = $(notdir $(CURDIR)).a
+SRCS = $(wildcard *.c)
+OBJS = $(SRCS:.c=.o)
+INCS = $(patsubst %, -I%, $(filter-out ../../.git%, $(shell find ../../ -type d)))
+
+#We get the variable 'VPATH' from the upper level of make
+#ifeq ($strip ($(VPATH)),)
+#ifndef $(VPATH)
+#VPATH += $(strip $(patsubst  -I%,%:,$(INCS)))
+#endif
+
+#Firstly define the target 'all' to make it the default entrance.
+all :
+include $(SRCS:.c=.d)
+#Then we immediately declare the inclusion of dependency files.
+
+
+CC = gcc
+INCS +=  -I../../../file_io-new/inc/  -I../../../Riemann_solver/inc/
+CFLAGS = -c -g
+
+
+all : $(OBJS)
+	@ar crv $(ARXIV) $(OBJS)
+	@ranlib $(ARXIV)
+
+%.d : %.c
+	@set -e; rm -f $@; \
+	$(CC) -MM $(INCS)  $< > $@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+
+$(OBJS) :
+#	@echo $^
+	gcc $< $(CFLAGS) $(patsubst %, -I%,$(sort $(dir $(filter %.h, $^))))
+
+
+clean :
+	rm -f $(OBJS) $(OBJS:.o=.d) $(ARXIV)
+
+.PHONY : clean all test
+
+
+
+
+test :
+	@echo =========================
+	@echo $(INCS)
+#	@echo $(CURDIR)
+#	@echo $(SRCS)
+#	@echo $(OBJS)
+#	@echo $(CFLAGS)
+#	@echo $(ARXIV)
+#	@echo $(HEADERS)

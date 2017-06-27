@@ -205,8 +205,8 @@ int main(int argc, char *argv[])
   char add_mkdir[L_STR+L_STR];
   strcpy(add_mkdir, version);
   printf("The present version is [%s]\n", version);
-  //K = GRP2_fix(CONFIG, m, h, rho, u, p, &runhist, add_mkdir, argv[2]);
-  K = RF4_WENO_fix(CONFIG, m, h, rho, u, p, &runhist, add_mkdir, argv[2]);
+  K = GRP2_fix(CONFIG, m, h, rho, u, p, &runhist, add_mkdir, argv[2]);
+  //K = RF4_WENO_fix(CONFIG, m, h, rho, u, p, &runhist, add_mkdir, argv[2]);
   //K = GRP4_HWENO5_fix(CONFIG, m, h, rho, u, p, &runhist, add_mkdir, argv[2]);
 
 
