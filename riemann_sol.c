@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
   }
   for(k = 0; k < nInitValue; ++k)
     delete_realArray(InitValue +k);
-  double x0; x0 = (double)j * h;
+  double x0; x0 = (double)(j+1) * h;
   if(j == m-2)
   {
     printf("Wrong data!\n");

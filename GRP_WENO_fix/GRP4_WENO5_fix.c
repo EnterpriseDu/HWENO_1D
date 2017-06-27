@@ -201,7 +201,7 @@ int GRP4_WENO5_fix
 
     for(j = 0; j < m+1; ++j)
     {
-      linear_GRP_solver(wave_speed, D, U, 0.0, gamma, eps,
+      Euler_GRP_solver(wave_speed, D, U, 0.0, gamma, eps,
 			rho_L[j], u_L[j], 0.0, p_L[j],
 			rho_R[j], u_R[j], 0.0, p_R[j],
 			D_rho_L[j], D_u_L[j], 0.0, D_p_L[j],
@@ -249,7 +249,7 @@ int GRP4_WENO5_fix
 
     for(j = 0; j < m+1; ++j)
     {
-      linear_GRP_solver(wave_speed, D, U, 0.0, gamma, eps,
+      Euler_GRP_solver(wave_speed, D, U, 0.0, gamma, eps,
 			rho_L[j], u_L[j], 0.0, p_L[j],
 			rho_R[j], u_R[j], 0.0, p_R[j],
 			D_rho_L[j], D_u_L[j], 0.0, D_p_L[j],

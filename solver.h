@@ -70,7 +70,8 @@ int GRP5_WENO5_fix
 
 int RF4_WENO_fix
 (double const CONFIG[], int const m, double const h,
- double rho[], double u[], double p[], runList * runhist, char *scheme);
+ double rho[], double u[], double p[], runHist *runhist,
+ char *add_mkdir, char *label);
 
 int FD_1st_fix
 (double const CONFIG[], int const m, double const h,
