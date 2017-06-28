@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
   display_config(CONFIG, argv[1]);
   double gamma = CONFIG[0];
   double TIME = CONFIG[12];
-  double eps = CONFIG[1];
+  double eps = CONFIG[2];
 
 
   int nInitValue = 4;
@@ -102,21 +102,36 @@ int main(int argc, char *argv[])
   find_cargo_realArray(&uR, m-1, &InitValue[1]);
   find_cargo_realArray(&pR, m-1, &InitValue[2]);
   find_cargo_realArray(&h, 0, &InitValue[3]);
+
+  if(fabs(rhoL-rhoR) > fabs(uL-uR))
+  {
+    if(fabs(rhoL-rhoR) > fabs(pL-pR))
+      k = 0;
+    else
+      k = 2;
+  }
+  else
+  {
+    if(fabs(pL-pR) > fabs(uL-uR))
+      k = 2;
+    else
+      k = 1;
+  }
   for(j = 0; j < m-1;++j)
   {
-    find_cargo_realArray(&u1, j, &InitValue[0]);
-    find_cargo_realArray(&u2, j+1, &InitValue[0]);
+    find_cargo_realArray(&u1, j, &InitValue[k]);
+    find_cargo_realArray(&u2, j+1, &InitValue[k]);
     if(fabs(u1-u2) > eps)
       break;
   }
-  for(k = 0; k < nInitValue; ++k)
-    delete_realArray(InitValue +k);
   double x0; x0 = (double)(j+1) * h;
   if(j == m-2)
   {
     printf("Wrong data!\n");
     return 0xFF;
   }
+  for(k = 0; k < nInitValue; ++k)
+    delete_realArray(InitValue +k);
   /*/
   double gamma = 1.4;//CONFIG[0];
   double TIME = 1.0;
@@ -156,10 +171,10 @@ int main(int argc, char *argv[])
   printf("%g \t | \t %g \t | \t %g \t | \t %g \n", cL, c_star_L, c_star_R, cR);
   printf("%d, %d\n", CRW[0], CRW[1]);
 
-  if(fabs(pL-p_star) < eps)
-    CRW[0] = 0;
-  if(fabs(pR-p_star) < eps)
-    CRW[1] = 0;
+  /* if(fabs(pL-p_star) < eps) */
+  /*   CRW[0] = 0; */
+  /* if(fabs(pR-p_star) < eps) */
+  /*   CRW[1] = 0; */
   if(CRW[0])
     printf("%g,%g \t | \t", (uL-cL)*TIME+x0,(u_star-c_star_L)*TIME+x0);
   else

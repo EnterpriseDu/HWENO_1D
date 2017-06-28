@@ -88,11 +88,13 @@ void flux_RF_1st(double const running_info[], int const m, double const h, doubl
 
 int FV_WENO_fix
 (double const CONFIG[], int const m, double const h,
- double rho[], double u[], double p[], runList * runhist, char *scheme);
+ double rho[], double u[], double p[], runHist *runhist,
+ char *add_mkdir, char *label);
 
 int LF4_WENO_fix
 (double const CONFIG[], int const m, double const h,
- double rho[], double u[], double p[], runList * runhist, char *scheme);
+ double rho[], double u[], double p[], runHist *runhist,
+ char *add_mkdir, char *label);
 
 
 

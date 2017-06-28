@@ -39,9 +39,10 @@ include riemann_sol.d
 
 
 all : main.o $(ARXIVS) -lm
-	gcc -o riemann_sol $< $(ARXIVS) $(LnkFLAGS)
 	gcc -o main $< $(ARXIVS) $(LnkFLAGS)
-all : riemann_sol.o $(ARXIVS) -lm
+
+riemann : riemann_sol.o $(ARXIVS) -lm
+	gcc -o riemann_sol $< $(ARXIVS) $(LnkFLAGS)
 
 
 main.o :
