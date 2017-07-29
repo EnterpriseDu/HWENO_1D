@@ -26,7 +26,11 @@ int GRP4_HWENO5_fix
   char version[L_STR], err_msg[L_STR];
   strcpy(version, add_mkdir);
   strcpy(add_mkdir, "../SOLUTION/\0");
-  state = make_directory(add_mkdir, err_msg, label, scheme, version, m, 1, CONFIG);
+  int SWITCHES[3];
+  SWITCHES[0] = CONFIG[16];
+  SWITCHES[1] = CONFIG[18];
+  SWITCHES[2] = CONFIG[17];
+  state = make_directory(add_mkdir, label, scheme, version, m, 1, SWITCHES, err_msg);
   if(state)
   { printf("%s", err_msg);
     exit(state); }
@@ -87,7 +91,9 @@ int GRP4_HWENO5_fix
 
 
 
-  double c, stmp, D[4], U[4], wave_speed[2];
+  double c, stmp, D[5], U[5], wave_speed[2];
+  RSboundary wL, wR;
+  RSparameters RSpara;
 
 
   double mom[m], ene[m];
@@ -200,12 +206,42 @@ int GRP4_HWENO5_fix
 
     for(j = 0; j < m+1; ++j)
     {
-      Euler_GRP_solver(wave_speed, D, U, 0.0, gamma, eps,
-			rho_L[j], u_L[j], 0.0, p_L[j],
-			rho_R[j], u_R[j], 0.0, p_R[j],
-			D_rho_L[j], D_u_L[j], 0.0, D_p_L[j],
-			D_rho_R[j], D_u_R[j], 0.0, D_p_R[j],
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+      wL.gamma = gamma;
+      wL.rho = rho_L[j];
+      wL.u = u_L[j];
+      wL.v = 0.0;
+      wL.p = p_L[j];
+      wL.d_gamma = 0.0;
+      wL.d_rho = D_rho_L[j];
+      wL.d_u = D_u_L[j];
+      wL.d_v = 0.0;
+      wL.d_p = D_p_L[j];
+      wL.t_gamma = 0.0;
+      wL.t_rho = 0.0;
+      wL.t_u = 0.0;
+      wL.t_v = 0.0;
+      wL.t_p = 0.0;
+      wR.gamma = gamma;
+      wR.rho = rho_R[j];
+      wR.u = u_R[j];
+      wR.v = 0.0;
+      wR.p = p_R[j];
+      wR.d_gamma = 0.0;
+      wR.d_rho = D_rho_R[j];
+      wR.d_u = D_u_R[j];
+      wR.d_v = 0.0;
+      wR.d_p = D_p_R[j];
+      wR.t_gamma = 0.0;
+      wR.t_rho = 0.0;
+      wR.t_u = 0.0;
+      wR.t_v = 0.0;
+      wR.t_p = 0.0;
+      RSpara.eps = eps;
+      RSpara.tol = tol;
+      RSpara.N = 500;
+      RSpara.radius = 1.0;
+      RSpara.nDim = 1;
+      Euler_GRP_solver(wave_speed, D, U, 0.0, &wL, &wR, &RSpara);
 
       
       f01[j] = U[0]*U[1];
@@ -299,12 +335,42 @@ int GRP4_HWENO5_fix
 
     for(j = 0; j < m+1; ++j)
     {
-      Euler_GRP_solver(wave_speed, D, U, 0.0, gamma, eps,
-			rho_L[j], u_L[j], 0.0, p_L[j],
-			rho_R[j], u_R[j], 0.0, p_R[j],
-			D_rho_L[j], D_u_L[j], 0.0, D_p_L[j],
-			D_rho_R[j], D_u_R[j], 0.0, D_p_R[j],
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+      wL.gamma = gamma;
+      wL.rho = rho_L[j];
+      wL.u = u_L[j];
+      wL.v = 0.0;
+      wL.p = p_L[j];
+      wL.d_gamma = 0.0;
+      wL.d_rho = D_rho_L[j];
+      wL.d_u = D_u_L[j];
+      wL.d_v = 0.0;
+      wL.d_p = D_p_L[j];
+      wL.t_gamma = 0.0;
+      wL.t_rho = 0.0;
+      wL.t_u = 0.0;
+      wL.t_v = 0.0;
+      wL.t_p = 0.0;
+      wR.gamma = gamma;
+      wR.rho = rho_R[j];
+      wR.u = u_R[j];
+      wR.v = 0.0;
+      wR.p = p_R[j];
+      wR.d_gamma = 0.0;
+      wR.d_rho = D_rho_R[j];
+      wR.d_u = D_u_R[j];
+      wR.d_v = 0.0;
+      wR.d_p = D_p_R[j];
+      wR.t_gamma = 0.0;
+      wR.t_rho = 0.0;
+      wR.t_u = 0.0;
+      wR.t_v = 0.0;
+      wR.t_p = 0.0;
+      RSpara.eps = eps;
+      RSpara.tol = tol;
+      RSpara.N = 500;
+      RSpara.radius = 1.0;
+      RSpara.nDim = 1;
+      Euler_GRP_solver(wave_speed, D, U, 0.0, &wL, &wR, &RSpara);
 
       g11[j] = U[0]*D[1] + U[1]*D[0];
       g12[j] = D[0]*U[1]*U[1] + 2.0*U[0]*U[1]*D[1] + D[3];
