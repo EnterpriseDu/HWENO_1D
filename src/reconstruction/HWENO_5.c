@@ -320,13 +320,11 @@ void HWENO_5
   for(j = 0; j < m; ++j)
   {
     W1[j+2] = rho[j]; W2[j+2] = mom[j]; W3[j+2] = ene[j];
-    trouble[j] = 0;
-  }
-  for(j = 0; j < m+1; ++j)
-  {
     WI1[j+2] = rhoI[j]; WI2[j+2] = momI[j]; WI3[j+2] = eneI[j];
-    EntpI[j+2] = pI[j] / pow(rhoI[j], gamma);
+    trouble[j] = 0;
+    //EntpI[j+2]
   }
+  WI1[m+2] = rhoI[m]; WI2[m+2] = momI[m]; WI3[m+2] = eneI[m];
 
   if(bod < 0)
   {
@@ -343,8 +341,8 @@ void HWENO_5
     WI2[m+3] =-momI[m-1];WI2[m+4] =-momI[m-2];
     WI3[m+3] = eneI[m-1];WI3[m+4] = eneI[m-2];
     WI2[2] = 0.0; WI2[m+2]=0.0;
-    EntpI[0]   = EntpI[4];  EntpI[1]   = EntpI[3];
-    EntpI[m+3]   = EntpI[m+1];  EntpI[m+4]   = EntpI[m];
+    //EntpI[0]   = EntpI[4];  EntpI[1]   = EntpI[3];
+    //EntpI[m+3]   = EntpI[m+1];  EntpI[m+4]   = EntpI[m];
   }
   else if(bod > 0)
   {
@@ -360,8 +358,8 @@ void HWENO_5
     WI1[m+3] = rhoI[m];  WI1[m+4] = rhoI[m];
     WI2[m+3] = momI[m];  WI2[m+4] = momI[m];
     WI3[m+3] = eneI[m];  WI3[m+4] = eneI[m];
-    EntpI[0]   = EntpI[2];  EntpI[1]   = EntpI[2];
-    EntpI[m+3]   = EntpI[m+2];  EntpI[m+4]   = EntpI[m+2];
+    //EntpI[0]   = EntpI[2];  EntpI[1]   = EntpI[2];
+    //EntpI[m+3]   = EntpI[m+2];  EntpI[m+4]   = EntpI[m+2];
   }
   else
   {
@@ -377,8 +375,8 @@ void HWENO_5
     WI1[m+3] = rhoI[1]; WI1[m+4] = rhoI[2];
     WI2[m+3] = momI[1]; WI2[m+4] = momI[2];
     WI3[m+3] = eneI[1]; WI3[m+4] = eneI[2];
-    EntpI[0]   = EntpI[m];  EntpI[1]   = EntpI[m+1];
-    EntpI[m+3]   = EntpI[3];  EntpI[m+4]   = EntpI[4];
+    //EntpI[0]   = EntpI[m];  EntpI[1]   = EntpI[m+1];
+    //EntpI[m+3]   = EntpI[3];  EntpI[m+4]   = EntpI[4];
   }
 
   /*
@@ -400,7 +398,7 @@ void HWENO_5
     u[j] = W2[j]/W1[j];
     p[j] = (W3[j] - 0.5*W2[j]*u[j])*(gamma-1.0);
     H[j] = 0.5*u[j]*u[j] + gamma*p[j]/W1[j]/(gamma-1.0);
-    Entp[j] = p[j] / pow(W1[j], gamma);
+    //Entp[j] = p[j] / pow(W1[j], gamma);
   }
 
   for(j = 2; j < m+3; ++j)
