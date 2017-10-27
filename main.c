@@ -46,16 +46,15 @@ int main(int argc, char *argv[])
  * CONFIG[9]  is the parameter of identifying the discontinuities
  * CONFIG[10] is the parameter of the thickness in the THINC reconstruction
  * CONFIG[11] is the maximal step to compute.
- * CONFIG[12] is the time to stop the computation
- * CONFIG[13] is the switch of whether use an adaptive mesh
- * CONFIG[14] denote the kind of boundary condition
- * CONFIG[15] indicates whether the initial data are the primitive
+ * CONFIG[12] is the switch of whether use an adaptive mesh
+ * CONFIG[13] denote the kind of boundary condition
+ * CONFIG[14] indicates whether the initial data are the primitive
  *            variables [1], or the conservative ones [0]
- * CONFIG[16] indicates whether we use the smooth derivatives [0],
+ * CONFIG[15] indicates whether we use the smooth derivatives [0],
  *            or the WENO-type ones in the reconstruction
- * CONFIG[17] is the switch of whether use the limiter in the reconstruction
- * CONFIG[18] is the switch of whether use the characteristic decomposition
- * CONFIG[19] is the scaling
+ * CONFIG[16] is the switch of whether use the limiter in the reconstruction
+ * CONFIG[17] is the switch of whether use the characteristic decomposition
+ * CONFIG[18] is the scaling
  */
   read_state = configurate(CONFIG, ITEM, already_read, err_msg, "CONF\0", argv[1]);
   if(read_state)
@@ -66,16 +65,17 @@ int main(int argc, char *argv[])
     return read_state;
   }
   display_config(CONFIG, argv[1]);
-  int adp        = (int)CONFIG[13];
-  double scaling = CONFIG[19];
+  int adp        = (int)CONFIG[12];
+  double scaling = CONFIG[18];
 
 
-  int nInitValue = 4;
+  int nInitValue = 5;
   char addInitValue[nInitValue][L_STR];
   strcpy(addInitValue[0], "RHO\0");
   strcpy(addInitValue[1], "U\0\0");
   strcpy(addInitValue[2], "P\0");
   strcpy(addInitValue[3], "X\0");
+  strcpy(addInitValue[4], "TIME\0");
   int sizeInitValue[nInitValue];
   realArray InitValue[nInitValue];
   for(it = 0; it < nInitValue; ++it)
@@ -164,6 +164,9 @@ int main(int argc, char *argv[])
     printf("NOT enough memory! XC\n");
     exit(17);
   }
+  double *TIME;
+  int nTIME = sizeInitValue[4];
+  TIME = (double *)malloc(sizeof(double)*nTIME);
 
 
 
@@ -172,6 +175,7 @@ int main(int argc, char *argv[])
   DATA_OUT[1] = u;
   DATA_OUT[2] = p;
   DATA_OUT[3] = x;
+  DATA_OUT[4] = TIME;
   
   for(it = 0; it < nInitValue; ++it)
     for(j = 0; j < sizeInitValue[it]; ++j)
@@ -179,35 +183,18 @@ int main(int argc, char *argv[])
   
   if(adp)
     for(j = 0; j < vm; ++j)
-      x[j] = x[j] * scaling;
+      x[j] = x[j];
   else
   {
     free(xc);
     xc = NULL;
-    h = x[0]*scaling;
+    h = x[0];
   }
-  CONFIG[12] = CONFIG[12]*scaling;
 
 
   for(k = 0; k < nInitValue; ++k)
     delete_realArray(InitValue +k);
 
-
-
-
-
-
-  runHist runhist;
-  init_runHist(&runhist);
-  int K = 0;
-  char scheme[L_STR];
-  char version[L_STR] = "dev\0";
-  char add_mkdir[L_STR+L_STR];
-  strcpy(add_mkdir, version);
-  printf("The present version is [%s]\n", version);
-  //K = GRP2_fix(CONFIG, m, h, rho, u, p, &runhist, add_mkdir, argv[2]);
-  //K = GRP4_WENO5_fix(CONFIG, m, h, rho, u, p, &runhist, add_mkdir, argv[2]);
-  K = RF4_WENO5_fix(CONFIG, m, h, rho, u, p, &runhist, add_mkdir, argv[2]);
 
 
   int len;
@@ -227,8 +214,55 @@ int main(int argc, char *argv[])
   output_flag[1] = 1; //u
   output_flag[2] = 1; //p
   output_flag[3] = 0; //x
+  output_flag[4] = 0; //time
   for(it = 0; it < nInitValue; ++it)
-    output_idx[it] = 0;
+    output_idx[it] = nTIME-1;
+
+  option OPT;
+  OPT.gamma     = CONFIG[0];  // the constant of the perfect gas
+  OPT.CFL       = CONFIG[1];  // CFL number
+  OPT.eps       = CONFIG[2];  // the largest value could be treat as zero
+  OPT.tol       = CONFIG[8];
+  OPT.MaxStp    = (int)(CONFIG[11]);  // the number of time steps
+  OPT.TIME      = DATA_OUT[4];
+  OPT.nTIME     = sizeInitValue[4];
+
+  OPT.bod       = (int)CONFIG[13];
+  OPT.Primative = (int)CONFIG[14];
+  OPT.Deri      = (int)CONFIG[15];
+  OPT.Limiter   = (int)CONFIG[16];
+  OPT.Decomp    = (int)CONFIG[17];
+
+  OPT.alp1      = CONFIG[3];
+  OPT.alp2      = CONFIG[4];
+  OPT.bet1      = CONFIG[5];
+  OPT.bet2      = CONFIG[6];
+  OPT.modifier  = CONFIG[7];
+  OPT.threshold = CONFIG[9];
+  OPT.thickness = CONFIG[10];
+
+  OPT.output_flag = output_flag;
+  OPT.nInitValue = nInitValue;
+  OPT.sizeInitValue = sizeInitValue;
+  OPT.addInitValue = (char **) malloc(sizeof(char *) * nInitValue);
+  for(it = 0; it < nInitValue; ++it)
+    OPT.addInitValue[it] = addInitValue[it];
+
+
+
+
+  runHist runhist;
+  init_runHist(&runhist);
+  int K = 0;
+  char scheme[L_STR];
+  char version[L_STR] = "dev\0";
+  char add_mkdir[L_STR+L_STR];
+  strcpy(add_mkdir, version);
+  printf("The present version is [%s]\n", version);
+  //K = GRP2_fix(OPT, m, h, rho, u, p, &runhist, add_mkdir, argv[2]);
+  K = GRP4_HWENO5_fix(OPT, m, h, rho, u, p, &runhist, add_mkdir, argv[2]);
+  //K = RF4_WENO5_fix(OPT, m, h, rho, u, p, &runhist, add_mkdir, argv[2]);
+
   
   output_state = DATA_OUTPUT(err_msg, nInitValue, addInitValue, sizeInitValue, DATA_OUT, output_idx, output_flag, add_mkdir);
   if(output_state)
@@ -250,6 +284,7 @@ int main(int argc, char *argv[])
       free(xc);
       xc = NULL;
     }
+    free(TIME);
     return output_state;
   }
   printf("DATA OUT.\n");
@@ -275,6 +310,7 @@ int main(int argc, char *argv[])
     free(xc);
     xc = NULL;
   }
+  free(TIME);
   printf("\n");
   return 0;
 }

@@ -4,8 +4,38 @@
 
 #define L_STR 1000
 #define bit_shift 8
-#define N_CONF 20
+#define N_CONF 19
 
+
+
+typedef struct{
+  double gamma;
+  double CFL;
+  double eps;
+  double tol;
+  double threshold;
+  double MaxStp;
+  double * TIME;
+  double nTIME;
+
+  int bod;
+  int Primative;
+  int Deri;
+  int Limiter;
+  int Decomp;
+
+  double thickness;
+  double alp1;
+  double alp2;
+  double bet1;
+  double bet2;
+  double modifier;
+
+  int * output_flag;
+  int nInitValue;
+  char ** addInitValue;
+  int * sizeInitValue;
+} option;
 
 
 

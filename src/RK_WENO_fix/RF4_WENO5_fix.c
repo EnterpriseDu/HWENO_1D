@@ -26,29 +26,68 @@
 
 
 int RF4_WENO5_fix
-(double const CONFIG[], int const m, double const h,
+(option OPT, int const m, double const h,
  double rho[], double u[], double p[], runHist *runhist,
  char *add_mkdir, char *label)
 {
   delete_runHist(runhist);
+  double const gamma     = OPT.gamma;  // the constant of the perfect gas
+  double const CFL       = OPT.CFL;  // CFL number
+  double const eps       = OPT.eps;  // the largest value could be treat as zero
+  double const tol       = OPT.tol;
+
+  double const alp1      = OPT.alp1;
+  double const alp2      = OPT.alp2;
+  double const bet1      = OPT.bet1;
+  double const bet2      = OPT.bet2;
+  double const modifier  = modifier;
+  double const threshold = OPT.threshold;
+  double const thickness = OPT.thickness;
+
+  int const    MaxStp    = OPT.MaxStp;  //the number of time steps
+  int const    bod       = OPT.bod;
+  int const    Primative = OPT.Primative;
+  int const    Deri      = OPT.Deri;
+  int const    Limiter   = OPT.Limiter;
+  int const    Decomp    = OPT.Decomp;
+  double const *TIME     = OPT.TIME;
+  int const    nTIME     = OPT.nTIME;
+  int itTIME = 0, output = 0;
+
+
   int i = 0, j = 0, k = 1, it = 0;
   int state, len = 0;
   char scheme[L_STR] = "RF4W5\0";
   char version[L_STR], err_msg[L_STR];
+  int SWITCHES[3];
+  SWITCHES[0] = Deri;
+  SWITCHES[1] = Decomp;
+  SWITCHES[2] = Limiter;
   strcpy(version, add_mkdir);
   strcpy(add_mkdir, "../SOLUTION/\0");
-  int SWITCHES[3];
-  SWITCHES[0] = CONFIG[16];
-  SWITCHES[1] = CONFIG[18];
-  SWITCHES[2] = CONFIG[17];
   state = make_directory(add_mkdir, label, scheme, version, m, 1, SWITCHES, err_msg);
   if(state)
   {
     printf("%s", err_msg);
     exit(state);
   }
+  FILE * fp_out;
+  char add_out[L_STR+L_STR] = "\0", strIDX[L_STR];
+  int it_out;
+  double * DATA[OPT.nInitValue];
+  int output_flag[OPT.nInitValue];
+  for(j = 0; j < OPT.nInitValue; ++j)
+    output_flag[j] = OPT.output_flag[j];
+  output_flag[4] = 0;
+  DATA[0] = rho;
+  DATA[1] = u;
+  DATA[2] = p;
 
 
+  printf("The output time points are:\n  ");
+  for(j = 0; j < nTIME; ++j)
+    printf("| %g ", TIME[j]);
+  printf("|\n\n");
   printf("===========================\n");
   printf("The scheme [%s] started.\n", scheme);
 
@@ -58,33 +97,16 @@ int RF4_WENO5_fix
   double current_cpu_time = 0.0, sum_cpu_time = 0.0, T = 0.0;
   
   
-  double const gamma     = CONFIG[0];  // the constant of the perfect gas
-  double const CFL       = CONFIG[1];  // CFL number
-  double const eps       = CONFIG[2];  // the largest value could be treat as zero
-  double const alp1      = CONFIG[3];
-  double const alp2      = CONFIG[4];
-  double const bet1      = CONFIG[5];
-  double const bet2      = CONFIG[6];
-  double const modifier  = CONFIG[7];
-  double const tol       = CONFIG[8];
-  double const threshold = CONFIG[9];
-  double const thickness = CONFIG[10];
-  int const    MaxStp    = (int)(CONFIG[11]);  // the number of time steps
-  double const TIME      = CONFIG[12];
-  int const    bod       = (int)CONFIG[14];
-  int const    Primative = (int)CONFIG[15];
-  int const    Deri      = (int)CONFIG[16];
-  int const    Limiter   = (int)CONFIG[17];
-  int const    Decomp    = (int)CONFIG[18];
 
   double running_info[N_RUNNING];
-  running_info[3] = CONFIG[14];    // the boundary condition
-  running_info[4] = CONFIG[16];    // the choice of the direvative reconstruction
-  running_info[5] = CONFIG[18];    // use the charactoristic decomposition or not
-  running_info[6] = CONFIG[17];    // use the limiter or not
-  running_info[7] = CONFIG[9]; // threshold
-  running_info[8] = CONFIG[10];
-  running_info[9] = CONFIG[2];
+  running_info[3] = bod;        //the boundary condition
+  running_info[4] = Deri;       //the choice of the direvative reconstruction
+  running_info[5] = Decomp;     //use the charactoristic decomposition or not
+  running_info[6] = Limiter;    //use the limiter or not
+  running_info[7] = threshold;  //threshold
+  int recon_info[3];
+  recon_info[1] = Decomp;  //characteristic decomposition or not
+
 
   double c, stmp, direvative[4], source[4], wave_speed[2];
 
@@ -137,9 +159,12 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
 
 //------------THE MAIN LOOP-------------
   for(k = 1; k <= MaxStp; ++k)
-  {    
-    if(T+eps > TIME)
-      break;
+  {
+    if(T+eps > TIME[itTIME])
+      if(itTIME == nTIME-1)
+	break;
+      else
+	output = 1;
 
 
     state = insert_runHist(runhist);
@@ -166,7 +191,7 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
 	speed_max = ((speed_max < sigma) ? sigma : speed_max);
       }
     tau = (CFL * h) / speed_max;
-    if(T+tau > TIME){tau = TIME-T; T = TIME;} else{T += tau;}
+    if(T+tau > TIME[itTIME]){tau = TIME[itTIME]-T; T = TIME[itTIME];} else{T += tau;}
     half_tau = 0.5*tau;
     runhist->current->time[0] = tau;
 
@@ -237,6 +262,34 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
     }
 
     toc = clock();
+    if(output)
+    {
+      printf("\nOutput at time (%d,%g).\n", itTIME, TIME[itTIME]);
+      for(it_out = 0; it_out < OPT.nInitValue; ++it_out)
+      {
+	if(!(output_flag[it_out]))
+	  continue;
+
+	strcpy(add_out, add_mkdir);
+	strcat(add_out, OPT.addInitValue[it_out]);
+	sprintf(strIDX, "_%04d", itTIME);
+	strcat(add_out, strIDX);
+	strcat(add_out, ".txt\0");
+
+	if((fp_out = fopen(add_out, "w")) == 0)
+	{
+	  sprintf(err_msg, "Cannot open solution output file: %s!\n", add_out);
+	  exit(999);
+	}
+	for(j = 0; j < OPT.sizeInitValue[it_out]; ++j)
+	  fprintf(fp_out, "%.18lf\t", DATA[it_out][j]);
+
+	fclose(fp_out);
+      }
+
+      output = 0;
+      ++itTIME;
+    }
     runhist->current->time[1] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;
     current_cpu_time = runhist->current->time[1];
     sum_cpu_time += runhist->current->time[1];
@@ -266,25 +319,68 @@ double b40 = 0.1, b41 = 1.0/6.0, b42 = 0.0, b43 = 1.0/6.0;
 
 
 int FD_1st_fix
-(double const CONFIG[], int const m, double const h,
+(option OPT, int const m, double const h,
  double rho[], double u[], double p[], runHist *runhist,
  char *add_mkdir, char *label)
 {
   delete_runHist(runhist);
+  double const gamma     = OPT.gamma;  // the constant of the perfect gas
+  double const CFL       = OPT.CFL;  // CFL number
+  double const eps       = OPT.eps;  // the largest value could be treat as zero
+  double const tol       = OPT.tol;
+
+  double const alp1      = OPT.alp1;
+  double const alp2      = OPT.alp2;
+  double const bet1      = OPT.bet1;
+  double const bet2      = OPT.bet2;
+  double const modifier  = modifier;
+  double const threshold = OPT.threshold;
+  double const thickness = OPT.thickness;
+
+  int const    MaxStp    = OPT.MaxStp;  //the number of time steps
+  int const    bod       = OPT.bod;
+  int const    Primative = OPT.Primative;
+  int const    Deri      = OPT.Deri;
+  int const    Limiter   = OPT.Limiter;
+  int const    Decomp    = OPT.Decomp;
+  double const *TIME     = OPT.TIME;
+  int const    nTIME     = OPT.nTIME;
+  int itTIME = 0, output = 0;
+
+
   int i = 0, j = 0, k = 1, it = 0;
   int state, len = 0;
   char scheme[L_STR] = "RF1\0";
   char version[L_STR], err_msg[L_STR];
   strcpy(version, add_mkdir);
   strcpy(add_mkdir, "../SOLUTION/\0");
-  state = make_directory(add_mkdir, err_msg, label, scheme, version, m, 1, CONFIG);
+  int SWITCHES[3];
+  SWITCHES[0] = Deri;
+  SWITCHES[1] = Decomp;
+  SWITCHES[2] = Limiter;
+  state = make_directory(add_mkdir, label, scheme, version, m, 1, SWITCHES, err_msg);
   if(state)
   {
     printf("%s", err_msg);
     exit(state);
   }
+  FILE * fp_out;
+  char add_out[L_STR+L_STR] = "\0", strIDX[L_STR];
+  int it_out;
+  double * DATA[OPT.nInitValue];
+  int output_flag[OPT.nInitValue];
+  for(j = 0; j < OPT.nInitValue; ++j)
+    output_flag[j] = OPT.output_flag[j];
+  output_flag[4] = 0;
+  DATA[0] = rho;
+  DATA[1] = u;
+  DATA[2] = p;
 
 
+  printf("The output time points are:\n  ");
+  for(j = 0; j < nTIME; ++j)
+    printf("| %g ", TIME[j]);
+  printf("|\n\n");
   printf("===========================\n");
   printf("The scheme [%s] started.\n", scheme);
 
@@ -294,33 +390,14 @@ int FD_1st_fix
   double current_cpu_time = 0.0, sum_cpu_time = 0.0, T = 0.0;
   
   
-  double const gamma     = CONFIG[0];  // the constant of the perfect gas
-  double const CFL       = CONFIG[1];  // CFL number
-  double const eps       = CONFIG[2];  // the largest value could be treat as zero
-  double const alp1      = CONFIG[3];
-  double const alp2      = CONFIG[4];
-  double const bet1      = CONFIG[5];
-  double const bet2      = CONFIG[6];
-  double const modifier  = CONFIG[7];
-  double const tol       = CONFIG[8];
-  double const threshold = CONFIG[9];
-  double const thickness = CONFIG[10];
-  int const    MaxStp    = (int)(CONFIG[11]);  // the number of time steps
-  double const TIME      = CONFIG[12];
-  int const    bod       = (int)CONFIG[14];
-  int const    Primative = (int)CONFIG[15];
-  int const    Deri      = (int)CONFIG[16];
-  int const    Limiter   = (int)CONFIG[17];
-  int const    Decomp    = (int)CONFIG[18];
-
   double running_info[N_RUNNING];
-  running_info[3] = CONFIG[14];    // the boundary condition
-  running_info[4] = CONFIG[16];    // the choice of the direvative reconstruction
-  running_info[5] = CONFIG[18];    // use the charactoristic decomposition or not
-  running_info[6] = CONFIG[17];    // use the limiter or not
-  running_info[7] = CONFIG[9]; // threshold
-  running_info[8] = CONFIG[10];
-  running_info[9] = CONFIG[2];
+  running_info[3] = bod;        //the boundary condition
+  running_info[4] = Deri;       //the choice of the direvative reconstruction
+  running_info[5] = Decomp;     //use the charactoristic decomposition or not
+  running_info[6] = Limiter;    //use the limiter or not
+  running_info[7] = threshold;  //threshold
+  int recon_info[3];
+  recon_info[1] = Decomp;  //characteristic decomposition or not
 
 
   double c, stmp, direvative[4], source[4], wave_speed[2];
@@ -354,8 +431,11 @@ int FD_1st_fix
 //------------THE MAIN LOOP-------------
   for(k = 1; k <= MaxStp; ++k)
   {
-    if(T+eps > TIME)
-      break;
+    if(T+eps > TIME[itTIME])
+      if(itTIME == nTIME-1)
+	break;
+      else
+	output = 1;
 
 
     state = insert_runHist(runhist);
@@ -382,7 +462,7 @@ int FD_1st_fix
 	speed_max = ((speed_max < sigma) ? sigma : speed_max);
       }
     tau = (CFL * h) / speed_max;
-    if(T+tau > TIME){tau = TIME-T; T = TIME;} else{T += tau;}
+    if(T+tau > TIME[itTIME]){tau = TIME[itTIME]-T; T = TIME[itTIME];} else{T += tau;}
     half_tau = 0.5*tau;
     runhist->current->time[0] = tau;
 
@@ -411,6 +491,34 @@ int FD_1st_fix
     }
 
     toc = clock();
+    if(output)
+    {
+      printf("\nOutput at time (%d,%g).\n", itTIME, TIME[itTIME]);
+      for(it_out = 0; it_out < OPT.nInitValue; ++it_out)
+      {
+	if(!(output_flag[it_out]))
+	  continue;
+
+	strcpy(add_out, add_mkdir);
+	strcat(add_out, OPT.addInitValue[it_out]);
+	sprintf(strIDX, "_%04d", itTIME);
+	strcat(add_out, strIDX);
+	strcat(add_out, ".txt\0");
+
+	if((fp_out = fopen(add_out, "w")) == 0)
+	{
+	  sprintf(err_msg, "Cannot open solution output file: %s!\n", add_out);
+	  exit(999);
+	}
+	for(j = 0; j < OPT.sizeInitValue[it_out]; ++j)
+	  fprintf(fp_out, "%.18lf\t", DATA[it_out][j]);
+
+	fclose(fp_out);
+      }
+
+      output = 0;
+      ++itTIME;
+    }
     runhist->current->time[1] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;
     current_cpu_time = runhist->current->time[1];
     sum_cpu_time += runhist->current->time[1];

@@ -9,6 +9,7 @@
 
 
 
+
 /* CONFIG[0]  is the constant of the perfect gas
  * CONFIG[1]  is the CFL number
  * CONFIG[2]  is the largest value can be seen as zero
@@ -21,16 +22,15 @@
  * CONFIG[9]  is the parameter of identifying the discontinuities
  * CONFIG[10] is the parameter of the thickness in the THINC reconstruction
  * CONFIG[11] is the maximal step to compute.
- * CONFIG[12] is the time to stop the computation
- * CONFIG[13] is the switch of whether use an adaptive mesh
- * CONFIG[14] denote the kind of boundary condition
- * CONFIG[15] indicates whether the initial data are the primitive
+ * CONFIG[12] is the switch of whether use an adaptive mesh
+ * CONFIG[13] denote the kind of boundary condition
+ * CONFIG[14] indicates whether the initial data are the primitive
  *            variables [1], or the conservative ones [0]
- * CONFIG[16] indicates whether we use the smooth derivatives [0],
+ * CONFIG[15] indicates whether we use the smooth derivatives [0],
  *            or the WENO-type ones in the reconstruction
- * CONFIG[17] is the switch of whether use the limiter in the reconstruction
- * CONFIG[18] is the switch of whether use the characteristic decomposition
- * CONFIG[19] is the scaling
+ * CONFIG[16] is the switch of whether use the limiter in the reconstruction
+ * CONFIG[17] is the switch of whether use the characteristic decomposition
+ * CONFIG[18] is the scaling
  */
 int configurate(double CONFIG[N_CONF], char ITEM[N_CONF][L_STR], int already_read[N_CONF], char * err_msg, char * addCONF, char * prob)
 {
@@ -61,7 +61,7 @@ int configurate(double CONFIG[N_CONF], char ITEM[N_CONF][L_STR], int already_rea
     already_read[i] = 0;
   //the value of already_read[idx] is the position of ITEM[idx] occured in the file
   int read_flag = 0;//0 for an item, 1 for a value
-  double up_bound[2][N_CONF];
+  double up_bound[2][N_CONF];//[0][it] is the up bound, [1][it] is the flag
   double low_bound[2][N_CONF];
   double default_value[N_CONF];
   strcpy(ITEM[0], "gamma\0");
@@ -136,54 +136,48 @@ int configurate(double CONFIG[N_CONF], char ITEM[N_CONF][L_STR], int already_rea
   low_bound[0][11]  = 0.0;
   low_bound[1][11]  = 1.0;
   default_value[11] = 0.0;
-  strcpy(ITEM[12], "Time\0");
+  strcpy(ITEM[12], "Adp\0");
   up_bound[0][12]   = 0.0;
   up_bound[1][12]   = 0.0;
   low_bound[0][12]  = 0.0;
   low_bound[1][12]  = 1.0;
   default_value[12] = 0.0;
-  strcpy(ITEM[13], "Adp\0");
+  strcpy(ITEM[13], "Boundary\0");
   up_bound[0][13]   = 0.0;
   up_bound[1][13]   = 0.0;
   low_bound[0][13]  = 0.0;
-  low_bound[1][13]  = 1.0;
-  default_value[13] = 0.0;
-  strcpy(ITEM[14], "Boundary\0");
+  low_bound[1][13]  = 0.0;
+  default_value[13] = 1.0;
+  strcpy(ITEM[14], "Primative\0");
   up_bound[0][14]   = 0.0;
   up_bound[1][14]   = 0.0;
   low_bound[0][14]  = 0.0;
-  low_bound[1][14]  = 0.0;
-  default_value[14] = 1.0;
-  strcpy(ITEM[15], "Primative\0");
+  low_bound[1][14]  = 1.0;
+  default_value[14] = 0.0;
+  strcpy(ITEM[15], "Deri\0");//zero stands for using smooth interpolation
   up_bound[0][15]   = 0.0;
   up_bound[1][15]   = 0.0;
   low_bound[0][15]  = 0.0;
   low_bound[1][15]  = 1.0;
   default_value[15] = 0.0;
-  strcpy(ITEM[16], "Deri\0");//zero stands for using smooth interpolation
+  strcpy(ITEM[16], "Limiter\0");
   up_bound[0][16]   = 0.0;
   up_bound[1][16]   = 0.0;
   low_bound[0][16]  = 0.0;
   low_bound[1][16]  = 1.0;
   default_value[16] = 0.0;
-  strcpy(ITEM[17], "Limiter\0");
+  strcpy(ITEM[17], "Decomp\0");
   up_bound[0][17]   = 0.0;
   up_bound[1][17]   = 0.0;
   low_bound[0][17]  = 0.0;
   low_bound[1][17]  = 1.0;
   default_value[17] = 0.0;
-  strcpy(ITEM[18], "Decomp\0");
+  strcpy(ITEM[18], "scaling\0");
   up_bound[0][18]   = 0.0;
   up_bound[1][18]   = 0.0;
-  low_bound[0][18]  = 0.0;
+  low_bound[0][18]  = 1.0;
   low_bound[1][18]  = 1.0;
-  default_value[18] = 0.0;
-  strcpy(ITEM[19], "scaling\0");
-  up_bound[0][19]   = 0.0;
-  up_bound[1][19]   = 0.0;
-  low_bound[0][19]  = 1.0;
-  low_bound[1][19]  = 1.0;
-  default_value[19] = 1.0;
+  default_value[18] = 1.0;
 
   char comment = '#';
   int n_digit_real = 15;
@@ -253,7 +247,7 @@ int configurate(double CONFIG[N_CONF], char ITEM[N_CONF][L_STR], int already_rea
 
       CONFIG[idx] = sign*str2real(number);
 
-      if((up_bound[1][idx]*CONFIG[idx] > up_bound[0][idx]) || (low_bound[1][idx]*CONFIG[idx] < low_bound[0][idx]))
+      if( ((up_bound[1][idx])&&(CONFIG[idx]>up_bound[0][idx])) || ((low_bound[1][idx])&&(CONFIG[idx]<low_bound[0][idx])) )
       {
 	sprintf(err_msg, "Illigal value [%g] for %d-th the item '%s'.\n", CONFIG[idx], idx, ITEM[idx]);
 	delete_Text(&text);
@@ -300,7 +294,6 @@ void display_config(double * CONFIG, char * prob)
   printf("  gamma     = %g\n", CONFIG[0]);
 
   printf("  MaxStp    = %d\n", (int)CONFIG[11]);
-  printf("  TIME      = %g\n", CONFIG[12]);
   printf("  CFL       = %g\n", CONFIG[1]);
   printf("  eps       = %g\n", CONFIG[2]);
   printf("  tol       = %g\n", CONFIG[8]);
@@ -315,17 +308,17 @@ void display_config(double * CONFIG, char * prob)
   printf("  threshold = %g\n", CONFIG[9]);
   printf("  thickness = %g\n", CONFIG[10]);
 
-  if(CONFIG[13])
-    CONFIG[13] = 1.0;
+  if(CONFIG[12])
+    CONFIG[12] = 1.0;
   else
-    CONFIG[13] = 0.0;
-  int adp = (int)CONFIG[13];
+    CONFIG[12] = 0.0;
+  int adp = (int)CONFIG[12];
   if(adp)
     printf("  ADAPTIVE       mesh\n");
   else
     printf("  FIXED          mesh\n");
 
-  int bod = (int)CONFIG[14];
+  int bod = (int)CONFIG[13];
   if(bod < 0)
     printf("  REFLECTION     boundary condition\n");
   else if(bod > 0)
@@ -333,41 +326,41 @@ void display_config(double * CONFIG, char * prob)
   else
     printf("  PERIODIC       boundary condition\n");
 
-  if(CONFIG[15])
-    CONFIG[15] = 1.0;
+  if(CONFIG[14])
+    CONFIG[14] = 1.0;
   else
-    CONFIG[15] = 0.0;
-  int Primative = (int)CONFIG[15];
+    CONFIG[14] = 0.0;
+  int Primative = (int)CONFIG[14];
   if(Primative)
     printf("  PRIMITIVE       variables\n");
   else
     printf("  CONSERVATION    variables\n");
 
-  if(CONFIG[16])
-    CONFIG[16] = 1.0;
+  if(CONFIG[15])
+    CONFIG[15] = 1.0;
   else
-    CONFIG[16] = 0.0;
-  int Deri = (int)CONFIG[16];
+    CONFIG[15] = 0.0;
+  int Deri = (int)CONFIG[15];
   if(Deri)
     printf("  WENO-type     direvatives\n");
   else
     printf("  SMOOTH        direvatives\n");
 
-  if(CONFIG[17])
-    CONFIG[17] = 1.0;
+  if(CONFIG[16])
+    CONFIG[16] = 1.0;
   else
-    CONFIG[17] = 0.0;
-  int Limiter = (int)CONFIG[17];
+    CONFIG[16] = 0.0;
+  int Limiter = (int)CONFIG[16];
   if(Limiter)
     printf("  Limiter              used\n");
   else
     printf("  Limiter          NOT used\n");
 
-  if(CONFIG[18])
-    CONFIG[18] = 1.0;
+  if(CONFIG[17])
+    CONFIG[17] = 1.0;
   else
-    CONFIG[18] = 0.0;
-  int Decomp = (int)CONFIG[18];
+    CONFIG[17] = 0.0;
+  int Decomp = (int)CONFIG[17];
   if(Decomp)
     printf("  Decomposition        used\n");
   else
