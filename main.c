@@ -287,6 +287,17 @@ int main(int argc, char *argv[])
     free(TIME);
     return output_state;
   }
+  char strIDX[L_STR]; FILE * fp_out; char add_out[L_STR+L_STR];
+  strcpy(add_out, add_mkdir);
+  strcat(add_out, "TIME.txt\0");
+  if((fp_out = fopen(add_out, "w")) == 0)
+    {
+      sprintf(err_msg, "Cannot open solution output file: %s!\n", add_out);
+      exit(999);
+    }
+  for(j = 0; j < OPT.nTIME; ++j)
+    fprintf(fp_out, "%.18lf\t", OPT.TIME[j]);
+  fclose(fp_out);
   printf("DATA OUT.\n");
 
   
