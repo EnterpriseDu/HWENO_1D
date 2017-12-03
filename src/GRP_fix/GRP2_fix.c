@@ -109,15 +109,30 @@ int GRP2_fix
 
 
   double c, stmp, D[5], U[5], wave_speed[2];
-  RSboundary wL, wR;
   RSparameters RSpara;
+  RSpara.eps = eps;
+  RSpara.tol = tol;
+  RSpara.N = 500;
+  RSpara.radius = 1.0;
+  RSpara.nDim = 1;
+  int n_trans = 0;
+  EulerPack wL, wR, res;
+  wL.VAR.trans = NULL;
+  wL.DER.trans = NULL;
+  wL.TGT.trans = NULL;
+  wR.VAR.trans = NULL;
+  wR.DER.trans = NULL;
+  wR.TGT.trans = NULL;
+  res.VAR.trans = NULL;
+  res.DER.trans = NULL;
+  res.TGT.trans = NULL;
 
 
   double mom[m], ene[m];
   double rho_L[m+1], rho_R[m+1], u_L[m+1], u_R[m+1], p_L[m+1], p_R[m+1];
   double D_rho_L[m+1], D_rho_R[m+1], D_u_L[m+1], D_u_R[m+1], D_p_L[m+1], D_p_R[m+1];
 
-  double F1[m+1], F2[m+1], F3[m+1], rhoI[m+1], uI[m+1], pI[m+1];
+  double F1[m+1], F2[m+1], F3[m+1], rhoI[m+1], uI[m+1], pI[m+1], momI[m+1], eneI[m+1];
 
   double sigma, speed_max;  /* speed_max denote the largest character
 					 * speed at each time step
@@ -145,6 +160,18 @@ int GRP2_fix
   running_info[1] = 0.0;
   running_info[1] = 0.0;
   GRP_minmod0(running_info, m, h, alp2, rho, u, p, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
+  /* GRP_minmod0(running_info, m, h, alp2, rho, mom, ene, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R); */
+  /* for(j=0;j<m+1;++j) */
+  /* { */
+  /*   u_L[j] = u_L[j]/rho_L[j]; */
+  /*   u_R[j] = u_R[j]/rho_R[j]; */
+  /*   p_L[j] = (p_L[j] - 0.5*rho_L[j]*u_L[j]*u_L[j])*(gamma-1.0); */
+  /*   p_R[j] = (p_R[j] - 0.5*rho_R[j]*u_R[j]*u_R[j])*(gamma-1.0); */
+  /*   D_u_L[j] = (D_u_L[j] - D_rho_L[j]*u_L[j])/rho_L[j]; */
+  /*   D_u_R[j] = (D_u_R[j] - D_rho_R[j]*u_R[j])/rho_R[j]; */
+  /*   D_p_L[j] = (D_p_L[j] - 0.5*D_rho_L[j]*u_L[j]*u_L[j] - rho_L[j]*u_L[j]*D_u_L[j])*(gamma-1.0); */
+  /*   D_p_R[j] = (D_p_R[j] - 0.5*D_rho_R[j]*u_R[j]*u_R[j] - rho_R[j]*u_R[j]*D_u_R[j])*(gamma-1.0); */
+  /* } */
 //------------THE MAIN LOOP-------------
   for(k = 1; k <= MaxStp; ++k)
   {
@@ -199,41 +226,40 @@ int GRP2_fix
     for(j = 0; j < m+1; ++j)
     {
       wL.gamma = gamma;
-      wL.rho = rho_L[j];
-      wL.u = u_L[j];
-      wL.v = 0.0;
-      wL.p = p_L[j];
-      wL.d_gamma = 0.0;
-      wL.d_rho = D_rho_L[j];
-      wL.d_u = D_u_L[j];
-      wL.d_v = 0.0;
-      wL.d_p = D_p_L[j];
-      wL.t_gamma = 0.0;
-      wL.t_rho = 0.0;
-      wL.t_u = 0.0;
-      wL.t_v = 0.0;
-      wL.t_p = 0.0;
+      wL.VAR.rho = rho_L[j];
+      wL.VAR.u   = u_L[j];
+      wL.VAR.v   = 0.0;
+      wL.VAR.p   = p_L[j];
+      wL.DER.rho = D_rho_L[j];
+      wL.DER.u   = D_u_L[j];
+      wL.DER.v   = 0.0;
+      wL.DER.p   = D_p_L[j];
+      wL.TGT.rho = 0.0;
+      wL.TGT.u   = 0.0;
+      wL.TGT.v   = 0.0;
+      wL.TGT.p   = 0.0;
       wR.gamma = gamma;
-      wR.rho = rho_R[j];
-      wR.u = u_R[j];
-      wR.v = 0.0;
-      wR.p = p_R[j];
-      wR.d_gamma = 0.0;
-      wR.d_rho = D_rho_R[j];
-      wR.d_u = D_u_R[j];
-      wR.d_v = 0.0;
-      wR.d_p = D_p_R[j];
-      wR.t_gamma = 0.0;
-      wR.t_rho = 0.0;
-      wR.t_u = 0.0;
-      wR.t_v = 0.0;
-      wR.t_p = 0.0;
-      RSpara.eps = eps;
-      RSpara.tol = tol;
-      RSpara.N = 500;
-      RSpara.radius = 1.0;
-      RSpara.nDim = 1;
-      Euler_GRP_solver(wave_speed, D, U, 0.0, &wL, &wR, &RSpara);
+      wR.VAR.rho = rho_R[j];
+      wR.VAR.u   = u_R[j];
+      wR.VAR.v   = 0.0;
+      wR.VAR.p   = p_R[j];
+      wR.DER.rho = D_rho_R[j];
+      wR.DER.u   = D_u_R[j];
+      wR.DER.v   = 0.0;
+      wR.DER.p   = D_p_R[j];
+      wR.TGT.rho = 0.0;
+      wR.TGT.u   = 0.0;
+      wR.TGT.v   = 0.0;
+      wR.TGT.p   = 0.0;
+      Euler_GRP_solver(wave_speed, &res, 0.0, 0.0, n_trans, &wL, &wR, &RSpara);
+      U[0] = res.VAR.rho;
+      U[1] = res.VAR.u;
+      U[2] = res.VAR.v;
+      U[3] = res.VAR.p;
+      D[0] = res.DER.rho;
+      D[1] = res.DER.u;
+      D[2] = res.DER.v;
+      D[3] = res.DER.p;
 
       F1[j] = U[0]*U[1] + half_tau*(D[0]*U[1]+U[0]*D[1]);
       F2[j] = U[0]*U[1]*U[1] + half_tau*(D[0]*U[1]*U[1]+2.0*U[0]*U[1]*D[1]) + U[3]+half_tau*D[3];
@@ -243,6 +269,8 @@ int GRP2_fix
       rhoI[j] = U[0] + tau*D[0];
         uI[j] = U[1] + tau*D[1];
         pI[j] = U[3] + tau*D[3];
+      momI[j] = U[0]*U[1] + tau*(U[0]*D[1]+D[0]*U[1]);
+      eneI[j] = 0.5*U[0]*U[1]*U[1]+U[3]/(gamma-1.0) + tau*(0.5*D[0]*U[1]*U[1]+U[0]*U[1]*D[1]+D[3]/(gamma-1.0));
     }
 
 //===============THE CORE ITERATION=================
@@ -259,6 +287,18 @@ int GRP2_fix
     running_info[1] = T;
     running_info[2] = 0.0;
     GRP_minmod(running_info, m, h, alp2, rho, u, p, rhoI, uI, pI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R);
+    /* GRP_minmod(running_info, m, h, alp2, rho, mom, ene, rhoI, momI, eneI, rho_L, rho_R, u_L, u_R, p_L, p_R, D_rho_L, D_rho_R, D_u_L, D_u_R, D_p_L, D_p_R); */
+    /* for(j=0;j<m+1;++j) */
+    /* { */
+    /*   u_L[j] = u_L[j]/rho_L[j]; */
+    /*   u_R[j] = u_R[j]/rho_R[j]; */
+    /*   p_L[j] = (p_L[j] - 0.5*rho_L[j]*u_L[j]*u_L[j])*(gamma-1.0); */
+    /*   p_R[j] = (p_R[j] - 0.5*rho_R[j]*u_R[j]*u_R[j])*(gamma-1.0); */
+    /*   D_u_L[j] = (D_u_L[j] - D_rho_L[j]*u_L[j])/rho_L[j]; */
+    /*   D_u_R[j] = (D_u_R[j] - D_rho_R[j]*u_R[j])/rho_R[j]; */
+    /*   D_p_L[j] = (D_p_L[j] - 0.5*D_rho_L[j]*u_L[j]*u_L[j] - rho_L[j]*u_L[j]*D_u_L[j])*(gamma-1.0); */
+    /*   D_p_R[j] = (D_p_R[j] - 0.5*D_rho_R[j]*u_R[j]*u_R[j] - rho_R[j]*u_R[j]*D_u_R[j])*(gamma-1.0); */
+    /* } */
 
 
     toc = clock();
@@ -307,7 +347,27 @@ int GRP2_fix
     printf("After %d steps of computation, the number of the runNodes is %d.\n\n", k, runhist->length);
     exit(100);
   }
+
   
+  /* double S[m+1], rhoS, momS, eneS; */
+  /* for(j=2;j<m-1;++j) */
+  /* { */
+  /*   rhoS = (3.5*(rho[j-1]+rho[j]) - 0.5*(rho[j-2]+rho[j+1]))/6.0; */
+  /*   momS = (3.5*(mom[j-1]+mom[j]) - 0.5*(mom[j-2]+mom[j+1]))/6.0; */
+  /*   eneS = (3.5*(ene[j-1]+ene[j]) - 0.5*(ene[j-2]+ene[j+1]))/6.0; */
+  /*   S[j] = ((eneS - 0.5*momS*momS/rhoS)*(gamma-1.0)) / pow(rhoS,gamma); */
+  /* } */
+  /* strcpy(add_out, add_mkdir); */
+  /* strcat(add_out, "s_0000.txt"); */
+  /* if((fp_out = fopen(add_out, "w")) == 0) */
+  /* { */
+  /*   sprintf(err_msg, "Cannot open solution output file: %s!\n", add_out); */
+  /*   exit(999); */
+  /* } */
+  /* for(j = 0; j < m+1; ++j) */
+  /*   fprintf(fp_out, "%.18lf\t", S[j]); */
+  /* fclose(fp_out); */
+
 
   printf("The cost of CPU time for [%s] computing this\n", scheme);
   printf("problem to time %g with %d steps is %g seconds.\n", T, k, sum_cpu_time);
