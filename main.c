@@ -259,8 +259,8 @@ int main(int argc, char *argv[])
   char add_mkdir[L_STR+L_STR];
   strcpy(add_mkdir, version);
   printf("The present version is [%s]\n", version);
-  //K = GRP2_fix(OPT, m, h, rho, u, p, &runhist, add_mkdir, argv[2]);
-  K = GRP4_HWENO5_fix(OPT, m, h, rho, u, p, &runhist, add_mkdir, argv[2]);
+  K = GRP2_fix(OPT, m, h, rho, u, p, &runhist, add_mkdir, argv[2]);
+  //K = GRP4_HWENO5_fix(OPT, m, h, rho, u, p, &runhist, add_mkdir, argv[2]);
   //K = RF4_WENO5_fix(OPT, m, h, rho, u, p, &runhist, add_mkdir, argv[2]);
 
   
