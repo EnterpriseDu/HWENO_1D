@@ -367,6 +367,19 @@ int GRP2_fix
   /* for(j = 0; j < m+1; ++j) */
   /*   fprintf(fp_out, "%.18lf\t", S[j]); */
   /* fclose(fp_out); */
+  /* double S[m]; */
+  /* for(j=0;j<m;++j) */
+  /*   S[j] = p[j]/pow(rho[j],gamma); */
+  /* strcpy(add_out, add_mkdir); */
+  /* strcat(add_out, "s_0000.txt"); */
+  /* if((fp_out = fopen(add_out, "w")) == 0) */
+  /* { */
+  /*   sprintf(err_msg, "Cannot open solution output file: %s!\n", add_out); */
+  /*   exit(999); */
+  /* } */
+  /* for(j = 0; j < m+1; ++j) */
+  /*   fprintf(fp_out, "%.18lf\t", S[j]); */
+  /* fclose(fp_out); */
 
 
   printf("The cost of CPU time for [%s] computing this\n", scheme);

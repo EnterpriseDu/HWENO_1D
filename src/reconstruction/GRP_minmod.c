@@ -8,6 +8,7 @@ void GRP_minmod
  double rho_L[], double rho_R[], double u_L[], double u_R[], double p_L[], double p_R[],
  double D_rho_L[], double D_rho_R[], double D_u_L[], double D_u_R[], double D_p_L[], double D_p_R[])
 {
+  double rr, pp, uu, dp, du;
   int i, j;
   int const    K         = (int)running_info[0];
   double const time      =      running_info[1];
@@ -49,6 +50,7 @@ void GRP_minmod
     Drho[j] = (rhoI[j+1] - rhoI[j]);
       Du[j] = (  uI[j+1] -   uI[j]);
       Dp[j] = (  pI[j+1] -   pI[j]);
+      //Dp[j] = 1.4*(p[j]/rho[j])*Drho[j];
   }
   for(j = 1; j < m+1; ++j)
   {
@@ -90,7 +92,13 @@ void GRP_minmod
       if(fabs(Stmp) < fabs(Dp[j-1]))
         Dp[j-1] = Stmp;
     }
-    //Dp[j-1] = 1.4*(P3[j]/P1[j])*Drho[j-1];
+    /* Dp[j-1] = 1.4*(P3[j]/P1[j])*Drho[j-1]; */
+    /* rr = P1[j]; */
+    /* uu = P2[j]/P1[j]; */
+    /* pp = (P3[j] - 0.5*rr*uu*uu)*0.4; */
+    /* du = (Du[j-1] - Drho[j-1]*uu)/rr; */
+    /* dp = 1.4*(pp/rr)*Drho[j-1]; */
+    /* Dp[j-1] = 0.5*Drho[j-1]*uu*uu + rr*uu*du + dp/0.4; */
   }
 
 

@@ -89,7 +89,7 @@ int configurate(double CONFIG[N_CONF], char ITEM[N_CONF][L_STR], int already_rea
   low_bound[1][3]  = 1.0;
   default_value[3] = 1.8;
   strcpy(ITEM[4], "alp2\0");
-  up_bound[0][4]   = 2.0;
+  up_bound[0][4]   = 2000.0;
   up_bound[1][4]   = 1.0;
   low_bound[0][4]  = 0.0;
   low_bound[1][4]  = 1.0;
