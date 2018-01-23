@@ -261,7 +261,7 @@ int main(int argc, char *argv[])
   printf("The present version is [%s]\n", version);
   K = GRP2_fix(OPT, m, h, rho, u, p, &runhist, add_mkdir, argv[2]);
   //K = GRP4_HWENO5_fix(OPT, m, h, rho, u, p, &runhist, add_mkdir, argv[2]);
-  //K = RF4_WENO5_fix(OPT, m, h, rho, u, p, &runhist, add_mkdir, argv[2]);
+  //K = LF4_WENO5_fix(OPT, m, h, rho, u, p, &runhist, add_mkdir, argv[2]);
 
   
   output_state = DATA_OUTPUT(err_msg, nInitValue, addInitValue, sizeInitValue, DATA_OUT, output_idx, output_flag, add_mkdir);

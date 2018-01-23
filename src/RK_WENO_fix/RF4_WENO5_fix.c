@@ -537,6 +537,29 @@ int FD_1st_fix
   }
 
 
+
+  
+  double S[m+1], rhoS, momS, eneS;
+  for(j=2;j<m-1;++j)
+  {
+    rhoS = (3.5*(rho[j-1]+rho[j]) - 0.5*(rho[j-2]+rho[j+1]))/6.0;
+    momS = (3.5*(mom[j-1]+mom[j]) - 0.5*(mom[j-2]+mom[j+1]))/6.0;
+    eneS = (3.5*(ene[j-1]+ene[j]) - 0.5*(ene[j-2]+ene[j+1]))/6.0;
+    S[j] = ((eneS - 0.5*momS*momS/rhoS)*(gamma-1.0)) / pow(rhoS,gamma);
+  }
+  strcpy(add_out, add_mkdir);
+  strcat(add_out, "s_0000.txt");
+  if((fp_out = fopen(add_out, "w")) == 0)
+  {
+    sprintf(err_msg, "Cannot open solution output file: %s!\n", add_out);
+    exit(999);
+  }
+  for(j = 0; j < m+1; ++j)
+    fprintf(fp_out, "%.18lf\t", S[j]);
+  fclose(fp_out);
+
+
+
   printf("The cost of CPU time for [%s] computing this\n", scheme);
   printf("problem to time %g with %d steps is %g seconds.\n", T, k, sum_cpu_time);
   printf("===========================\n");
