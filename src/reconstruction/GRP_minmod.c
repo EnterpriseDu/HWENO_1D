@@ -50,7 +50,6 @@ void GRP_minmod
     Drho[j] = (rhoI[j+1] - rhoI[j]);
       Du[j] = (  uI[j+1] -   uI[j]);
       Dp[j] = (  pI[j+1] -   pI[j]);
-      //Dp[j] = 1.4*(p[j]/rho[j])*Drho[j];
   }
   for(j = 1; j < m+1; ++j)
   {
@@ -92,13 +91,6 @@ void GRP_minmod
       if(fabs(Stmp) < fabs(Dp[j-1]))
         Dp[j-1] = Stmp;
     }
-    /* Dp[j-1] = 1.4*(P3[j]/P1[j])*Drho[j-1]; */
-    /* rr = P1[j]; */
-    /* uu = P2[j]/P1[j]; */
-    /* pp = (P3[j] - 0.5*rr*uu*uu)*0.4; */
-    /* du = (Du[j-1] - Drho[j-1]*uu)/rr; */
-    /* dp = 1.4*(pp/rr)*Drho[j-1]; */
-    /* Dp[j-1] = 0.5*Drho[j-1]*uu*uu + rr*uu*du + dp/0.4; */
   }
 
 
@@ -176,14 +168,6 @@ void GRP_minmod
     D_u_L[0] =   D_u_L[m];
     D_p_L[0] =   D_p_L[m];
   }
-
-/*   for(j = 0; j < m+1; ++j) */
-/*   { */
-/*     p_L[j] = pow(rho_L[j], 1.4); */
-/*     p_R[j] = pow(rho_R[j], 1.4); */
-/*     D_p_L[j] = 1.4*pow(rho_L[j], 0.4)*D_rho_L[j]; */
-/*     D_p_R[j] = 1.4*pow(rho_R[j], 0.4)*D_rho_R[j]; */
-/*   } */
 }
 
 void GRP_minmod0
@@ -251,7 +235,6 @@ void GRP_minmod0
       Dp[j-1] = 0.0;
     else
       Dp[j-1] = ( (fabs(SL) < fabs(SR)) ? SL : SR );
-    //Dp[j-1] = 1.4*(P3[j]/P1[j])*Drho[j-1];
   }
 
 
@@ -329,12 +312,4 @@ void GRP_minmod0
     D_u_L[0] =   D_u_L[m];
     D_p_L[0] =   D_p_L[m];
   }
-
-  /* for(j = 0; j < m+1; ++j) */
-  /* { */
-  /*   p_L[j] = pow(rho_L[j], 1.4); */
-  /*   p_R[j] = pow(rho_R[j], 1.4); */
-  /*   D_p_L[j] = 1.4*pow(rho_L[j], 0.4)*D_rho_L[j]; */
-  /*   D_p_R[j] = 1.4*pow(rho_R[j], 0.4)*D_rho_R[j]; */
-  /* } */
 }
