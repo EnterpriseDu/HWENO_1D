@@ -8,7 +8,6 @@ void GRP_minmod
  double rho_L[], double rho_R[], double u_L[], double u_R[], double p_L[], double p_R[],
  double D_rho_L[], double D_rho_R[], double D_u_L[], double D_u_R[], double D_p_L[], double D_p_R[])
 {
-  double rr, pp, uu, dp, du;
   int i, j;
   int const    K         = (int)running_info[0];
   double const time      =      running_info[1];

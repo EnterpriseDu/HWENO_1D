@@ -108,7 +108,7 @@ int GRP2_fix
   recon_info[1] = Decomp;  //characteristic decomposition or not
 
 
-  double c, stmp, D[5], U[5], U_star[5], wave_speed[2];
+  double c, stmp, D[5], U[5], wave_speed[2];
   RSparameters RSpara;
   RSpara.eps = eps;
   RSpara.tol = tol;
