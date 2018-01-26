@@ -115,6 +115,7 @@ int GRP2_fix
   RSpara.N = 500;
   RSpara.radius = 1.0;
   RSpara.nDim = 1;
+  RSpara.geo_factor = 0.0;
   int n_trans = 0;
   EulerPack wL, wR, res;
   wL.VAR.trans = NULL;

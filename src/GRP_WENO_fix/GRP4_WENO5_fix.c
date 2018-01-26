@@ -116,10 +116,11 @@ int GRP4_WENO5_fix
   double c, stmp, D[5], U[5], wave_speed[2];
   RSparameters RSpara;
   RSpara.eps = eps;
-  RSpara.tol = tol;
+  RSpara.tol = 1e-8;
   RSpara.N = 500;
   RSpara.radius = 1.0;
   RSpara.nDim = 1;
+  RSpara.geo_factor = 0.0;
   int n_trans = 0;
   EulerPack wL, wR, res;
   wL.VAR.trans = NULL;
