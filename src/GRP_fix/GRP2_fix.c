@@ -3,7 +3,9 @@
 #include <stdlib.h>
 #include <time.h>
 
-
+#ifndef L_BUFF
+#include "file_io.h"
+#endif
 #include "Riemann_solver.h"
 
 #ifndef L_STR
@@ -180,7 +182,34 @@ int GRP2_fix
       if(itTIME == nTIME-1)
 	break;
       else
-	output = 1;
+      {
+	printf("\nOutput at time (%d,%g).\n", itTIME, TIME[itTIME]);
+	for(it_out = 0; it_out < OPT.nInitValue; ++it_out)
+	{
+	  if(!(output_flag[it_out]))
+	    continue;
+
+	  strcpy(add_out, add_mkdir);
+	  strcat(add_out, OPT.addInitValue[it_out]);
+	  sprintf(strIDX, "_%04d", itTIME);
+	  strcat(add_out, strIDX);
+	  strcat(add_out, ".txt\0");
+
+	  if((fp_out = fopen(add_out, "w")) == 0)
+	  {
+	    sprintf(err_msg, "Cannot open solution output file: %s!\n", add_out);
+	    exit(999);
+	  }
+	  for(j = 0; j < OPT.sizeInitValue[it_out]; ++j)
+	    fprintf(fp_out, "%.18lf\t", DATA[it_out][j]);
+
+	  fclose(fp_out);
+	}
+
+	--k;
+	++itTIME;
+	continue;
+      }
 
 
     state = insert_runHist(runhist);
@@ -304,34 +333,6 @@ int GRP2_fix
 
 
     toc = clock();
-    if(output)
-    {
-      printf("\nOutput at time (%d,%g).\n", itTIME, TIME[itTIME]);
-      for(it_out = 0; it_out < OPT.nInitValue; ++it_out)
-      {
-	if(!(output_flag[it_out]))
-	  continue;
-
-	strcpy(add_out, add_mkdir);
-	strcat(add_out, OPT.addInitValue[it_out]);
-	sprintf(strIDX, "_%04d", itTIME);
-	strcat(add_out, strIDX);
-	strcat(add_out, ".txt\0");
-
-	if((fp_out = fopen(add_out, "w")) == 0)
-	{
-	  sprintf(err_msg, "Cannot open solution output file: %s!\n", add_out);
-	  exit(999);
-	}
-	for(j = 0; j < OPT.sizeInitValue[it_out]; ++j)
-	  fprintf(fp_out, "%.18lf\t", DATA[it_out][j]);
-
-	fclose(fp_out);
-      }
-
-      output = 0;
-      ++itTIME;
-    }
     runhist->current->time[1] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;
     current_cpu_time = runhist->current->time[1];
     sum_cpu_time += runhist->current->time[1];

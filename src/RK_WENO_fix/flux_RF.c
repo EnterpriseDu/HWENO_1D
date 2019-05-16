@@ -1,4 +1,6 @@
 #include <math.h>
+#include "reconstruction.h"
+#include "solver.h"
 
 
 void flux_RF(double const running_info[], int const m, double const h, double const gamma,

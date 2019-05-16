@@ -2,7 +2,7 @@ CC = gcc
 CmpFLAGS = -g -c
 LnkFLAGS = ../file_io-new/file_io.a  ../Riemann_solver/Riemann_solver.a  -lm
 
-INCS = $(patsubst %, -I%, $(filter-out ../../.git%, $(shell find -type d)))
+INCS = $(patsubst %, -I%, $(filter-out ./.git%, $(shell find ./ -type d)))
 INCS +=  -I../file_io-new/inc/  -I../Riemann_solver/inc/
 VPATH += $(patsubst  -I%,%,$(INCS))
 export VPATH

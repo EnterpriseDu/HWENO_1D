@@ -1,5 +1,9 @@
-
-
+#ifndef L_BUFF
+#include "file_io.h"
+#endif
+#ifndef bit_shift
+#include "file_io_local.h"
+#endif
 
 #ifndef U_MIN_BURGERS
 #define U_MIN_BURGERS 0.0
@@ -56,12 +60,10 @@ int RF4_WENO_fix
 
 void flux_RF(double const running_info[], int const m, double const h, double const gamma,
 	     double const rho[], double const mom[], double const ene[], double F1[], double F2[], double F3[]);
-
 void flux_RF_dual(double const running_info[], int const m, double const h, double const gamma,
 		  double const rho[], double const mom[], double const ene[], double F1[], double F2[], double F3[]);
-
-void flux_RF_1st(double const running_info[], int const m, double const h, double const gamma,
-		 double const rho[], double const mom[], double const ene[], double F1[], double F2[], double F3[]);
+void flux_RF_1st(int const running_info[], int const m, double const h, double const gamma,
+	     double const rho[], double const mom[], double const ene[], double F1[], double F2[], double F3[]);
 
 int FV_WENO_fix
 (option OPT, int const m, double const h,

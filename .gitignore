@@ -1,6 +1,10 @@
 *.[oad]
 *~
 null
+*.d
+*.d.*
+
+.vscode/ipch
 
 compile/*.[oa]
 file_io/*.[oa]

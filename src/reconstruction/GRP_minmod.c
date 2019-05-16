@@ -112,6 +112,7 @@ void GRP_minmod
 
   if(bod < 0)
   {
+/*
   u_L[m] = 0.0;
   u_R[m-1] = 2.0*u[m-1];
   D_u_L[m] = -u_R[m-1]/h;
@@ -120,7 +121,7 @@ void GRP_minmod
   u_L[1] = 2.0*u[0];
   D_u_R[0] = u_L[1] / h;
   D_u_L[1] = D_u_R[0];
-
+*/
   rho_R[m] = rho_L[m];
     u_R[m] =  -u_L[m];
     p_R[m] =   p_L[m];
@@ -256,6 +257,7 @@ void GRP_minmod0
 
   if(bod < 0)
   {
+/*
   u_L[m] = 0.0;
   u_R[m-1] = 2.0*u[m-1];
   D_u_L[m] = -u_R[m-1]/h;
@@ -264,7 +266,7 @@ void GRP_minmod0
   u_L[1] = 2.0*u[0];
   D_u_R[0] = u_L[1] / h;
   D_u_L[1] = D_u_R[0];
-
+*/
   rho_R[m] = rho_L[m];
     u_R[m] =  -u_L[m];
     p_R[m] =   p_L[m];
