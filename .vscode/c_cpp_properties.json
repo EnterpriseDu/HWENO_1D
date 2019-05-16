@@ -1,0 +1,25 @@
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "includePath": [
+                "${workspaceFolder}/src/geometry",
+                "${workspaceFolder}/src/reconstruction",
+                "${workspaceFolder}/inc",
+                "${workspaceFolder}/../Riemann_solver-dirty/inc",
+                "${workspaceFolder}/../Riemann_solver/inc",
+                "${workspaceFolder}/../file_io-new/inc",
+                "${workspaceFolder}/src/geometry"
+            ],
+            "defines": [],
+            "macFrameworkPath": [
+                "/Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/System/Library/Frameworks"
+            ],
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64"
+        }
+    ],
+    "version": 4
+}
