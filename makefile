@@ -1,6 +1,6 @@
 CC = gcc
 CmpFLAGS = -g -c
-LnkFLAGS = ../file_io-new/file_io.a  ../Riemann_solver/Riemann_solver.a  -lm
+LnkFLAGS = ../file_io-new/file_io.a  ../Riemann_solver/GRP_Solver.a  -lm
 
 INCS = $(patsubst %, -I%, $(filter-out ./.git%, $(shell find ./ -type d)))
 INCS +=  -I../file_io-new/inc/  -I../Riemann_solver/inc/
@@ -38,10 +38,10 @@ include riemann_sol.d
 
 
 
-all : main.o $(ARXIVS) -lm
+all : main.o $(ARXIVS)
 	gcc -o main $< $(ARXIVS) $(LnkFLAGS)
 
-riemann : riemann_sol.o $(ARXIVS) -lm
+riemann : riemann_sol.o $(ARXIVS)
 	gcc -o riemann_sol $< $(ARXIVS) $(LnkFLAGS)
 
 
